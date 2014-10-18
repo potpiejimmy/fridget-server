@@ -1,12 +1,26 @@
 <?xml version='1.0' encoding='UTF-8' ?>
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml"
-      xmlns:h="http://xmlns.jcp.org/jsf/html">
+      xmlns:h="http://xmlns.jcp.org/jsf/html"
+      xmlns:p="http://primefaces.org/ui"
+      xmlns:f="http://xmlns.jcp.org/jsf/core">
     <h:head>
         <title>Facelet Title</title>
     </h:head>
     <h:body>
-        Hello from Facelets
+        <f:view>
+            <h:form>
+                <p:panel id="outputPanel" header="Spark Core Debug Messages">
+
+                    <h:dataTable styleClass="no-table-header" value="#{deviceDebugBean.debugMessages}" var="msg">
+                        <h:column>
+                            <h:outputText value="[#{msg.adDeviceId}] #{msg.date} #{msg.message}"/>
+                        </h:column>
+                    </h:dataTable>
+                    <p:poll interval="2" update="outputPanel"/>
+                </p:panel>
+            </h:form>
+        </f:view>
     </h:body>
 </html>
 
