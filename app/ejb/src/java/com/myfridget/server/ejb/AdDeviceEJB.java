@@ -40,11 +40,20 @@ public class AdDeviceEJB implements AdDeviceEJBLocal {
     }
 
     @Override
-    public List<AdDeviceDebugMsg> getDebugMessages() {
-        //return em.createNamedQuery("AdDeviceDebugMsg.findByAdDeviceId", AdDeviceDebugMsg.class).setParameter("adDeviceId", 0).getResultList();
-        return em.createNamedQuery("AdDeviceDebugMsg.findAll", AdDeviceDebugMsg.class).getResultList();
+    public List<AdDeviceDebugMsg> getDebugMessages(int deviceId) {
+        return em.createNamedQuery("AdDeviceDebugMsg.findByAdDeviceId", AdDeviceDebugMsg.class).setParameter("adDeviceId", deviceId).getResultList();
     }
     
+    @Override
+    public List<AdDevice> getAllDevices() {
+        return em.createNamedQuery("AdDevice.findAll", AdDevice.class).getResultList();
+    }
+    
+    @Override
+    public void clearDebugMessages(int deviceId) {
+        getDebugMessages(deviceId).forEach(i->em.remove(i));
+    }
+
     public AdDevice findAdDeviceBySerial(String deviceSerial) {
         try {
             return em.createNamedQuery("AdDevice.findBySerial", AdDevice.class).setParameter("serial", deviceSerial).getSingleResult();

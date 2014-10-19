@@ -15,6 +15,7 @@ import javax.naming.Context;
 import javax.naming.InitialContext;
 import javax.naming.NamingException;
 import javax.ws.rs.Consumes;
+import javax.ws.rs.GET;
 import javax.ws.rs.POST;
 import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
@@ -35,6 +36,12 @@ public class DeviceDebugResource {
     @Produces({"application/json"})
     public AdDeviceDebugMsg debug(@QueryParam("serial") String serial, String msg) {
         return deviceEjb.addDebugMessage(serial, WebUtils.removeQuotes(msg));
+    }
+    
+    @GET
+    @Produces({"application/json"})
+    public String getParameter(@QueryParam("param") String param) {
+        return new java.util.Date().toString();
     }
 
     private AdDeviceEJBLocal lookupAdDeviceEJBLocal() {

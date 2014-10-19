@@ -5,6 +5,7 @@
  */
 package com.myfridget.server.ejb;
 
+import com.myfridget.server.db.entity.AdDevice;
 import com.myfridget.server.db.entity.AdDeviceDebugMsg;
 import java.util.List;
 import javax.ejb.Local;
@@ -18,5 +19,9 @@ public interface AdDeviceEJBLocal {
     
     public AdDeviceDebugMsg addDebugMessage(String deviceSerial, String message);
 
-    public List<AdDeviceDebugMsg> getDebugMessages();
+    public List<AdDeviceDebugMsg> getDebugMessages(int deviceId);
+    
+    public void clearDebugMessages(int deviceId);
+    
+    public List<AdDevice> getAllDevices();
 }

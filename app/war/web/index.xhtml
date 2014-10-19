@@ -12,12 +12,21 @@
             <h:form>
                 <p:panel id="outputPanel" header="Spark Core Debug Messages">
 
-                    <h:dataTable styleClass="no-table-header" value="#{deviceDebugBean.debugMessages}" var="msg">
+                    <h:panelGrid columns="3">
+                        <h:outputLabel for="selectDevice" value="Select Device:"/>
+                        <p:selectOneMenu id="selectDevice" value="#{deviceDebugBean.selectedDevice}">
+                            <p:ajax event="change" update="outputPanel"/>
+                            <f:selectItems value="#{deviceDebugBean.devicesSelectItems}"/>
+                        </p:selectOneMenu>
+                        <p:commandButton action="#{deviceDebugBean.clearLog}" update="outputPanel" value="Clear log"/>
+                    </h:panelGrid> 
+                    
+                    <h:dataTable id="logPanel" styleClass="no-table-header" value="#{deviceDebugBean.debugMessages}" var="msg">
                         <h:column>
                             <h:outputText value="[#{msg.adDeviceId}] #{msg.date} #{msg.message}"/>
                         </h:column>
                     </h:dataTable>
-                    <p:poll interval="2" update="outputPanel"/>
+                    <p:poll interval="2" update="logPanel"/>
                 </p:panel>
             </h:form>
         </f:view>
