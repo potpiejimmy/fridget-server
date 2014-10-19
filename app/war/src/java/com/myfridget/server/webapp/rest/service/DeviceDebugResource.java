@@ -7,13 +7,15 @@ package com.myfridget.server.webapp.rest.service;
 
 import com.myfridget.server.db.entity.AdDeviceDebugMsg;
 import com.myfridget.server.ejb.AdDeviceEJBLocal;
+import com.myfridget.server.webapp.util.WebUtils;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.faces.bean.RequestScoped;
 import javax.naming.Context;
 import javax.naming.InitialContext;
 import javax.naming.NamingException;
-import javax.ws.rs.GET;
+import javax.ws.rs.Consumes;
+import javax.ws.rs.POST;
 import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
 import javax.ws.rs.QueryParam;
@@ -28,10 +30,11 @@ public class DeviceDebugResource {
     
     protected AdDeviceEJBLocal deviceEjb = lookupAdDeviceEJBLocal();
     
-    @GET
-    @Produces({"application/xml","application/json"})
-    public AdDeviceDebugMsg debug(@QueryParam("serial") String serial, @QueryParam("msg") String msg) {
-        return deviceEjb.addDebugMessage(serial, msg);
+    @POST
+    @Consumes({"application/json"})
+    @Produces({"application/json"})
+    public AdDeviceDebugMsg debug(@QueryParam("serial") String serial, String msg) {
+        return deviceEjb.addDebugMessage(serial, WebUtils.removeQuotes(msg));
     }
 
     private AdDeviceEJBLocal lookupAdDeviceEJBLocal() {
