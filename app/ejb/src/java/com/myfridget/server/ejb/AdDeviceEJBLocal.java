@@ -7,6 +7,7 @@ package com.myfridget.server.ejb;
 
 import com.myfridget.server.db.entity.AdDevice;
 import com.myfridget.server.db.entity.AdDeviceDebugMsg;
+import com.myfridget.server.db.entity.AdDeviceParameter;
 import java.util.List;
 import javax.ejb.Local;
 
@@ -24,4 +25,10 @@ public interface AdDeviceEJBLocal {
     public void clearDebugMessages(int deviceId);
     
     public List<AdDevice> getAllDevices();
+    
+    public AdDevice getBySerial(String deviceSerial);
+    
+    public AdDeviceParameter getParameter(int deviceId, String param);
+
+    public void setParameter(AdDeviceParameter param);
 }

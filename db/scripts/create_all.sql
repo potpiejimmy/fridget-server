@@ -87,11 +87,29 @@ ENGINE = InnoDB;
 CREATE TABLE IF NOT EXISTS `ad_device_debug_msg` (
   `id` INT NOT NULL AUTO_INCREMENT,
   `ad_device_id` INT NOT NULL,
-  `date` TIMESTAMP NOT NULL,
+  `date` TIMESTAMP(3) NOT NULL,
   `message` VARCHAR(255) NOT NULL,
   PRIMARY KEY (`id`),
   INDEX `fk_ad_device_debug_ad_device1_idx` (`ad_device_id` ASC),
   CONSTRAINT `fk_ad_device_debug_ad_device1`
+    FOREIGN KEY (`ad_device_id`)
+    REFERENCES `ad_device` (`id`)
+    ON DELETE NO ACTION
+    ON UPDATE NO ACTION)
+ENGINE = InnoDB;
+
+
+-- -----------------------------------------------------
+-- Table `ad_device_parameter`
+-- -----------------------------------------------------
+CREATE TABLE IF NOT EXISTS `ad_device_parameter` (
+  `id` INT NOT NULL AUTO_INCREMENT,
+  `ad_device_id` INT NOT NULL,
+  `param` VARCHAR(45) NOT NULL,
+  `value` VARCHAR(128) NOT NULL,
+  PRIMARY KEY (`id`),
+  INDEX `fk_ad_device_parameter_ad_device1_idx` (`ad_device_id` ASC),
+  CONSTRAINT `fk_ad_device_parameter_ad_device1`
     FOREIGN KEY (`ad_device_id`)
     REFERENCES `ad_device` (`id`)
     ON DELETE NO ACTION

@@ -7,10 +7,12 @@ package com.myfridget.server.ejb;
 
 import com.myfridget.server.db.entity.AdDevice;
 import com.myfridget.server.db.entity.AdDeviceDebugMsg;
+import com.myfridget.server.db.entity.AdDeviceParameter;
 import java.math.BigDecimal;
 import java.util.List;
 import javax.ejb.Stateless;
 import javax.persistence.EntityManager;
+import javax.persistence.NoResultException;
 import javax.persistence.PersistenceContext;
 
 /**
@@ -38,6 +40,15 @@ public class AdDeviceEJB implements AdDeviceEJBLocal {
         em.flush();
         return msg;
     }
+    
+    @Override
+    public AdDevice getBySerial(String deviceSerial) {
+        try {
+            return em.createNamedQuery("AdDevice.findBySerial", AdDevice.class).setParameter("serial", deviceSerial).getSingleResult();
+        } catch (NoResultException nre) {
+            return null;
+        }
+    }
 
     @Override
     public List<AdDeviceDebugMsg> getDebugMessages(int deviceId) {
@@ -54,6 +65,28 @@ public class AdDeviceEJB implements AdDeviceEJBLocal {
         getDebugMessages(deviceId).forEach(i->em.remove(i));
     }
 
+    @Override
+    public AdDeviceParameter getParameter(int deviceId, String param) {
+        try {
+            return em.createNamedQuery("AdDeviceParameter.findByAdDeviceIdAndParam", AdDeviceParameter.class).setParameter("adDeviceId", deviceId).setParameter("param", param).getSingleResult();
+        } catch (NoResultException nre) {
+            return null;
+        }
+    }
+
+    @Override
+    public void setParameter(AdDeviceParameter param) {
+        AdDeviceParameter storedParam = getParameter(param.getAdDeviceId(), param.getParam());
+        if (storedParam != null) {
+            // if already stored, just update:
+            storedParam.setValue(param.getValue());
+        } else {
+            // else, create a new one:
+            param.setId(null);
+            em.persist(param);
+        }
+    }
+    
     public AdDevice findAdDeviceBySerial(String deviceSerial) {
         try {
             return em.createNamedQuery("AdDevice.findBySerial", AdDevice.class).setParameter("serial", deviceSerial).getSingleResult();

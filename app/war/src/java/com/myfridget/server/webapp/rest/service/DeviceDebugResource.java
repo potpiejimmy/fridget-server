@@ -5,8 +5,11 @@
  */
 package com.myfridget.server.webapp.rest.service;
 
+import com.myfridget.server.db.entity.AdDevice;
 import com.myfridget.server.db.entity.AdDeviceDebugMsg;
+import com.myfridget.server.db.entity.AdDeviceParameter;
 import com.myfridget.server.ejb.AdDeviceEJBLocal;
+import com.myfridget.server.webapp.mbean.DeviceDebugBean;
 import com.myfridget.server.webapp.util.WebUtils;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -40,8 +43,20 @@ public class DeviceDebugResource {
     
     @GET
     @Produces({"application/json"})
-    public String getParameter(@QueryParam("param") String param) {
-        return new java.util.Date().toString();
+    public String getParameter(@QueryParam("serial") String serial, @QueryParam("param") String param) {
+        String defaultValue = getDefaultParameterValue(param);
+        AdDevice device = deviceEjb.getBySerial(serial);
+        if (device == null) return defaultValue; // unknown device
+        AdDeviceParameter p = deviceEjb.getParameter(device.getId(), param);
+        if (p == null) return defaultValue; // parameter not set
+        return p.getValue();
+    }
+    
+    protected String getDefaultParameterValue(String param) {
+        // XXX REMOVE DEPENDENCIES FOR PARAMS
+        if ("waketime".equals(param)) return ""+DeviceDebugBean.DEFAULT_WAKE_TIME;
+        if ("sleeptime".equals(param)) return ""+DeviceDebugBean.DEFAULT_SLEEP_TIME;
+        return ""; 
     }
 
     private AdDeviceEJBLocal lookupAdDeviceEJBLocal() {
