@@ -9,6 +9,8 @@ import com.myfridget.server.db.entity.AdDevice;
 import com.myfridget.server.db.entity.AdDeviceDebugMsg;
 import com.myfridget.server.db.entity.AdDeviceParameter;
 import com.myfridget.server.ejb.AdDeviceEJBLocal;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.List;
 import javax.ejb.EJB;
@@ -26,6 +28,8 @@ import javax.validation.constraints.Min;
 @SessionScoped
 public class DeviceDebugBean {
     
+    protected final static DateFormat DATE_FORMAT = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss.SSS");
+    
     @EJB
     private AdDeviceEJBLocal deviceEjb;
     
@@ -38,6 +42,7 @@ public class DeviceDebugBean {
     private int wakeTime = 0;
     @Min(1) @Max(3600)
     private int sleepTime = 0;
+    private boolean connectToCloud = false;
 
     public String getSayHello() {
         return "Say Hello";
@@ -59,12 +64,15 @@ public class DeviceDebugBean {
     protected void readDeviceSettings() {
         if (selectedDevice == null) {
             wakeTime = 0;
-            sleepTime= 0;
+            sleepTime = 0;
+            connectToCloud = false;
         } else {
             AdDeviceParameter param = deviceEjb.getParameter(selectedDevice, "waketime");
             wakeTime = (param != null) ? Integer.parseInt(param.getValue()) : DEFAULT_WAKE_TIME;
             param = deviceEjb.getParameter(selectedDevice, "sleeptime");
             sleepTime = (param != null) ? Integer.parseInt(param.getValue()) : DEFAULT_SLEEP_TIME;
+            param = deviceEjb.getParameter(selectedDevice, "connectmode");
+            connectToCloud = (param != null) ? "1".equals(param.getValue()) : true;
         }
     }
     
@@ -72,6 +80,7 @@ public class DeviceDebugBean {
         if (selectedDevice == null) return;
         deviceEjb.setParameter(new AdDeviceParameter(null, selectedDevice, "waketime", ""+wakeTime));
         deviceEjb.setParameter(new AdDeviceParameter(null, selectedDevice, "sleeptime", ""+sleepTime));
+        deviceEjb.setParameter(new AdDeviceParameter(null, selectedDevice, "connectmode", connectToCloud ? "1" : "2"));
     }
     
     public void save() {
@@ -80,6 +89,10 @@ public class DeviceDebugBean {
     
     public void clearLog() {
         deviceEjb.clearDebugMessages(selectedDevice!=null ? selectedDevice : 0);
+    }
+    
+    public String getFormattedDate(Long date) {
+        return DATE_FORMAT.format(new java.util.Date(date));
     }
 
     public Integer getSelectedDevice() {
@@ -105,6 +118,14 @@ public class DeviceDebugBean {
 
     public void setSleepTime(int sleepTime) {
         this.sleepTime = sleepTime;
+    }
+
+    public boolean isConnectToCloud() {
+        return connectToCloud;
+    }
+
+    public void setConnectToCloud(boolean connectToCloud) {
+        this.connectToCloud = connectToCloud;
     }
     
 }

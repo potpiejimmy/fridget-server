@@ -87,7 +87,7 @@ ENGINE = InnoDB;
 CREATE TABLE IF NOT EXISTS `ad_device_debug_msg` (
   `id` INT NOT NULL AUTO_INCREMENT,
   `ad_device_id` INT NOT NULL,
-  `date` TIMESTAMP(3) NOT NULL,
+  `date` BIGINT NOT NULL,
   `message` VARCHAR(255) NOT NULL,
   PRIMARY KEY (`id`),
   INDEX `fk_ad_device_debug_ad_device1_idx` (`ad_device_id` ASC),

@@ -34,7 +34,7 @@ public class AdDeviceEJB implements AdDeviceEJBLocal {
         
         AdDeviceDebugMsg msg = new AdDeviceDebugMsg();
         msg.setAdDeviceId(adDevice.getId());
-        msg.setDate(new java.util.Date());
+        msg.setDate(System.currentTimeMillis());
         msg.setMessage(message);
         em.persist(msg);
         em.flush();

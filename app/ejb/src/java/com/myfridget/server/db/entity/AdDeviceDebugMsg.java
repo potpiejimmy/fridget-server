@@ -47,8 +47,7 @@ public class AdDeviceDebugMsg implements Serializable {
     @Basic(optional = false)
     @NotNull
     @Column(name = "date")
-    @Temporal(TemporalType.TIMESTAMP)
-    private Date date;
+    private Long date;
     
     @Basic(optional = false)
     @NotNull
@@ -68,7 +67,7 @@ public class AdDeviceDebugMsg implements Serializable {
         this.id = id;
     }
 
-    public AdDeviceDebugMsg(Integer id, Date date, String message) {
+    public AdDeviceDebugMsg(Integer id, Long date, String message) {
         this.id = id;
         this.date = date;
         this.message = message;
@@ -82,11 +81,11 @@ public class AdDeviceDebugMsg implements Serializable {
         this.id = id;
     }
 
-    public Date getDate() {
+    public Long getDate() {
         return date;
     }
 
-    public void setDate(Date date) {
+    public void setDate(Long date) {
         this.date = date;
     }
 

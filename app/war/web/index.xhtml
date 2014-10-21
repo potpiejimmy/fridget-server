@@ -20,6 +20,10 @@
                         </p:selectOneMenu>
                         <p:message for="selectDevice"/>
                         
+                        <h:outputLabel for="connectToCloud" value="Connect to cloud only:"/>
+                        <p:selectBooleanCheckbox id="connectToCloud" value="#{deviceDebugBean.connectToCloud}" disabled="#{deviceDebugBean.selectedDevice eq null}"/>
+                        <p:message for="connectToCloud"/>
+                        
                         <h:outputLabel for="wakeTime" value="Configure wake time (sec.):"/>
                         <p:inputText id="wakeTime" value="#{deviceDebugBean.wakeTime}" disabled="#{deviceDebugBean.selectedDevice eq null}"/>
                         <p:message for="wakeTime"/>
@@ -32,12 +36,14 @@
                     <p:commandButton action="#{deviceDebugBean.save}" update="outputPanel" value="Save" disabled="#{deviceDebugBean.selectedDevice eq null}"/>
                     <p:commandButton action="#{deviceDebugBean.clearLog}" update="outputPanel" value="Clear log" disabled="#{deviceDebugBean.selectedDevice eq null}"/>
                     
-                    <h:dataTable id="logPanel" styleClass="no-table-header" value="#{deviceDebugBean.debugMessages}" var="msg">
-                        <h:column>
-                            <h:outputText value="[#{msg.adDeviceId}] #{msg.date} #{msg.message}"/>
-                        </h:column>
-                    </h:dataTable>
-                    <p:poll interval="2" update="logPanel"/>
+                    <p:scrollPanel mode="native" style="height:400px">
+                        <h:dataTable id="logPanel" styleClass="no-table-header" value="#{deviceDebugBean.debugMessages}" var="msg">
+                            <h:column>
+                                <h:outputText value="[#{msg.adDeviceId}] #{deviceDebugBean.getFormattedDate(msg.date)} #{msg.message}"/>
+                            </h:column>
+                        </h:dataTable>
+                        <p:poll interval="2" update="logPanel"/>
+                    </p:scrollPanel>
                 </p:panel>
             </h:form>
         </f:view>
