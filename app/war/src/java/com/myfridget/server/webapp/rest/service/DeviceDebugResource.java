@@ -44,21 +44,13 @@ public class DeviceDebugResource {
     @GET
     @Produces({"application/json"})
     public String getParameter(@QueryParam("serial") String serial, @QueryParam("param") String param) {
-        String defaultValue = getDefaultParameterValue(param);
         AdDevice device = deviceEjb.getBySerial(serial);
-        if (device == null) return defaultValue; // unknown device
+        if (device == null) return ""; // unknown device
         AdDeviceParameter p = deviceEjb.getParameter(device.getId(), param);
-        if (p == null) return defaultValue; // parameter not set
+        if (p == null) return ""; // parameter not set
         return p.getValue();
     }
     
-    protected String getDefaultParameterValue(String param) {
-        // XXX REMOVE DEPENDENCIES FOR PARAMS
-        if ("waketime".equals(param)) return ""+DeviceDebugBean.DEFAULT_WAKE_TIME;
-        if ("sleeptime".equals(param)) return ""+DeviceDebugBean.DEFAULT_SLEEP_TIME;
-        return ""; 
-    }
-
     private AdDeviceEJBLocal lookupAdDeviceEJBLocal() {
         try {
             Context c = new InitialContext();

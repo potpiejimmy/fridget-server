@@ -34,9 +34,9 @@ public class DeviceDebugBean {
     public static int DEFAULT_WAKE_TIME = 5;
     public static int DEFAULT_SLEEP_TIME = 30;
     
-    @Min(1) @Max(60)
+    @Min(1) @Max(120)
     private int wakeTime = 0;
-    @Min(1) @Max(60)
+    @Min(1) @Max(3600)
     private int sleepTime = 0;
 
     public String getSayHello() {
