@@ -5,11 +5,11 @@
       xmlns:p="http://primefaces.org/ui"
       xmlns:f="http://xmlns.jcp.org/jsf/core">
     <h:head>
-        <title>Facelet Title</title>
+        <title>Fridget - Spark Core Configuration</title>
     </h:head>
     <h:body>
         <f:view>
-            <h:form>
+            <h:form id="configForm">
                 <p:panel id="outputPanel" header="Spark Core Configuration">
 
                     <h:panelGrid columns="3">
@@ -35,15 +35,30 @@
 
                     <p:commandButton action="#{deviceDebugBean.save}" update="outputPanel" value="Save" disabled="#{deviceDebugBean.selectedDevice eq null}"/>
                     <p:commandButton action="#{deviceDebugBean.clearLog}" update="outputPanel" value="Clear log" disabled="#{deviceDebugBean.selectedDevice eq null}"/>
-                    
-                    <p:scrollPanel mode="native" style="height:400px">
-                        <h:dataTable id="logPanel" styleClass="no-table-header" value="#{deviceDebugBean.debugMessages}" var="msg">
-                            <h:column>
-                                <h:outputText value="[#{msg.adDeviceId}] #{deviceDebugBean.getFormattedDate(msg.date)} #{msg.message}"/>
-                            </h:column>
-                        </h:dataTable>
-                        <p:poll interval="2" update="logPanel"/>
-                    </p:scrollPanel>
+
+                    <p:outputPanel id="logPanel" rendered="#{deviceDebugBean.selectedDevice ne null}">
+                        <p:scrollPanel mode="native" style="height:400px">
+                            <h:dataTable id="log" styleClass="no-table-header" value="#{deviceDebugBean.debugMessages}" var="msg">
+                                <h:column>
+                                    <h:outputText value="[#{msg.adDeviceId}] #{deviceDebugBean.getFormattedDate(msg.date)} #{msg.message}"/>
+                                </h:column>
+                            </h:dataTable>
+                            <p:poll id="logPoll" interval="2" update="log" rendered="#{deviceDebugBean.autoUpdate}"/>
+                        </p:scrollPanel>
+
+                        <h:panelGrid id="logsettings" columns="3" style="margin-bottom:10px" cellpadding="5">
+                            <p:selectBooleanCheckbox id="autoUpdate" value="#{deviceDebugBean.autoUpdate}" onchange="this.form.submit();"/>
+                            <h:outputLabel for="autoUpdate" value="Auto update log" />
+                            <p:ajaxStatus style="width:16px;height:16px;" id="ajaxStatusPanel">  
+                                <f:facet name="start">  
+                                    <h:graphicImage value="/webres/img/ajax-loader.gif" />  
+                                </f:facet>  
+                                <f:facet name="complete">  
+                                    <h:outputText value="" />  
+                                </f:facet>  
+                            </p:ajaxStatus>  
+                        </h:panelGrid>
+                    </p:outputPanel>
                 </p:panel>
             </h:form>
         </f:view>

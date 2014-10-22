@@ -43,6 +43,8 @@ public class DeviceDebugBean {
     @Min(1) @Max(3600)
     private int sleepTime = 0;
     private boolean connectToCloud = false;
+    
+    private boolean autoUpdate = false;
 
     public String getSayHello() {
         return "Say Hello";
@@ -126,6 +128,14 @@ public class DeviceDebugBean {
 
     public void setConnectToCloud(boolean connectToCloud) {
         this.connectToCloud = connectToCloud;
+    }
+
+    public boolean isAutoUpdate() {
+        return autoUpdate;
+    }
+
+    public void setAutoUpdate(boolean autoUpdate) {
+        this.autoUpdate = autoUpdate;
     }
     
 }
