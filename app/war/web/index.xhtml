@@ -31,8 +31,28 @@
                         <h:outputLabel for="sleepTime" value="Configure sleep time (sec.):"/>
                         <p:inputText id="sleepTime" value="#{deviceDebugBean.sleepTime}" disabled="#{deviceDebugBean.selectedDevice eq null}"/>
                         <p:message for="sleepTime"/>
+                        
+                        <h:outputLabel for="imgUpload" value="Image Upload:"/>
+                        <p:fileUpload id="imgUpload" fileUploadListener="#{deviceDebugBean.handleFileUpload}" mode="advanced"
+                                     update="messages,origImgDisplay,imgDisplay" auto="true" sizeLimit="5000000" allowTypes="/(\.|\/)(gif|jpe?g|png)$/"/>
+                        <p:message for="imgUpload"/>
+                        
+                        <h:outputLabel for="origImgDisplay" value="Your image:"/>
+                        <p:outputPanel id="origImgDisplay">
+                            <p:graphicImage value="#{deviceDebugBean.originalImage}" cache="false" rendered="#{deviceDebugBean.originalImage ne null}"/>
+                        </p:outputPanel>
+                        <h:panelGroup/>
+                        
+                        <h:outputLabel for="imgDisplay" value="Spectra 400x300:"/>
+                        <p:outputPanel id="imgDisplay">
+                            <p:graphicImage value="#{deviceDebugBean.image}" cache="false" rendered="#{deviceDebugBean.image ne null}"/>
+                        </p:outputPanel>
+                        <h:panelGroup/>
+
                     </h:panelGrid> 
 
+                    <p:growl id="messages" showDetail="true"/>  
+                        
                     <p:commandButton action="#{deviceDebugBean.save}" update="outputPanel" value="Save" disabled="#{deviceDebugBean.selectedDevice eq null}"/>
                     <p:commandButton action="#{deviceDebugBean.clearLog}" update="outputPanel" value="Clear log" disabled="#{deviceDebugBean.selectedDevice eq null}"/>
 
