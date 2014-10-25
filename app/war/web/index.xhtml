@@ -24,14 +24,23 @@
                         <p:selectBooleanCheckbox id="connectToCloud" value="#{deviceDebugBean.connectToCloud}" disabled="#{deviceDebugBean.selectedDevice eq null}"/>
                         <p:message for="connectToCloud"/>
                         
-                        <h:outputLabel for="wakeTime" value="Configure wake time (sec.):"/>
+                        <h:outputLabel for="wakeTime" value="Configure wake time (sec.) (blue LED on):"/>
                         <p:inputText id="wakeTime" value="#{deviceDebugBean.wakeTime}" disabled="#{deviceDebugBean.selectedDevice eq null}"/>
                         <p:message for="wakeTime"/>
                         
-                        <h:outputLabel for="sleepTime" value="Configure sleep time (sec.):"/>
+                        <h:outputLabel for="sleepTime" value="Configure sleep time (sec.) (deep-sleep):"/>
                         <p:inputText id="sleepTime" value="#{deviceDebugBean.sleepTime}" disabled="#{deviceDebugBean.selectedDevice eq null}"/>
                         <p:message for="sleepTime"/>
                         
+                        <h:outputLabel for="connectCycle" value="Connect cycle (# of wakes until WiFi connect):"/>
+                        <p:inputText id="connectCycle" value="#{deviceDebugBean.connectCycle}" disabled="#{deviceDebugBean.selectedDevice eq null}"/>
+                        <p:message for="connectCycle"/>
+                        
+                    </h:panelGrid>
+                    
+                    <p:commandButton action="#{deviceDebugBean.save}" update="outputPanel" value="Save" disabled="#{deviceDebugBean.selectedDevice eq null}"/>
+
+                    <h:panelGrid columns="3">
                         <h:outputLabel for="imgUpload" value="Image Upload:"/>
                         <p:fileUpload id="imgUpload" fileUploadListener="#{deviceDebugBean.handleFileUpload}" mode="advanced" disabled="#{deviceDebugBean.selectedDevice eq null}"
                                      update="messages,origImgDisplay,imgDisplay,epdDownload" auto="true" sizeLimit="5000000" allowTypes="/(\.|\/)(gif|jpe?g|png)$/"/>
@@ -51,7 +60,7 @@
                         
                         <h:outputLabel for="epdDownload" value="EPD File:"/>
                         <p:outputPanel id="epdDownload">
-                            <h:outputLink value="#{request.contextPath}/res/img/#{deviceDebugBean.selectedDevice}" rendered="#{deviceDebugBean.image ne null}">
+                            <h:outputLink value="#{request.contextPath}/res/img/#{deviceDebugBean.selectedDeviceSerial}" rendered="#{deviceDebugBean.image ne null}">
                                 <h:outputText value="Download"/>
                             </h:outputLink>
                         </p:outputPanel>
@@ -61,9 +70,6 @@
 
                     <p:growl id="messages" showDetail="true"/>  
                         
-                    <p:commandButton action="#{deviceDebugBean.save}" update="outputPanel" value="Save" disabled="#{deviceDebugBean.selectedDevice eq null}"/>
-                    <p:commandButton action="#{deviceDebugBean.clearLog}" update="outputPanel" value="Clear log" disabled="#{deviceDebugBean.selectedDevice eq null}"/>
-
                     <p:outputPanel id="logPanel" rendered="#{deviceDebugBean.selectedDevice ne null}">
                         <p:scrollPanel mode="native" style="height:400px">
                             <h:dataTable id="log" styleClass="no-table-header" value="#{deviceDebugBean.debugMessages}" var="msg">
@@ -74,7 +80,8 @@
                             <p:poll id="logPoll" interval="2" update="log" rendered="#{deviceDebugBean.autoUpdate}"/>
                         </p:scrollPanel>
 
-                        <h:panelGrid id="logsettings" columns="3" style="margin-bottom:10px" cellpadding="5">
+                        <h:panelGrid id="logsettings" columns="4" style="margin-bottom:10px" cellpadding="5">
+                            <p:commandButton action="#{deviceDebugBean.clearLog}" update="outputPanel" value="Clear log" disabled="#{deviceDebugBean.selectedDevice eq null}"/>
                             <p:selectBooleanCheckbox id="autoUpdate" value="#{deviceDebugBean.autoUpdate}" onchange="this.form.submit();"/>
                             <h:outputLabel for="autoUpdate" value="Auto update log" />
                             <p:ajaxStatus style="width:16px;height:16px;" id="ajaxStatusPanel">  

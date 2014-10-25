@@ -29,6 +29,8 @@ public interface AdDeviceEJBLocal {
     
     public AdDevice getBySerial(String deviceSerial);
     
+    public AdDevice getById(int deviceId);
+    
     public AdDeviceParameter getParameter(int deviceId, String param);
 
     public void setParameter(AdDeviceParameter param);

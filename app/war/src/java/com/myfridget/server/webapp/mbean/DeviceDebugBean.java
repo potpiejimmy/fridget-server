@@ -52,6 +52,8 @@ public class DeviceDebugBean {
     private int wakeTime = 0;
     @Min(1) @Max(3600)
     private int sleepTime = 0;
+    @Min(1) @Max(50)
+    private int connectCycle = 0;
     private boolean connectToCloud = false;
     
     private boolean autoUpdate = false;
@@ -78,12 +80,15 @@ public class DeviceDebugBean {
         if (selectedDevice == null) {
             wakeTime = 0;
             sleepTime = 0;
+            connectCycle = 0;
             connectToCloud = false;
         } else {
             AdDeviceParameter param = deviceEjb.getParameter(selectedDevice, "waketime");
             wakeTime = (param != null) ? Integer.parseInt(param.getValue()) : DEFAULT_WAKE_TIME;
             param = deviceEjb.getParameter(selectedDevice, "sleeptime");
             sleepTime = (param != null) ? Integer.parseInt(param.getValue()) : DEFAULT_SLEEP_TIME;
+            param = deviceEjb.getParameter(selectedDevice, "connectcycle");
+            connectCycle = (param != null) ? Integer.parseInt(param.getValue()) : 1;
             param = deviceEjb.getParameter(selectedDevice, "connectmode");
             connectToCloud = (param != null) ? "1".equals(param.getValue()) : true;
         }
@@ -93,6 +98,7 @@ public class DeviceDebugBean {
         if (selectedDevice == null) return;
         deviceEjb.setParameter(new AdDeviceParameter(null, selectedDevice, "waketime", ""+wakeTime));
         deviceEjb.setParameter(new AdDeviceParameter(null, selectedDevice, "sleeptime", ""+sleepTime));
+        deviceEjb.setParameter(new AdDeviceParameter(null, selectedDevice, "connectcycle", ""+connectCycle));
         deviceEjb.setParameter(new AdDeviceParameter(null, selectedDevice, "connectmode", connectToCloud ? "1" : "2"));
     }
     
@@ -133,6 +139,11 @@ public class DeviceDebugBean {
     public Integer getSelectedDevice() {
         return selectedDevice;
     }
+    
+    public String getSelectedDeviceSerial() {
+        if (selectedDevice == null) return null;
+        return deviceEjb.getById(selectedDevice).getSerial();
+    }
 
     public void setSelectedDevice(Integer selectedDevice) {
         this.selectedDevice = selectedDevice;
@@ -153,6 +164,14 @@ public class DeviceDebugBean {
 
     public void setSleepTime(int sleepTime) {
         this.sleepTime = sleepTime;
+    }
+
+    public int getConnectCycle() {
+        return connectCycle;
+    }
+
+    public void setConnectCycle(int connectCycle) {
+        this.connectCycle = connectCycle;
     }
 
     public boolean isConnectToCloud() {

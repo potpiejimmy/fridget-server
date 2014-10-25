@@ -5,6 +5,7 @@
  */
 package com.myfridget.server.webapp.rest.service;
 
+import com.myfridget.server.db.entity.AdDevice;
 import com.myfridget.server.ejb.AdDeviceEJBLocal;
 import java.io.IOException;
 import java.util.logging.Level;
@@ -23,19 +24,21 @@ import javax.ws.rs.QueryParam;
  *
  * @author thorsten
  */
-@Path("/img/{id}")
+@Path("/img/{serial}")
 @RequestScoped
 public class DeviceTestImageResource {
     
-    @PathParam("id")
-    private int id;
+    @PathParam("serial")
+    private String serial;
     
     protected AdDeviceEJBLocal deviceEjb = lookupAdDeviceEJBLocal();
     
     @GET
     @Produces({"application/binary"})
     public byte[] getData(@QueryParam("pos") Integer pos, @QueryParam("len") Integer len) throws IOException {
-        byte[] data = deviceEjb.getTestImage(id);
+        AdDevice device = deviceEjb.getBySerial(serial);
+        if (device == null) return null; // unknown device
+        byte[] data = deviceEjb.getTestImage(device.getId());
         if (data == null) return null;
         if (pos == null || len == null) return data;
         byte[] result = new byte[len];

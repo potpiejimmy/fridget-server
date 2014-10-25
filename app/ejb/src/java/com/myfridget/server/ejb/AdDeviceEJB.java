@@ -57,6 +57,11 @@ public class AdDeviceEJB implements AdDeviceEJBLocal {
             return null;
         }
     }
+    
+    @Override
+    public AdDevice getById(int deviceId) {
+        return em.find(AdDevice.class, deviceId);
+    }
 
     @Override
     public List<AdDeviceDebugMsg> getDebugMessages(int deviceId) {

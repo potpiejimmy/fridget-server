@@ -9,7 +9,6 @@ import com.myfridget.server.db.entity.AdDevice;
 import com.myfridget.server.db.entity.AdDeviceDebugMsg;
 import com.myfridget.server.db.entity.AdDeviceParameter;
 import com.myfridget.server.ejb.AdDeviceEJBLocal;
-import com.myfridget.server.webapp.mbean.DeviceDebugBean;
 import com.myfridget.server.webapp.util.WebUtils;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -21,6 +20,7 @@ import javax.ws.rs.Consumes;
 import javax.ws.rs.GET;
 import javax.ws.rs.POST;
 import javax.ws.rs.Path;
+import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
 import javax.ws.rs.QueryParam;
 
@@ -28,22 +28,25 @@ import javax.ws.rs.QueryParam;
  *
  * @author thorsten
  */
-@Path("/debug")
+@Path("/debug/{serial}")
 @RequestScoped
 public class DeviceDebugResource {
+    
+    @PathParam("serial")
+    private String serial;
     
     protected AdDeviceEJBLocal deviceEjb = lookupAdDeviceEJBLocal();
     
     @POST
     @Consumes({"application/json"})
     @Produces({"application/json"})
-    public AdDeviceDebugMsg debug(@QueryParam("serial") String serial, String msg) {
+    public AdDeviceDebugMsg debug(String msg) {
         return deviceEjb.addDebugMessage(serial, WebUtils.removeQuotes(msg));
     }
     
     @GET
     @Produces({"application/json"})
-    public String getParameter(@QueryParam("serial") String serial, @QueryParam("param") String param) {
+    public String getParameter(@QueryParam("param") String param) {
         AdDevice device = deviceEjb.getBySerial(serial);
         if (device == null) return ""; // unknown device
         AdDeviceParameter p = deviceEjb.getParameter(device.getId(), param);
