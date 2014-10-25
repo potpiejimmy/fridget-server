@@ -9,8 +9,8 @@ import com.myfridget.server.db.entity.AdDevice;
 import com.myfridget.server.db.entity.AdDeviceDebugMsg;
 import com.myfridget.server.db.entity.AdDeviceParameter;
 import com.myfridget.server.ejb.AdDeviceEJBLocal;
+import com.myfridget.server.util.Utils;
 import com.myfridget.server.webapp.util.WebUtils;
-import java.awt.image.BufferedImage;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.text.DateFormat;
@@ -44,7 +44,6 @@ public class DeviceDebugBean {
     private Integer selectedDevice = null;
     
     private UploadedFile originalImage = null;
-    private byte[] image;
 
     public static int DEFAULT_WAKE_TIME = 5;
     public static int DEFAULT_SLEEP_TIME = 30;
@@ -75,6 +74,7 @@ public class DeviceDebugBean {
     }
     
     protected void readDeviceSettings() {
+        this.originalImage = null; // holds uploaded image temporarily only
         if (selectedDevice == null) {
             wakeTime = 0;
             sleepTime = 0;
@@ -107,9 +107,7 @@ public class DeviceDebugBean {
     public void handleFileUpload(FileUploadEvent event) {
         try {
             originalImage = event.getFile();
-            BufferedImage img = WebUtils.getScaledBufferedImage(WebUtils.readAll(originalImage.getInputstream()), 400, 300);
-            WebUtils.makeSpectra3Color(img);
-            image = WebUtils.getEncodedImage(img, "png");
+            deviceEjb.uploadTestImage(selectedDevice, Utils.readAll(originalImage.getInputstream()));
             WebUtils.addFacesMessage("File " + event.getFile().getFileName() + " uploaded successfully.");  
         } catch (Exception ex) {
             WebUtils.addFacesMessage(ex);
@@ -117,6 +115,8 @@ public class DeviceDebugBean {
     }
     
     public StreamedContent getImage() throws IOException {
+        if (selectedDevice == null) return null;
+        byte[] image = deviceEjb.getTestImagePreview(selectedDevice);
         if (image == null) return null;
         return new DefaultStreamedContent(new ByteArrayInputStream(image), "image/png");
     }

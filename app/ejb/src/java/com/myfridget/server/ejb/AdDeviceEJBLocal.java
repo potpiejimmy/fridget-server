@@ -8,6 +8,7 @@ package com.myfridget.server.ejb;
 import com.myfridget.server.db.entity.AdDevice;
 import com.myfridget.server.db.entity.AdDeviceDebugMsg;
 import com.myfridget.server.db.entity.AdDeviceParameter;
+import java.io.IOException;
 import java.util.List;
 import javax.ejb.Local;
 
@@ -31,4 +32,10 @@ public interface AdDeviceEJBLocal {
     public AdDeviceParameter getParameter(int deviceId, String param);
 
     public void setParameter(AdDeviceParameter param);
+    
+    public void uploadTestImage(int deviceId, byte[] imgData) throws IOException;
+    
+    public byte[] getTestImage(int deviceId) throws IOException;
+
+    public byte[] getTestImagePreview(int deviceId) throws IOException;
 }

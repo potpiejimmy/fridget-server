@@ -33,8 +33,8 @@
                         <p:message for="sleepTime"/>
                         
                         <h:outputLabel for="imgUpload" value="Image Upload:"/>
-                        <p:fileUpload id="imgUpload" fileUploadListener="#{deviceDebugBean.handleFileUpload}" mode="advanced"
-                                     update="messages,origImgDisplay,imgDisplay" auto="true" sizeLimit="5000000" allowTypes="/(\.|\/)(gif|jpe?g|png)$/"/>
+                        <p:fileUpload id="imgUpload" fileUploadListener="#{deviceDebugBean.handleFileUpload}" mode="advanced" disabled="#{deviceDebugBean.selectedDevice eq null}"
+                                     update="messages,origImgDisplay,imgDisplay,epdDownload" auto="true" sizeLimit="5000000" allowTypes="/(\.|\/)(gif|jpe?g|png)$/"/>
                         <p:message for="imgUpload"/>
                         
                         <h:outputLabel for="origImgDisplay" value="Your image:"/>
@@ -46,6 +46,14 @@
                         <h:outputLabel for="imgDisplay" value="Spectra 400x300:"/>
                         <p:outputPanel id="imgDisplay">
                             <p:graphicImage value="#{deviceDebugBean.image}" cache="false" rendered="#{deviceDebugBean.image ne null}"/>
+                        </p:outputPanel>
+                        <h:panelGroup/>
+                        
+                        <h:outputLabel for="epdDownload" value="EPD File:"/>
+                        <p:outputPanel id="epdDownload">
+                            <h:outputLink value="#{request.contextPath}/res/img/#{deviceDebugBean.selectedDevice}" rendered="#{deviceDebugBean.image ne null}">
+                                <h:outputText value="Download"/>
+                            </h:outputLink>
                         </p:outputPanel>
                         <h:panelGroup/>
 

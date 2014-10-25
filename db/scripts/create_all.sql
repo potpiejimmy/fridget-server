@@ -117,6 +117,22 @@ CREATE TABLE IF NOT EXISTS `ad_device_parameter` (
 ENGINE = InnoDB;
 
 
+-- -----------------------------------------------------
+-- Table `ad_device_test_image`
+-- -----------------------------------------------------
+CREATE TABLE IF NOT EXISTS `ad_device_test_image` (
+  `id` INT NOT NULL AUTO_INCREMENT,
+  `ad_device_id` INT NOT NULL,
+  PRIMARY KEY (`id`),
+  INDEX `fk_ad_device_test_image_ad_device1_idx` (`ad_device_id` ASC),
+  CONSTRAINT `fk_ad_device_test_image_ad_device1`
+    FOREIGN KEY (`ad_device_id`)
+    REFERENCES `ad_device` (`id`)
+    ON DELETE NO ACTION
+    ON UPDATE NO ACTION)
+ENGINE = InnoDB;
+
+
 SET SQL_MODE=@OLD_SQL_MODE;
 SET FOREIGN_KEY_CHECKS=@OLD_FOREIGN_KEY_CHECKS;
 SET UNIQUE_CHECKS=@OLD_UNIQUE_CHECKS;
