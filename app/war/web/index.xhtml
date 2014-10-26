@@ -36,6 +36,10 @@
                         <p:inputText id="connectCycle" value="#{deviceDebugBean.connectCycle}" disabled="#{deviceDebugBean.selectedDevice eq null}"/>
                         <p:message for="connectCycle"/>
                         
+                        <h:outputLabel for="flashImage" value="Fetch and flash image on WiFi connect:"/>
+                        <p:selectBooleanCheckbox id="flashImage" value="#{deviceDebugBean.flashImage}" disabled="#{deviceDebugBean.selectedDevice eq null}"/>
+                        <p:message for="flashImage"/>
+                        
                     </h:panelGrid>
                     
                     <p:commandButton action="#{deviceDebugBean.save}" update="outputPanel" value="Save" disabled="#{deviceDebugBean.selectedDevice eq null}"/>

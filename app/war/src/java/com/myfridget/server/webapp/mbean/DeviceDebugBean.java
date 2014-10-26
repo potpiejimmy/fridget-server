@@ -55,6 +55,7 @@ public class DeviceDebugBean {
     @Min(1) @Max(50)
     private int connectCycle = 0;
     private boolean connectToCloud = false;
+    private boolean flashImage = false;
     
     private boolean autoUpdate = false;
 
@@ -82,6 +83,7 @@ public class DeviceDebugBean {
             sleepTime = 0;
             connectCycle = 0;
             connectToCloud = false;
+            flashImage = false;
         } else {
             AdDeviceParameter param = deviceEjb.getParameter(selectedDevice, "waketime");
             wakeTime = (param != null) ? Integer.parseInt(param.getValue()) : DEFAULT_WAKE_TIME;
@@ -91,6 +93,8 @@ public class DeviceDebugBean {
             connectCycle = (param != null) ? Integer.parseInt(param.getValue()) : 1;
             param = deviceEjb.getParameter(selectedDevice, "connectmode");
             connectToCloud = (param != null) ? "1".equals(param.getValue()) : true;
+            param = deviceEjb.getParameter(selectedDevice, "flashimage");
+            flashImage = (param != null) ? "1".equals(param.getValue()) : false;
         }
     }
     
@@ -100,6 +104,7 @@ public class DeviceDebugBean {
         deviceEjb.setParameter(new AdDeviceParameter(null, selectedDevice, "sleeptime", ""+sleepTime));
         deviceEjb.setParameter(new AdDeviceParameter(null, selectedDevice, "connectcycle", ""+connectCycle));
         deviceEjb.setParameter(new AdDeviceParameter(null, selectedDevice, "connectmode", connectToCloud ? "1" : "2"));
+        deviceEjb.setParameter(new AdDeviceParameter(null, selectedDevice, "flashimage", flashImage ? "1" : "0"));
     }
     
     public void save() {
@@ -180,6 +185,14 @@ public class DeviceDebugBean {
 
     public void setConnectToCloud(boolean connectToCloud) {
         this.connectToCloud = connectToCloud;
+    }
+
+    public boolean isFlashImage() {
+        return flashImage;
+    }
+
+    public void setFlashImage(boolean flashImage) {
+        this.flashImage = flashImage;
     }
 
     public boolean isAutoUpdate() {
