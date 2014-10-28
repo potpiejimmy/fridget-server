@@ -1,0 +1,58 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:ui="http://java.sun.com/jsf/facelets"
+      xmlns:h="http://java.sun.com/jsf/html"
+      xmlns:f="http://java.sun.com/jsf/core"
+      xmlns:p="http://primefaces.org/ui">
+    
+    <ui:composition template="/WEB-INF/facelets/templates/rootlayout.xhtml">
+
+        <ui:define name="pagetitle">Liese &amp; Liese Research</ui:define>
+
+        <ui:define name="headerdivright">
+            <h:form>
+                <h:panelGrid columns="1">
+                    <h:panelGrid columns="3">
+                        <h:outputLabel for="selectDevice" value="Select Your Device:"/>
+                        <p:selectOneMenu id="selectDevice" value="#{deviceDebugBean.selectedDevice}" onchange="this.form.submit();">
+                            <f:selectItems value="#{deviceDebugBean.devicesSelectItems}"/>
+                        </p:selectOneMenu>
+                        <p:message for="selectDevice"/>
+                    </h:panelGrid>
+                </h:panelGrid>
+            </h:form>
+        </ui:define>
+
+        <ui:define name="rootbody">
+
+            <h:form id="tabMenuForm">
+                <p:tabMenu id="tabMenu" activeIndex="${tabIndex}">  
+                    <p:menuitem value="Device Configuration" url="/index.xhtml"/>
+                    <p:menuitem value="Device Log" url="/devicelog.xhtml"/>
+                    <p:menuitem value="EPD Image Upload" url="/imageupload.xhtml"/>
+                </p:tabMenu>
+            </h:form>  
+
+            <p/>
+
+            <ui:insert name="body"/>
+
+            </ui:define>
+
+            <ui:define name="rootfooter">
+
+            <ui:insert name="body_footer"/>
+
+            <div id="root_footer">
+                <hr/>
+                <h:outputLink value="#{request.contextPath}/changepassword.xhtml" disabled="true">
+                    <h:outputText value="Change password"/>
+                </h:outputLink>
+            </div>
+
+        </ui:define>
+
+    </ui:composition>
+    
+</html>

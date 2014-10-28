@@ -1,0 +1,53 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:ui="http://java.sun.com/jsf/facelets"
+      xmlns:h="http://xmlns.jcp.org/jsf/html"
+      xmlns:p="http://primefaces.org/ui"
+      xmlns:f="http://xmlns.jcp.org/jsf/core">
+
+    <ui:composition template="/WEB-INF/facelets/templates/baselayout.xhtml">
+
+       	<ui:param name="tabIndex" value="2" />
+        
+        <ui:define name="body">
+            <h:form id="configForm">
+
+                <p:panel id="outputPanel" header="Spark Core Image Upload">
+
+                    <h:panelGrid columns="3">
+                        <h:outputLabel for="imgUpload" value="Image Upload:"/>
+                        <p:fileUpload id="imgUpload" fileUploadListener="#{deviceDebugBean.handleFileUpload}" mode="advanced" disabled="#{deviceDebugBean.selectedDevice eq null}"
+                                     update="messages,origImgDisplay,imgDisplay,epdDownload" auto="true" sizeLimit="5000000" allowTypes="/(\.|\/)(gif|jpe?g|png)$/"/>
+                        <p:message for="imgUpload"/>
+
+                        <h:outputLabel for="origImgDisplay" value="Your image:"/>
+                        <p:outputPanel id="origImgDisplay">
+                            <p:graphicImage value="#{deviceDebugBean.originalImage}" cache="false" rendered="#{deviceDebugBean.originalImage ne null}"/>
+                        </p:outputPanel>
+                        <h:panelGroup/>
+
+                        <h:outputLabel for="imgDisplay" value="Spectra 400x300:"/>
+                        <p:outputPanel id="imgDisplay">
+                            <p:graphicImage value="#{deviceDebugBean.image}" cache="false" rendered="#{deviceDebugBean.image ne null}"/>
+                        </p:outputPanel>
+                        <h:panelGroup/>
+
+                        <h:outputLabel for="epdDownload" value="EPD File:"/>
+                        <p:outputPanel id="epdDownload">
+                            <h:outputLink value="#{request.contextPath}/res/img/#{deviceDebugBean.selectedDeviceSerial}" rendered="#{deviceDebugBean.image ne null}">
+                                <h:outputText value="Download"/>
+                            </h:outputLink>
+                        </p:outputPanel>
+                        <h:panelGroup/>
+
+                    </h:panelGrid> 
+
+                    <p:growl id="messages" showDetail="true"/>  
+
+                </p:panel>
+            </h:form>
+        </ui:define>
+    </ui:composition>
+</html>
+
