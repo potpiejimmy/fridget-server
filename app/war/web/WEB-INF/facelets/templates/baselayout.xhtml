@@ -14,7 +14,7 @@
             <h:form>
                 <h:panelGrid columns="1">
                     <h:panelGrid columns="3">
-                        <h:outputLabel for="selectDevice" value="Select Your Device:"/>
+                        <h:outputLabel for="selectDevice" value="Select Your Device:" style="font-size: 75%;"/>
                         <p:selectOneMenu id="selectDevice" value="#{deviceDebugBean.selectedDevice}" onchange="this.form.submit();">
                             <f:selectItems value="#{deviceDebugBean.devicesSelectItems}"/>
                         </p:selectOneMenu>
