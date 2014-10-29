@@ -26,21 +26,18 @@ public class EPDUtils {
                 int r = (rgb&0xff0000)>>16;
                 int g = (rgb&0xff00)>>8;
                 int b = (rgb&0xff);
-                byte encodedPixel;
+                int pos = y*width + x;
+                int bitOffset = 7 - (pos % 8); // 7,6,5,4,3,2,1,0
                 if (r>g+50 && r>b+50) {
                     gr.setColor(Color.RED);
-                    encodedPixel = (byte)0b01;
+                    result[pos/8] |= (1<<bitOffset);
                 } else if (r+g+b<384) {
                     gr.setColor(Color.BLACK);
-                    encodedPixel = (byte)0b00;
+                    result[(width*height+pos)/8] |= (1<<bitOffset);
                 } else {
                     gr.setColor(Color.WHITE);
-                    encodedPixel = (byte)0b11;
                 }
                 gr.drawLine(x, y, x, y);
-                int pos = y*width + x;
-                int bitOffset = (3 - pos % 4) * 2; // 6, 4, 2, 0
-                result[pos/4] |= (encodedPixel<<bitOffset);
             }
         }
         return result;
