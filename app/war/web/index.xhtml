@@ -21,10 +21,6 @@
                         <p:selectBooleanCheckbox id="connectToCloud" value="#{deviceDebugBean.connectToCloud}" disabled="#{deviceDebugBean.selectedDevice eq null}"/>
                         <p:message for="connectToCloud"/>
 
-                        <h:outputLabel for="wakeTime" value="Configure wake time (sec.) (blue LED on):"/>
-                        <p:inputText id="wakeTime" value="#{deviceDebugBean.wakeTime}" disabled="#{deviceDebugBean.selectedDevice eq null}"/>
-                        <p:message for="wakeTime"/>
-
                         <h:outputLabel for="sleepTime" value="Configure sleep time (sec.) (deep-sleep):"/>
                         <p:inputText id="sleepTime" value="#{deviceDebugBean.sleepTime}" disabled="#{deviceDebugBean.selectedDevice eq null}"/>
                         <p:message for="sleepTime"/>

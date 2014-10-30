@@ -124,9 +124,6 @@ public class AdDeviceEJB implements AdDeviceEJBLocal {
         byte[] epdData = EPDUtils.makeSpectra3Color(img);
         imgData = Utils.encodeImage(img, "png");
         
-        // for now, only allow one test image per device
-        removeDeviceTestImage(getDeviceTestImage(deviceId));
-        
         AdDeviceTestImage testImage = new AdDeviceTestImage();
         testImage.setAdDeviceId(deviceId);
         em.persist(testImage);
@@ -149,26 +146,34 @@ public class AdDeviceEJB implements AdDeviceEJBLocal {
         em.remove(img);
     }
     
-    protected AdDeviceTestImage getDeviceTestImage(int deviceId) {
+    @Override
+    public byte[] getTestImage(int deviceTestImageId) throws IOException {
+        return getTestImageData(deviceTestImageId, "epd");
+    }
+
+    @Override
+    public byte[] getTestImagePreview(int deviceTestImageId) throws IOException {
+        return getTestImageData(deviceTestImageId, "png");
+    }
+
+    protected byte[] getTestImageData(int deviceTestImageId, String format) throws IOException {
+        AdDeviceTestImage img = em.find(AdDeviceTestImage.class, deviceTestImageId);
+        if (img == null) return null;
+        return Utils.readAll(new FileInputStream(cacheFileForImage(img, format)));
+    }
+
+    @Override
+    public List<AdDeviceTestImage> getDeviceTestImages(int deviceId) {
         try {
-            return em.createNamedQuery("AdDeviceTestImage.findByAdDeviceId", AdDeviceTestImage.class).setParameter("adDeviceId", deviceId).getSingleResult();
+            return em.createNamedQuery("AdDeviceTestImage.findByAdDeviceId", AdDeviceTestImage.class).setParameter("adDeviceId", deviceId).getResultList();
         } catch (Exception e) {
             return null;
         }
     }
     
     @Override
-    public byte[] getTestImage(int deviceId) throws IOException {
-        AdDeviceTestImage img = getDeviceTestImage(deviceId);
-        if (img == null) return null;
-        return Utils.readAll(new FileInputStream(cacheFileForImage(img, "epd")));
-    }
-
-    @Override
-    public byte[] getTestImagePreview(int deviceId) throws IOException {
-        AdDeviceTestImage img = getDeviceTestImage(deviceId);
-        if (img == null) return null;
-        return Utils.readAll(new FileInputStream(cacheFileForImage(img, "png")));
+    public void removeTestImage(int deviceTestImageId) throws IOException {
+        em.remove(em.find(AdDeviceTestImage.class, deviceTestImageId));
     }
     
     protected static File cacheFileForImage(AdDeviceTestImage img, String type) {

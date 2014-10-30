@@ -15,36 +15,27 @@
 
                 <p:panel id="outputPanel" header="Spark Core Image Upload">
 
-                    <h:panelGrid columns="3">
-                        <h:outputLabel for="imgUpload" value="Image Upload:"/>
-                        <p:fileUpload id="imgUpload" fileUploadListener="#{deviceDebugBean.handleFileUpload}" mode="advanced" disabled="#{deviceDebugBean.selectedDevice eq null}"
-                                     update="messages,origImgDisplay,imgDisplay,epdDownload" auto="true" sizeLimit="5000000" allowTypes="/(\.|\/)(gif|jpe?g|png)$/"/>
-                        <p:message for="imgUpload"/>
-
-                        <h:outputLabel for="origImgDisplay" value="Your image:"/>
-                        <p:outputPanel id="origImgDisplay">
-                            <p:graphicImage value="#{deviceDebugBean.originalImage}" cache="false" rendered="#{deviceDebugBean.originalImage ne null}"/>
-                        </p:outputPanel>
-                        <h:panelGroup/>
-
-                        <h:outputLabel for="imgDisplay" value="Spectra 400x300:"/>
-                        <p:outputPanel id="imgDisplay">
-                            <p:graphicImage value="#{deviceDebugBean.image}" cache="false" rendered="#{deviceDebugBean.image ne null}"/>
-                        </p:outputPanel>
-                        <h:panelGroup/>
-
-                        <h:outputLabel for="epdDownload" value="EPD File:"/>
-                        <p:outputPanel id="epdDownload">
-                            <h:outputLink value="#{request.contextPath}/res/img/#{deviceDebugBean.selectedDeviceSerial}" rendered="#{deviceDebugBean.image ne null}">
-                                <h:outputText value="Download"/>
-                            </h:outputLink>
-                        </p:outputPanel>
-                        <h:panelGroup/>
-
-                    </h:panelGrid> 
+                    <p:fileUpload id="imgUpload" fileUploadListener="#{deviceDebugBean.handleFileUpload}" mode="advanced" disabled="#{deviceDebugBean.selectedDevice eq null}"
+                                 update="messages,imgDisplay" auto="true" sizeLimit="5000000" allowTypes="/(\.|\/)(gif|jpe?g|png)$/"/>
 
                     <p:growl id="messages" showDetail="true"/>  
 
+                    <p:outputPanel id="imgDisplay">
+                        <p:panelGrid columns="4" rendered="#{deviceDebugBean.images.size() gt 0}">
+                            <p:selectOneListbox value="#{deviceDebugBean.currentImageIndex}">
+                                <f:selectItems value="#{deviceDebugBean.imageSelectItems}"/>
+                                <p:ajax event="change" update="imgDisplay"/>
+                            </p:selectOneListbox>
+
+                            <p:graphicImage value="#{deviceDebugBean.imageData}" cache="false"/>
+
+                            <h:outputLink value="#{request.contextPath}/res/img/#{deviceDebugBean.selectedDeviceSerial}/?index=#{deviceDebugBean.currentImageIndex}">
+                                <h:outputText value="Download EPD"/>
+                            </h:outputLink>
+
+                            <p:commandLink value="Delete" action="#{deviceDebugBean.deleteImage}" update="imgDisplay"/>
+                        </p:panelGrid> 
+                    </p:outputPanel>
                 </p:panel>
             </h:form>
         </ui:define>

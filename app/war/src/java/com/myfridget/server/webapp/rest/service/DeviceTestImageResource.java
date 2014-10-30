@@ -6,8 +6,10 @@
 package com.myfridget.server.webapp.rest.service;
 
 import com.myfridget.server.db.entity.AdDevice;
+import com.myfridget.server.db.entity.AdDeviceTestImage;
 import com.myfridget.server.ejb.AdDeviceEJBLocal;
 import java.io.IOException;
+import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.faces.bean.RequestScoped;
@@ -35,15 +37,13 @@ public class DeviceTestImageResource {
     
     @GET
     @Produces({"application/binary"})
-    public byte[] getData(@QueryParam("pos") Integer pos, @QueryParam("len") Integer len) throws IOException {
+    public byte[] getData(@QueryParam("index") Integer index) throws IOException {
         AdDevice device = deviceEjb.getBySerial(serial);
         if (device == null) return null; // unknown device
-        byte[] data = deviceEjb.getTestImage(device.getId());
-        if (data == null) return null;
-        if (pos == null || len == null) return data;
-        byte[] result = new byte[len];
-        System.arraycopy(data, pos, result, 0, len);
-        return result;
+        List<AdDeviceTestImage> images = deviceEjb.getDeviceTestImages(device.getId());
+        int ix = (index == null) ? 0 : index;
+        if (images == null || ix < 0 || ix >= images.size()) return null; // no image at that index
+        return deviceEjb.getTestImage(images.get(ix).getId());
     }
     
     

@@ -30,10 +30,11 @@ public class EPDUtils {
                 int bitOffset = 7 - (pos % 8); // 7,6,5,4,3,2,1,0
                 if (r>g+50 && r>b+50) {
                     gr.setColor(Color.RED);
-                    result[pos/8] |= (1<<bitOffset);
+                    result[pos/8] |= (1<<bitOffset); // red map
                 } else if (r+g+b<384) {
                     gr.setColor(Color.BLACK);
-                    result[(width*height+pos)/8] |= (1<<bitOffset);
+                    result[pos/8] |= (1<<bitOffset); // put black also in red map
+                    result[(width*height+pos)/8] |= (1<<bitOffset); // black map
                 } else {
                     gr.setColor(Color.WHITE);
                 }

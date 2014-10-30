@@ -8,6 +8,7 @@ package com.myfridget.server.webapp.mbean;
 import com.myfridget.server.db.entity.AdDevice;
 import com.myfridget.server.db.entity.AdDeviceDebugMsg;
 import com.myfridget.server.db.entity.AdDeviceParameter;
+import com.myfridget.server.db.entity.AdDeviceTestImage;
 import com.myfridget.server.ejb.AdDeviceEJBLocal;
 import com.myfridget.server.util.Utils;
 import com.myfridget.server.webapp.util.WebUtils;
@@ -43,19 +44,16 @@ public class DeviceDebugBean {
     
     private Integer selectedDevice = null;
     
-    private UploadedFile originalImage = null;
-
-    public static int DEFAULT_WAKE_TIME = 5;
     public static int DEFAULT_SLEEP_TIME = 30;
     
-    @Min(1) @Max(120)
-    private int wakeTime = 0;
     @Min(1) @Max(3600)
     private int sleepTime = 0;
     @Min(1) @Max(50)
     private int connectCycle = 0;
     private boolean connectToCloud = false;
     private boolean flashImage = false;
+    
+    private int currentImageIndex = 0;
     
     private boolean autoUpdate = false;
 
@@ -77,17 +75,13 @@ public class DeviceDebugBean {
     }
     
     protected void readDeviceSettings() {
-        this.originalImage = null; // holds uploaded image temporarily only
         if (selectedDevice == null) {
-            wakeTime = 0;
             sleepTime = 0;
             connectCycle = 0;
             connectToCloud = false;
             flashImage = false;
         } else {
-            AdDeviceParameter param = deviceEjb.getParameter(selectedDevice, "waketime");
-            wakeTime = (param != null) ? Integer.parseInt(param.getValue()) : DEFAULT_WAKE_TIME;
-            param = deviceEjb.getParameter(selectedDevice, "sleeptime");
+            AdDeviceParameter param = deviceEjb.getParameter(selectedDevice, "sleeptime");
             sleepTime = (param != null) ? Integer.parseInt(param.getValue()) : DEFAULT_SLEEP_TIME;
             param = deviceEjb.getParameter(selectedDevice, "connectcycle");
             connectCycle = (param != null) ? Integer.parseInt(param.getValue()) : 1;
@@ -100,7 +94,6 @@ public class DeviceDebugBean {
     
     protected void writeDeviceSettings() {
         if (selectedDevice == null) return;
-        deviceEjb.setParameter(new AdDeviceParameter(null, selectedDevice, "waketime", ""+wakeTime));
         deviceEjb.setParameter(new AdDeviceParameter(null, selectedDevice, "sleeptime", ""+sleepTime));
         deviceEjb.setParameter(new AdDeviceParameter(null, selectedDevice, "connectcycle", ""+connectCycle));
         deviceEjb.setParameter(new AdDeviceParameter(null, selectedDevice, "connectmode", connectToCloud ? "1" : "2"));
@@ -117,24 +110,42 @@ public class DeviceDebugBean {
     
     public void handleFileUpload(FileUploadEvent event) {
         try {
-            originalImage = event.getFile();
+            UploadedFile originalImage = event.getFile();
             deviceEjb.uploadTestImage(selectedDevice, Utils.readAll(originalImage.getInputstream()));
-            WebUtils.addFacesMessage("File " + event.getFile().getFileName() + " uploaded successfully.");  
+            WebUtils.addFacesMessage("File " + event.getFile().getFileName() + " uploaded successfully.");
+            currentImageIndex = deviceEjb.getDeviceTestImages(selectedDevice).size()-1;
         } catch (Exception ex) {
             WebUtils.addFacesMessage(ex);
         }
     }
+
+    public List<SelectItem> getImageSelectItems() {
+        List<SelectItem> result = new ArrayList<SelectItem>();
+        List<AdDeviceTestImage> imgs = getImages();
+        if (imgs != null) {
+            for (int i=0; i<imgs.size(); i++) result.add(new SelectItem(i, "Image #"+(i+1)));
+        }
+        return result;
+    }
     
-    public StreamedContent getImage() throws IOException {
+    public List<AdDeviceTestImage> getImages() {
         if (selectedDevice == null) return null;
-        byte[] image = deviceEjb.getTestImagePreview(selectedDevice);
+        return deviceEjb.getDeviceTestImages(selectedDevice);
+    }
+    
+    public StreamedContent getImageData() throws IOException {
+        List<AdDeviceTestImage> imgs = getImages();
+        if (imgs == null || imgs.size() == 0) return null;
+        byte[] image = deviceEjb.getTestImagePreview(imgs.get(currentImageIndex).getId());
         if (image == null) return null;
         return new DefaultStreamedContent(new ByteArrayInputStream(image), "image/png");
     }
     
-    public StreamedContent getOriginalImage() throws IOException {
-        if (originalImage == null) return null;
-        return new DefaultStreamedContent(originalImage.getInputstream(), originalImage.getContentType());
+    public void deleteImage() throws IOException {
+        List<AdDeviceTestImage> imgs = getImages();
+        if (imgs == null || imgs.size() == 0) return;
+        deviceEjb.removeTestImage(imgs.get(currentImageIndex).getId());
+        if (currentImageIndex == imgs.size()-1 && currentImageIndex > 0) currentImageIndex--;
     }
     
     public String getFormattedDate(Long date) {
@@ -153,14 +164,7 @@ public class DeviceDebugBean {
     public void setSelectedDevice(Integer selectedDevice) {
         this.selectedDevice = selectedDevice;
         readDeviceSettings();
-    }
-
-    public int getWakeTime() {
-        return wakeTime;
-    }
-
-    public void setWakeTime(int wakeTime) {
-        this.wakeTime = wakeTime;
+        this.currentImageIndex = 0;
     }
 
     public int getSleepTime() {
@@ -202,5 +206,12 @@ public class DeviceDebugBean {
     public void setAutoUpdate(boolean autoUpdate) {
         this.autoUpdate = autoUpdate;
     }
-    
+
+    public int getCurrentImageIndex() {
+        return currentImageIndex;
+    }
+
+    public void setCurrentImageIndex(int currentImageIndex) {
+        this.currentImageIndex = currentImageIndex;
+    }
 }
