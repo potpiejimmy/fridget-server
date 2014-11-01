@@ -8,6 +8,7 @@ package com.myfridget.server.webapp.rest.service;
 import com.myfridget.server.db.entity.AdDevice;
 import com.myfridget.server.db.entity.AdDeviceTestImage;
 import com.myfridget.server.ejb.AdDeviceEJBLocal;
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.util.List;
 import java.util.logging.Level;
@@ -41,9 +42,17 @@ public class DeviceTestImageResource {
         AdDevice device = deviceEjb.getBySerial(serial);
         if (device == null) return null; // unknown device
         List<AdDeviceTestImage> images = deviceEjb.getDeviceTestImages(device.getId());
-        int ix = (index == null) ? 0 : index;
-        if (images == null || ix < 0 || ix >= images.size()) return null; // no image at that index
-        return deviceEjb.getTestImage(images.get(ix).getId());
+        if (images == null) return null; // no images;
+        if (index !=null) {
+            if (index < 0 || index >= images.size()) return null; // no image at that index
+            return deviceEjb.getTestImage(images.get(index).getId());
+        } else {
+            // return all images:
+            ByteArrayOutputStream baos = new ByteArrayOutputStream(images.size()*30000); // XXX
+            for (AdDeviceTestImage img : images) baos.write(deviceEjb.getTestImage(img.getId()));
+            baos.close();
+            return baos.toByteArray();
+        }
     }
     
     
