@@ -14,10 +14,13 @@ import com.myfridget.server.util.Utils;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.math.BigDecimal;
 import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javax.ejb.Stateless;
 import javax.persistence.EntityManager;
 import javax.persistence.NoResultException;
@@ -120,8 +123,8 @@ public class AdDeviceEJB implements AdDeviceEJBLocal {
     
     @Override
     public void uploadTestImage(int deviceId, byte[] imgData) throws IOException {
-        BufferedImage img = Utils.getScaledBufferedImage(imgData, 400, 300);
-        byte[] epdData = EPDUtils.makeSpectra3Color(img);
+        BufferedImage img = getResizedImage(imgData);
+        byte[] epdData = encodeEPD(img);
         imgData = Utils.encodeImage(img, "png");
         
         AdDeviceTestImage testImage = new AdDeviceTestImage();
@@ -131,6 +134,15 @@ public class AdDeviceEJB implements AdDeviceEJBLocal {
         
         writeCacheFile(testImage, "png", imgData);
         writeCacheFile(testImage, "epd", epdData);
+    }
+    
+    protected static BufferedImage getResizedImage(byte[] imgData) {
+        // XXX 400x300
+        return Utils.getScaledBufferedImage(imgData, 400, 300);
+    }
+    
+    protected static byte[] encodeEPD(BufferedImage img) {
+        return EPDUtils.compressRLE(EPDUtils.makeSpectra3Color(img));
     }
     
     protected void writeCacheFile(AdDeviceTestImage img, String type, byte[] data) throws IOException {
@@ -148,7 +160,15 @@ public class AdDeviceEJB implements AdDeviceEJBLocal {
     
     @Override
     public byte[] getTestImage(int deviceTestImageId) throws IOException {
-        return getTestImageData(deviceTestImageId, "epd");
+        byte[] imgData = getTestImageData(deviceTestImageId, "epd");
+        // XXX REMOVE THE FOLLOWING. RECREATE ON THE FLY (allow change of encoding by removing EPD files from cache)
+        if (imgData == null) {
+            // recreate from preview
+            imgData = getTestImagePreview(deviceTestImageId);
+            imgData = encodeEPD(getResizedImage(imgData));
+            writeCacheFile(em.find(AdDeviceTestImage.class, deviceTestImageId), "epd", imgData);
+        }
+        return imgData;
     }
 
     @Override
@@ -159,7 +179,9 @@ public class AdDeviceEJB implements AdDeviceEJBLocal {
     protected byte[] getTestImageData(int deviceTestImageId, String format) throws IOException {
         AdDeviceTestImage img = em.find(AdDeviceTestImage.class, deviceTestImageId);
         if (img == null) return null;
-        return Utils.readAll(new FileInputStream(cacheFileForImage(img, format)));
+        File file = cacheFileForImage(img, format);
+        if (!file.exists()) return null;
+        return Utils.readAll(new FileInputStream(file));
     }
 
     @Override
