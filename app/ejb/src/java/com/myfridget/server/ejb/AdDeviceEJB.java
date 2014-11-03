@@ -124,8 +124,8 @@ public class AdDeviceEJB implements AdDeviceEJBLocal {
     @Override
     public void uploadTestImage(int deviceId, byte[] imgData) throws IOException {
         BufferedImage img = getResizedImage(imgData);
-        byte[] epdData = encodeEPD(img);
         imgData = Utils.encodeImage(img, "png");
+        byte[] epdData = encodeEPD(img);
         
         AdDeviceTestImage testImage = new AdDeviceTestImage();
         testImage.setAdDeviceId(deviceId);
@@ -142,7 +142,7 @@ public class AdDeviceEJB implements AdDeviceEJBLocal {
     }
     
     protected static byte[] encodeEPD(BufferedImage img) {
-        return EPDUtils.compressRLE(EPDUtils.makeSpectra3Color(img));
+        return EPDUtils.compressHuffman(EPDUtils.compressRLE(EPDUtils.makeSpectra3Color(img)));
     }
     
     protected void writeCacheFile(AdDeviceTestImage img, String type, byte[] data) throws IOException {

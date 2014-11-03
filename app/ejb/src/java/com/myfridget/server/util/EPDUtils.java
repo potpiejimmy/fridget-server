@@ -10,6 +10,8 @@ import java.awt.Graphics;
 import java.awt.image.BufferedImage;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.util.Arrays;
+import java.util.PriorityQueue;
 
 /**
  *
@@ -86,5 +88,68 @@ public class EPDUtils {
             if (rleCount > 0) enc |= 0x80;
             baos.write(enc);
         }
+    }
+    
+    public static class HuffmanTree implements Comparable<HuffmanTree>
+    {
+        public final int frequency; // the frequency of this tree
+        public final short symbol;
+        public final HuffmanTree left, right; // subtrees
+        public HuffmanTree(int freq, short sym) { frequency = freq; symbol = sym; left = null; right = null;}
+        public HuffmanTree(HuffmanTree l, HuffmanTree r) { frequency = l.frequency + r.frequency; left = l; right = r; symbol = 0;}
+
+        @Override
+        public int compareTo(HuffmanTree o) {
+            return frequency - o.frequency == 0 ? symbol - o.symbol : frequency - o.frequency;
+        }
+    }
+    
+    public static HuffmanTree buildHuffmanTree(int[] freqs) {
+        PriorityQueue<HuffmanTree> trees = new PriorityQueue<>();
+        for (int i = 0; i < freqs.length; i++)
+            if (freqs[i] > 0)
+                trees.offer(new HuffmanTree(freqs[i], (short)i));
+
+        // loop until there is only one tree left
+        while (trees.size() > 1) {
+            // two trees with least frequency
+            HuffmanTree a = trees.poll();
+            HuffmanTree b = trees.poll();
+
+            // put into new node and re-insert into queue
+            trees.offer(new HuffmanTree(a, b));
+        }
+        return trees.poll();
+    }
+    
+    public static int printCodes(HuffmanTree tree, StringBuffer prefix) {
+        if (tree.left == null) {
+            // print out character, frequency, and code for this leaf (which is just the prefix)
+            System.out.println(tree.symbol + "\t" + tree.frequency + "\t" + prefix);
+            return tree.frequency * prefix.length();
+        } else {
+            // traverse left
+            prefix.append('0');
+            int sc1 = printCodes(tree.left, prefix);
+            prefix.deleteCharAt(prefix.length()-1);
+
+            // traverse right
+            prefix.append('1');
+            int sc2 = printCodes(tree.right, prefix);
+            prefix.deleteCharAt(prefix.length()-1);
+            
+            return sc1 + sc2;
+        }
+    }
+    
+    public static byte[] compressHuffman(byte[] data) {
+        int[] counter = new int[256];
+        for (byte b : data) counter[b&0xff]++;
+        HuffmanTree tree = buildHuffmanTree(counter);
+
+        System.out.println("SYMBOL\tFREQ\tHUFFMAN CODE");
+        int bits = printCodes(tree, new StringBuffer());
+        System.out.println("RESULTING SIZE: " + (bits/8));
+        return data;
     }
 }
