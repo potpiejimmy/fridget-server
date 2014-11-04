@@ -14,13 +14,10 @@ import com.myfridget.server.util.Utils;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.FileInputStream;
-import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.math.BigDecimal;
 import java.util.List;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import javax.ejb.Stateless;
 import javax.persistence.EntityManager;
 import javax.persistence.NoResultException;
@@ -141,7 +138,7 @@ public class AdDeviceEJB implements AdDeviceEJBLocal {
         return Utils.getScaledBufferedImage(imgData, 400, 300);
     }
     
-    protected static byte[] encodeEPD(BufferedImage img) {
+    protected static byte[] encodeEPD(BufferedImage img) throws IOException {
         return EPDUtils.compressHuffman(EPDUtils.compressRLE(EPDUtils.makeSpectra3Color(img)));
     }
     

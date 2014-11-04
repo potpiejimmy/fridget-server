@@ -10,7 +10,9 @@ import java.awt.Graphics;
 import java.awt.image.BufferedImage;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
-import java.util.Arrays;
+import java.io.OutputStream;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.PriorityQueue;
 
 /**
@@ -104,6 +106,41 @@ public class EPDUtils {
         }
     }
     
+    public static final class BitOutputStream
+    { 
+ 	private OutputStream output; 
+ 	 
+ 	private int currentByte; 
+ 	private int numBitsInCurrentByte; 
+ 	 
+ 	// Creates a bit output stream based on the given byte output stream. 
+ 	public BitOutputStream(OutputStream out) {
+            if (out == null) 
+                    throw new NullPointerException("Argument is null"); 
+            output = out; 
+            currentByte = 0; 
+            numBitsInCurrentByte = 0; 
+ 	} 
+ 	 
+ 	// Writes a bit to the stream.
+ 	public void write(boolean b) throws IOException { 
+            currentByte = currentByte << 1 | (b?1:0); 
+            numBitsInCurrentByte++; 
+            if (numBitsInCurrentByte == 8) { 
+                    output.write(currentByte); 
+                    numBitsInCurrentByte = 0; 
+            } 
+ 	} 
+ 	 
+ 	// Closes this stream and the underlying OutputStream. If called when this bit stream is not at a byte boundary, 
+ 	// then the minimum number of "0" bits (between 0 and 7 of them) are written as padding to reach the next byte boundary. 
+ 	public void close() throws IOException {
+            while (numBitsInCurrentByte != 0) 
+                    write(false); 
+            output.close(); 
+ 	} 
+    } 
+
     public static HuffmanTree buildHuffmanTree(int[] freqs) {
         PriorityQueue<HuffmanTree> trees = new PriorityQueue<>();
         for (int i = 0; i < freqs.length; i++)
@@ -122,34 +159,51 @@ public class EPDUtils {
         return trees.poll();
     }
     
-    public static int printCodes(HuffmanTree tree, StringBuffer prefix) {
+    public static int buildDictionary(HuffmanTree tree, StringBuffer prefix, Map<Short,String> dictionary) {
         if (tree.left == null) {
-            // print out character, frequency, and code for this leaf (which is just the prefix)
-            System.out.println(tree.symbol + "\t" + tree.frequency + "\t" + prefix);
+            dictionary.put(tree.symbol, prefix.toString());
             return tree.frequency * prefix.length();
         } else {
             // traverse left
             prefix.append('0');
-            int sc1 = printCodes(tree.left, prefix);
+            int sc1 = buildDictionary(tree.left, prefix, dictionary);
             prefix.deleteCharAt(prefix.length()-1);
 
             // traverse right
             prefix.append('1');
-            int sc2 = printCodes(tree.right, prefix);
+            int sc2 = buildDictionary(tree.right, prefix, dictionary);
             prefix.deleteCharAt(prefix.length()-1);
             
             return sc1 + sc2;
         }
     }
     
-    public static byte[] compressHuffman(byte[] data) {
+    public static void printDictionary(Map<Short, String> dictionary) {
+        System.out.println("SYMBOL\tHUFFMAN CODE");
+        for (short symbol : dictionary.keySet()) {
+            // print out character, frequency, and code for this leaf (which is just the prefix)
+            System.out.println(symbol + "\t" + dictionary.get(symbol));
+        }
+    }
+    
+    public static byte[] compressHuffman(byte[] data) throws IOException {
         int[] counter = new int[256];
         for (byte b : data) counter[b&0xff]++;
         HuffmanTree tree = buildHuffmanTree(counter);
 
-        System.out.println("SYMBOL\tFREQ\tHUFFMAN CODE");
-        int bits = printCodes(tree, new StringBuffer());
-        System.out.println("RESULTING SIZE: " + (bits/8));
-        return data;
+        Map<Short, String> dictionary = new HashMap<>();
+        int expectedResultSize = buildDictionary(tree, new StringBuffer(), dictionary);
+        
+        printDictionary(dictionary);
+        System.out.println("RESULTING SIZE: " + (expectedResultSize/8));
+        
+        // compress data
+        ByteArrayOutputStream baos = new ByteArrayOutputStream((expectedResultSize/8));
+        BitOutputStream compressOut = new BitOutputStream(baos);
+        for (byte b : data) {
+            for (char bit : dictionary.get((short)(b&0xff)).toCharArray()) compressOut.write(bit=='1');
+        }
+        compressOut.close();
+        return baos.toByteArray();
     }
 }
