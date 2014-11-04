@@ -10,6 +10,7 @@ import com.myfridget.server.db.entity.AdDeviceDebugMsg;
 import com.myfridget.server.db.entity.AdDeviceParameter;
 import com.myfridget.server.db.entity.AdDeviceTestImage;
 import com.myfridget.server.util.EPDUtils;
+import com.myfridget.server.util.HuffmanCompression;
 import com.myfridget.server.util.Utils;
 import java.awt.image.BufferedImage;
 import java.io.File;
@@ -139,7 +140,7 @@ public class AdDeviceEJB implements AdDeviceEJBLocal {
     }
     
     protected static byte[] encodeEPD(BufferedImage img) throws IOException {
-        return EPDUtils.compressHuffman(EPDUtils.compressRLE(EPDUtils.makeSpectra3Color(img)));
+        return HuffmanCompression.compress(EPDUtils.compressRLE(EPDUtils.makeSpectra3Color(img)));
     }
     
     protected void writeCacheFile(AdDeviceTestImage img, String type, byte[] data) throws IOException {
