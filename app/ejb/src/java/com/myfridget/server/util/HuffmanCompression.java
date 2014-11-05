@@ -23,9 +23,10 @@ public class HuffmanCompression
     {
         public final int frequency; // the frequency of this tree
         public final short symbol;
+        public final int depth; // current depth at this node level
         public final HuffmanTree left, right; // subtrees
-        public HuffmanTree(int freq, short sym) { frequency = freq; symbol = sym; left = null; right = null;}
-        public HuffmanTree(HuffmanTree l, HuffmanTree r) { frequency = l.frequency + r.frequency; left = l; right = r; symbol = 0;}
+        public HuffmanTree(int freq, short sym) { frequency = freq; symbol = sym; left = null; right = null; depth = 0;}
+        public HuffmanTree(HuffmanTree l, HuffmanTree r) { frequency = l.frequency + r.frequency; left = l; right = r; symbol = 0; depth = Math.max(l.depth, r.depth) + 1;}
 
         @Override
         public int compareTo(HuffmanTree o) {
@@ -45,8 +46,8 @@ public class HuffmanCompression
             HuffmanTree a = trees.poll();
             HuffmanTree b = trees.poll();
 
-            // put into new node and re-insert into queue
-            trees.offer(new HuffmanTree(a, b));
+            // put into new node and re-insert into queue, shorter depths go left
+            trees.offer(a.depth <= b.depth ? new HuffmanTree(a, b) : new HuffmanTree(b, a));
         }
         return trees.poll();
     }
@@ -76,8 +77,8 @@ public class HuffmanCompression
         result[0] = (byte)lrIterator.size();
         for (int i=0; i<lrIterator.size(); i++) {
             short symbol = lrIterator.get(i);
-            result[1+i] = (byte)symbol;
-            result[1+dictionary.size()+i] = (byte)dictionary.get(symbol).length();
+            result[1+(i*2)] = (byte)symbol;
+            result[1+(i*2)+1] = (byte)dictionary.get(symbol).length();
         }
         return result;
     }
