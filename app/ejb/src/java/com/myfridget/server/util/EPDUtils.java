@@ -61,6 +61,7 @@ public class EPDUtils {
             }
             rleCount++;
         }
+        encodeRLE(baos, currentBit, rleCount);
         try {baos.close();} catch (IOException e) {/*doesn't matter*/}
         byte[] result = baos.toByteArray();
         if (result.length <= data.length) return result;
