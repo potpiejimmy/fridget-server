@@ -49,7 +49,14 @@ public class DeviceTestImageResource {
         } else {
             // return all images:
             ByteArrayOutputStream baos = new ByteArrayOutputStream(images.size()*30000); // XXX
-            for (AdDeviceTestImage img : images) baos.write(deviceEjb.getTestImage(img.getId()));
+            for (AdDeviceTestImage img : images) {
+                byte[] imgData = deviceEjb.getTestImage(img.getId());
+                int size = imgData.length;
+                // write two bytes of length
+                baos.write((size&0xff00)>>8);
+                baos.write((size&0xff));
+                baos.write(imgData);
+            }
             baos.close();
             return baos.toByteArray();
         }

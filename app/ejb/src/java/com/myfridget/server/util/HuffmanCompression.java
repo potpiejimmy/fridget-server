@@ -137,7 +137,7 @@ public class HuffmanCompression
 
         HuffmanTree tree = buildHuffmanTree(counter);
         List<DictionaryEntry> dictionary = buildDictionary(tree);
-        printDictionary(dictionary);
+//        printDictionary(dictionary);
         
         byte[] encodedDictionary = encodeDictionary(dictionary);
         
