@@ -46,23 +46,24 @@ public class EPDUtils {
         return result;
     }
     
-    public static byte[] compressRLE(byte[] data) {
+    public static byte[] compressRLE(byte[] data) throws IOException {
         ByteArrayOutputStream baos = new ByteArrayOutputStream(data.length/8);
-        baos.write((byte)1); // 1 = compressed
+        NibbleOutputStream nibOut = new NibbleOutputStream(baos);
+        nibOut.writeNibble((byte)1); // 1 = compressed
         int currentBit = -1;
         int rleCount = 0;
         for (int i=0; i<data.length*8; i++) {
             int bit = (data[i/8] & (1<<(7-(i%8))))>0 ? 1 : 0;
             if (currentBit != bit) {
                 // bit changed, encode:
-                encodeRLE(baos, currentBit, rleCount); // first loop iteration has rleCount 0
+                encodeRLE(nibOut, currentBit, rleCount); // first loop iteration has rleCount 0
                 currentBit = bit;
                 rleCount = 0;
             }
             rleCount++;
         }
-        encodeRLE(baos, currentBit, rleCount);
-        try {baos.close();} catch (IOException e) {/*doesn't matter*/}
+        encodeRLE(nibOut, currentBit, rleCount);
+        try {nibOut.close();} catch (IOException e) {/*doesn't matter*/}
         byte[] result = baos.toByteArray();
         if (result.length <= data.length) return result;
         // compressed size larger than input data + 1:
@@ -72,20 +73,14 @@ public class EPDUtils {
         return uncompressed;
     }
     
-    protected static void encodeRLE(ByteArrayOutputStream baos, int bit, int rleCount) {
+    protected static void encodeRLE(NibbleOutputStream out, int bit, int rleCount) throws IOException {
         if (rleCount == 0) return;
         rleCount--; // encode count - 1 instead of count
-        byte enc = (byte)(bit<<7); // MSB encodes the bit
-        enc |= rleCount & 0x3F; // lowest 6 bits of length
-        rleCount >>= 6;
-        if (rleCount > 0) enc |= 0x40; // second MSB encodes presence of additional length byte
-        baos.write(enc);
-        // from here, encode 7 bits with each MSB signaling next byte
-        while (rleCount > 0) {
-            enc = (byte)(rleCount & 0x7f);
-            rleCount >>= 7;
-            if (rleCount > 0) enc |= 0x80;
-            baos.write(enc);
-        }
+        do {
+            byte enc = (byte)(rleCount & 0x07);
+            enc |= (bit << 3);
+            out.writeNibble(enc);
+            rleCount >>= 3;
+        } while (rleCount > 0);
     }
 }
