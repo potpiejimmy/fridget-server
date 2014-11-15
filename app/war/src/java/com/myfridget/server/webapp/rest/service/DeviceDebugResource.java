@@ -40,24 +40,20 @@ public class DeviceDebugResource {
     @POST
     @Consumes({"application/json"})
     @Produces({"application/json"})
-    public AdDeviceDebugMsg debug(String msg) {
-        return deviceEjb.addDebugMessage(serial, WebUtils.removeQuotes(msg));
-    }
-    
-    @GET
-    @Produces({"application/json"})
-    public String getParameter(@QueryParam("param") String param) {
-        AdDevice device = deviceEjb.getBySerial(serial);
-        if (device == null) return ""; // unknown device
-        AdDeviceParameter p = deviceEjb.getParameter(device.getId(), param);
-        if (p == null) return ""; // parameter not set
-        return p.getValue();
+    public String hello(String msg) {
+        deviceEjb.addDebugMessage(serial, WebUtils.removeQuotes(msg));
+        StringBuilder result = new StringBuilder();
+        for (AdDeviceParameter param : deviceEjb.getParameters(deviceEjb.getBySerial(serial).getId())) {
+            result.append(param.getParam()).append('=').append(param.getValue()).append(';');
+        }
+        deviceEjb.addDebugMessage(serial, "<<< " + result);
+        return result.toString();
     }
     
     private AdDeviceEJBLocal lookupAdDeviceEJBLocal() {
         try {
             Context c = new InitialContext();
-            return (AdDeviceEJBLocal) c.lookup("java:global/Fridget_EA/Fridget_EJBs/AdDeviceEJB!com.myfridget.server.ejb.AdDeviceEJBLocal");
+            return (AdDeviceEJBLocal) c.lookup("java:app/Fridget_EJBs/AdDeviceEJB!com.myfridget.server.ejb.AdDeviceEJBLocal");
         } catch (NamingException ne) {
             Logger.getLogger(getClass().getName()).log(Level.SEVERE, "exception caught", ne);
             throw new RuntimeException(ne);

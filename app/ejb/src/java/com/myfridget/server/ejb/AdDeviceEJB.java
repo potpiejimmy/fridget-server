@@ -78,6 +78,11 @@ public class AdDeviceEJB implements AdDeviceEJBLocal {
     public void clearDebugMessages(int deviceId) {
         getDebugMessages(deviceId).forEach(i->em.remove(i));
     }
+    
+    @Override
+    public List<AdDeviceParameter> getParameters(int deviceId) {
+        return em.createNamedQuery("AdDeviceParameter.findByAdDeviceId", AdDeviceParameter.class).setParameter("adDeviceId", deviceId).getResultList();
+    }
 
     @Override
     public AdDeviceParameter getParameter(int deviceId, String param) {
