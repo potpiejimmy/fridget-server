@@ -44,12 +44,7 @@ public class DeviceDebugBean {
     
     private Integer selectedDevice = null;
     
-    public static int DEFAULT_SLEEP_TIME = 30;
-    
-    @Min(1) @Max(3600)
-    private int sleepTime = 0;
-    @Min(1) @Max(50)
-    private int connectCycle = 0;
+    private String exec = null;
     private boolean connectToCloud = false;
     private boolean flashImage = false;
     
@@ -76,15 +71,12 @@ public class DeviceDebugBean {
     
     protected void readDeviceSettings() {
         if (selectedDevice == null) {
-            sleepTime = 0;
-            connectCycle = 0;
+            exec = null;
             connectToCloud = false;
             flashImage = false;
         } else {
-            AdDeviceParameter param = deviceEjb.getParameter(selectedDevice, "sleeptime");
-            sleepTime = (param != null) ? Integer.parseInt(param.getValue()) : DEFAULT_SLEEP_TIME;
-            param = deviceEjb.getParameter(selectedDevice, "connectcycle");
-            connectCycle = (param != null) ? Integer.parseInt(param.getValue()) : 1;
+            AdDeviceParameter param = deviceEjb.getParameter(selectedDevice, "exec");
+            exec = (param != null) ? param.getValue() : null;
             param = deviceEjb.getParameter(selectedDevice, "connectmode");
             connectToCloud = (param != null) ? "1".equals(param.getValue()) : true;
             param = deviceEjb.getParameter(selectedDevice, "flashimage");
@@ -94,8 +86,7 @@ public class DeviceDebugBean {
     
     protected void writeDeviceSettings() {
         if (selectedDevice == null) return;
-        deviceEjb.setParameter(new AdDeviceParameter(null, selectedDevice, "sleeptime", ""+sleepTime));
-        deviceEjb.setParameter(new AdDeviceParameter(null, selectedDevice, "connectcycle", ""+connectCycle));
+        deviceEjb.setParameter(new AdDeviceParameter(null, selectedDevice, "exec", exec));
         deviceEjb.setParameter(new AdDeviceParameter(null, selectedDevice, "connectmode", connectToCloud ? "1" : "2"));
         deviceEjb.setParameter(new AdDeviceParameter(null, selectedDevice, "flashimage", flashImage ? "1" : "0"));
     }
@@ -167,20 +158,12 @@ public class DeviceDebugBean {
         this.currentImageIndex = 0;
     }
 
-    public int getSleepTime() {
-        return sleepTime;
+    public String getExec() {
+        return exec;
     }
 
-    public void setSleepTime(int sleepTime) {
-        this.sleepTime = sleepTime;
-    }
-
-    public int getConnectCycle() {
-        return connectCycle;
-    }
-
-    public void setConnectCycle(int connectCycle) {
-        this.connectCycle = connectCycle;
+    public void setExec(String exec) {
+        this.exec = exec;
     }
 
     public boolean isConnectToCloud() {

@@ -21,15 +21,13 @@
                         <p:selectBooleanCheckbox id="connectToCloud" value="#{deviceDebugBean.connectToCloud}" disabled="#{deviceDebugBean.selectedDevice eq null}"/>
                         <p:message for="connectToCloud"/>
 
-                        <h:outputLabel for="sleepTime" value="Configure sleep time (sec.) (deep-sleep):"/>
-                        <p:inputText id="sleepTime" value="#{deviceDebugBean.sleepTime}" disabled="#{deviceDebugBean.selectedDevice eq null}"/>
-                        <p:message for="sleepTime"/>
+                        <h:outputLabel for="exec" value="Execution plan (e.g. D0D2D1N0N8):"/>
+                        <p:inputText id="exec" value="#{deviceDebugBean.exec}" disabled="#{deviceDebugBean.selectedDevice eq null}" >
+                            <f:validateRegex pattern="^([DN][0-7])+$"/>
+                        </p:inputText>
+                        <p:message for="exec"/>
 
-                        <h:outputLabel for="connectCycle" value="Connect cycle (# of wakes until WiFi connect):"/>
-                        <p:inputText id="connectCycle" value="#{deviceDebugBean.connectCycle}" disabled="#{deviceDebugBean.selectedDevice eq null}"/>
-                        <p:message for="connectCycle"/>
-
-                        <h:outputLabel for="flashImage" value="Fetch and flash image on WiFi connect:"/>
+                        <h:outputLabel for="flashImage" value="Write downloaded image data to flash:"/>
                         <p:selectBooleanCheckbox id="flashImage" value="#{deviceDebugBean.flashImage}" disabled="#{deviceDebugBean.selectedDevice eq null}"/>
                         <p:message for="flashImage"/>
 
