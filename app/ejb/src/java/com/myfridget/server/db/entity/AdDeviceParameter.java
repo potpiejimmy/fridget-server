@@ -48,7 +48,7 @@ public class AdDeviceParameter implements Serializable {
     
     @Basic(optional = false)
     @NotNull
-    @Size(min = 1, max = 128)
+    @Size(min = 0, max = 128)
     @Column(name = "value")
     private String value;
 

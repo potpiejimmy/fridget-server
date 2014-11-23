@@ -22,8 +22,6 @@ import javax.ejb.EJB;
 import javax.faces.bean.ManagedBean;
 import javax.faces.bean.SessionScoped;
 import javax.faces.model.SelectItem;
-import javax.validation.constraints.Max;
-import javax.validation.constraints.Min;
 import org.primefaces.event.FileUploadEvent;
 import org.primefaces.model.DefaultStreamedContent;
 import org.primefaces.model.StreamedContent;
@@ -46,7 +44,7 @@ public class DeviceDebugBean {
     
     private String exec = null;
     private boolean connectToCloud = false;
-    private boolean flashImage = false;
+    private String flashImages = null;
     
     private int currentImageIndex = 0;
     
@@ -73,14 +71,14 @@ public class DeviceDebugBean {
         if (selectedDevice == null) {
             exec = null;
             connectToCloud = false;
-            flashImage = false;
+            flashImages = null;
         } else {
             AdDeviceParameter param = deviceEjb.getParameter(selectedDevice, "exec");
             exec = (param != null) ? param.getValue() : null;
             param = deviceEjb.getParameter(selectedDevice, "connectmode");
             connectToCloud = (param != null) ? "1".equals(param.getValue()) : true;
-            param = deviceEjb.getParameter(selectedDevice, "flashimage");
-            flashImage = (param != null) ? "1".equals(param.getValue()) : false;
+            param = deviceEjb.getParameter(selectedDevice, "flashimages");
+            flashImages = (param != null) ? param.getValue() : null;
         }
     }
     
@@ -88,11 +86,16 @@ public class DeviceDebugBean {
         if (selectedDevice == null) return;
         deviceEjb.setParameter(new AdDeviceParameter(null, selectedDevice, "exec", exec));
         deviceEjb.setParameter(new AdDeviceParameter(null, selectedDevice, "connectmode", connectToCloud ? "1" : "2"));
-        deviceEjb.setParameter(new AdDeviceParameter(null, selectedDevice, "flashimage", flashImage ? "1" : "0"));
+        deviceEjb.setParameter(new AdDeviceParameter(null, selectedDevice, "flashimages", flashImages == null ? "" : flashImages));
     }
     
     public void save() {
-        writeDeviceSettings();
+        try {
+            writeDeviceSettings();
+        } catch (Exception ex) {
+            WebUtils.addFacesMessage(ex);
+            ex.printStackTrace();
+        }
     }
     
     public void clearLog() {
@@ -111,10 +114,10 @@ public class DeviceDebugBean {
     }
 
     public List<SelectItem> getImageSelectItems() {
-        List<SelectItem> result = new ArrayList<SelectItem>();
+        List<SelectItem> result = new ArrayList<>();
         List<AdDeviceTestImage> imgs = getImages();
         if (imgs != null) {
-            for (int i=0; i<imgs.size(); i++) result.add(new SelectItem(i, "Image #"+(i+1)));
+            for (int i=0; i<imgs.size(); i++) result.add(new SelectItem(i, "Image "+ new String(new byte[] {(byte)(65+i)})));
         }
         return result;
     }
@@ -174,12 +177,12 @@ public class DeviceDebugBean {
         this.connectToCloud = connectToCloud;
     }
 
-    public boolean isFlashImage() {
-        return flashImage;
+    public String getFlashImages() {
+        return flashImages;
     }
 
-    public void setFlashImage(boolean flashImage) {
-        this.flashImage = flashImage;
+    public void setFlashImages(String flashImages) {
+        this.flashImages = flashImages;
     }
 
     public boolean isAutoUpdate() {

@@ -6,6 +6,7 @@
 package com.myfridget.server.webapp.rest.service;
 
 import com.myfridget.server.db.entity.AdDevice;
+import com.myfridget.server.db.entity.AdDeviceParameter;
 import com.myfridget.server.db.entity.AdDeviceTestImage;
 import com.myfridget.server.ejb.AdDeviceEJBLocal;
 import java.io.ByteArrayOutputStream;
@@ -47,14 +48,21 @@ public class DeviceTestImageResource {
             if (index < 0 || index >= images.size()) return null; // no image at that index
             return deviceEjb.getTestImage(images.get(index).getId());
         } else {
-            // return all images:
-            ByteArrayOutputStream baos = new ByteArrayOutputStream(images.size()*30000); // XXX
-            for (AdDeviceTestImage img : images) {
-                byte[] imgData = deviceEjb.getTestImage(img.getId());
+            // return the images listed in parameter "flashimages":
+            AdDeviceParameter imgList = deviceEjb.getParameter(device.getId(), "flashimages");
+            if (imgList == null) return null;
+            ByteArrayOutputStream baos = new ByteArrayOutputStream();
+            for (byte b : imgList.getValue().getBytes()) {
+                int imgIndex = b - 65; //'A'
+                if (imgIndex < 0 || imgIndex >= images.size()) continue; // no such image
+                byte[] imgData = deviceEjb.getTestImage(images.get(imgIndex).getId());
                 int size = imgData.length;
+                // write one byte image index
+                baos.write(imgIndex);
                 // write two bytes of length
                 baos.write((size&0xff00)>>8);
                 baos.write((size&0xff));
+                // write image data
                 baos.write(imgData);
             }
             baos.close();

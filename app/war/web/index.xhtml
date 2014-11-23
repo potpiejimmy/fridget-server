@@ -21,20 +21,22 @@
                         <p:selectBooleanCheckbox id="connectToCloud" value="#{deviceDebugBean.connectToCloud}" disabled="#{deviceDebugBean.selectedDevice eq null}"/>
                         <p:message for="connectToCloud"/>
 
-                        <h:outputLabel for="exec" value="Execution plan (e.g. D0D2D1N0N8):"/>
+                        <h:outputLabel for="exec" value="Execution plan (e.g. A0B2C1-0-3):"/>
                         <p:inputText id="exec" value="#{deviceDebugBean.exec}" disabled="#{deviceDebugBean.selectedDevice eq null}" >
-                            <f:validateRegex pattern="^([DN][0-7])+$"/>
+                            <f:validateRegex pattern="^([A-Z|-][0-3])+$"/>
                         </p:inputText>
                         <p:message for="exec"/>
 
-                        <h:outputLabel for="flashImage" value="Write downloaded image data to flash:"/>
-                        <p:selectBooleanCheckbox id="flashImage" value="#{deviceDebugBean.flashImage}" disabled="#{deviceDebugBean.selectedDevice eq null}"/>
-                        <p:message for="flashImage"/>
+                        <h:outputLabel for="flashImages" value="Download and flash images (e.g. CDEF):"/>
+                        <p:inputText id="flashImages" value="#{deviceDebugBean.flashImages}" disabled="#{deviceDebugBean.selectedDevice eq null}">
+                            <f:validateRegex pattern="^([A-Z])*$"/>
+                        </p:inputText>
+                        <p:message for="flashImages"/>
 
                     </h:panelGrid>
 
                     <p:commandButton action="#{deviceDebugBean.save}" update="outputPanel" value="Save" disabled="#{deviceDebugBean.selectedDevice eq null}"/>
-
+                    
                 </p:panel>
             </h:form>
         </ui:define>
