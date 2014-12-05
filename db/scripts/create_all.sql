@@ -123,6 +123,7 @@ ENGINE = InnoDB;
 CREATE TABLE IF NOT EXISTS `ad_device_test_image` (
   `id` INT NOT NULL AUTO_INCREMENT,
   `ad_device_id` INT NOT NULL,
+  `order_index` SMALLINT NOT NULL DEFAULT 0,
   PRIMARY KEY (`id`),
   INDEX `fk_ad_device_test_image_ad_device1_idx` (`ad_device_id` ASC),
   CONSTRAINT `fk_ad_device_test_image_ad_device1`

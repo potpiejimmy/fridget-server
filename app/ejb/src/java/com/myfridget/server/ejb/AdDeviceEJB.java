@@ -127,11 +127,12 @@ public class AdDeviceEJB implements AdDeviceEJBLocal {
     @Override
     public void uploadTestImage(int deviceId, byte[] imgData) throws IOException {
         BufferedImage img = getResizedImage(imgData);
+        byte[] epdData = encodeEPD(img); // Note: converts "img" to 3 colors
         imgData = Utils.encodeImage(img, "png");
-        byte[] epdData = encodeEPD(img);
         
         AdDeviceTestImage testImage = new AdDeviceTestImage();
         testImage.setAdDeviceId(deviceId);
+        testImage.setOrderIndex(0x7FFF);
         em.persist(testImage);
         em.flush(); // fetch new ID
         

@@ -17,6 +17,8 @@ import java.io.IOException;
  */
 public class EPDUtils {
     
+    public final static Color SPECTRA_RED = new Color(135, 16, 19);
+    
     public static byte[] makeSpectra3Color(BufferedImage img) {
         Graphics gr = img.getGraphics();
         int width = img.getWidth();
@@ -31,7 +33,7 @@ public class EPDUtils {
                 int pos = y*width + x;
                 int bitOffset = 7 - (pos % 8); // 7,6,5,4,3,2,1,0
                 if (r>g+50 && r>b+50) {
-                    gr.setColor(Color.RED);
+                    gr.setColor(SPECTRA_RED);
                     result[pos/8] |= (1<<bitOffset); // red map
                 } else if (r+g+b<384) {
                     gr.setColor(Color.BLACK);

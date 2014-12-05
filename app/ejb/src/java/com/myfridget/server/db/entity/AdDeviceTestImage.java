@@ -27,7 +27,7 @@ import javax.xml.bind.annotation.XmlRootElement;
 @XmlRootElement
 @NamedQueries({
     @NamedQuery(name = "AdDeviceTestImage.findAll", query = "SELECT a FROM AdDeviceTestImage a"),
-    @NamedQuery(name = "AdDeviceTestImage.findByAdDeviceId", query = "SELECT a FROM AdDeviceTestImage a WHERE a.adDeviceId = :adDeviceId")})
+    @NamedQuery(name = "AdDeviceTestImage.findByAdDeviceId", query = "SELECT a FROM AdDeviceTestImage a WHERE a.adDeviceId = :adDeviceId ORDER BY a.orderIndex, a.id")})
 public class AdDeviceTestImage implements Serializable {
     private static final long serialVersionUID = 1L;
     @Id
@@ -40,6 +40,11 @@ public class AdDeviceTestImage implements Serializable {
     @NotNull
     @Column(name = "ad_device_id")
     private Integer adDeviceId;
+ 
+    @Basic(optional = false)
+    @NotNull
+    @Column(name = "order_index")
+    private Integer orderIndex;
 
     public AdDeviceTestImage() {
     }
@@ -62,6 +67,14 @@ public class AdDeviceTestImage implements Serializable {
 
     public void setAdDeviceId(Integer adDeviceId) {
         this.adDeviceId = adDeviceId;
+    }
+
+    public Integer getOrderIndex() {
+        return orderIndex;
+    }
+
+    public void setOrderIndex(Integer orderIndex) {
+        this.orderIndex = orderIndex;
     }
 
     @Override
