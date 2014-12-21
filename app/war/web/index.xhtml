@@ -21,9 +21,9 @@
                         <p:selectBooleanCheckbox id="connectToCloud" value="#{deviceDebugBean.connectToCloud}" disabled="#{deviceDebugBean.selectedDevice eq null}"/>
                         <p:message for="connectToCloud"/>
 
-                        <h:outputLabel for="exec" value="Execution plan (e.g. A0B2C1-0-3):"/>
-                        <p:inputText id="exec" value="#{deviceDebugBean.exec}" disabled="#{deviceDebugBean.selectedDevice eq null}" >
-                            <f:validateRegex pattern="^([A-Z|-][0-3])+$"/>
+                        <h:outputLabel for="exec" value="Execution plan (^([A-Z|-][0-9A-F]{4})+$):"/>
+                        <p:inputText id="exec" size="75" value="#{deviceDebugBean.exec}" disabled="#{deviceDebugBean.selectedDevice eq null}" >
+                            <f:validateRegex pattern="^([A-Z|-][0-9A-F]{4})+$"/>
                         </p:inputText>
                         <p:message for="exec"/>
 
