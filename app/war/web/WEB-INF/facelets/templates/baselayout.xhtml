@@ -13,12 +13,14 @@
         <ui:define name="headerdivright">
             <h:form>
                 <h:panelGrid columns="1">
-                    <h:panelGrid columns="3">
+                    <h:panelGrid columns="5">
                         <h:outputLabel for="selectDevice" value="Select Your Device:" style="font-size: 75%;"/>
                         <p:selectOneMenu id="selectDevice" value="#{deviceDebugBean.selectedDevice}" onchange="this.form.submit();">
                             <f:selectItems value="#{deviceDebugBean.devicesSelectItems}"/>
                         </p:selectOneMenu>
                         <p:message for="selectDevice"/>
+                        <p:commandLink id="logoutBtn" value="Logout" action="#{usersBean.logout}" ajax="false" immediate="true"/>
+                        <p:outputPanel><h:outputText value="#{request.userPrincipal.name}"/></p:outputPanel>
                     </h:panelGrid>
                 </h:panelGrid>
             </h:form>
@@ -46,9 +48,14 @@
 
             <div id="root_footer">
                 <hr/>
-                <h:outputLink value="#{request.contextPath}/changepassword.xhtml" disabled="true">
+                <h:outputLink value="#{request.contextPath}/app/changepassword.xhtml">
                     <h:outputText value="Change password"/>
                 </h:outputLink>
+                <h:panelGroup rendered="#{request.isUserInRole('superuser')}">,
+                    <h:outputLink value="#{request.contextPath}/app/adminuser.xhtml">
+                        <h:outputText value="Manage Users"/>
+                    </h:outputLink>
+                </h:panelGroup>
             </div>
 
         </ui:define>

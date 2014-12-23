@@ -11,6 +11,7 @@ CREATE TABLE IF NOT EXISTS `ad_device` (
   `serial` VARCHAR(24) NOT NULL,
   `lon` DECIMAL(18,14) NOT NULL,
   `lat` DECIMAL(18,14) NOT NULL,
+  `name` VARCHAR(64) NULL,
   PRIMARY KEY (`id`))
 ENGINE = InnoDB;
 

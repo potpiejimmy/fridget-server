@@ -17,6 +17,7 @@ import javax.persistence.NamedQueries;
 import javax.persistence.NamedQuery;
 import javax.persistence.Table;
 import javax.validation.constraints.NotNull;
+import javax.validation.constraints.Null;
 import javax.validation.constraints.Size;
 import javax.xml.bind.annotation.XmlRootElement;
 
@@ -59,6 +60,12 @@ public class AdDevice implements Serializable {
     @NotNull
     @Column(name = "lat")
     private BigDecimal lat;
+    
+    @Basic(optional = false)
+    @Null
+    @Size(min = 1, max = 64)
+    @Column(name = "name")
+    private String name;
     
     public AdDevice() {
     }
@@ -104,6 +111,14 @@ public class AdDevice implements Serializable {
 
     public void setLat(BigDecimal lat) {
         this.lat = lat;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
     }
 
     @Override

@@ -4,8 +4,10 @@
  */
 package com.myfridget.server.webapp.util;
 
+import java.io.IOException;
 import java.security.Principal;
 import javax.faces.application.FacesMessage;
+import javax.faces.context.ExternalContext;
 import javax.faces.context.FacesContext;
 import javax.servlet.http.HttpServletRequest;
 
@@ -14,17 +16,12 @@ import javax.servlet.http.HttpServletRequest;
  */
 public class WebUtils
 {
-    public static int getCurrentUserId(HttpServletRequest hsr)
+    public static String getCurrentPerson(HttpServletRequest hsr)
     {
         Principal p = hsr.getUserPrincipal();
-        return (p==null ? -1 : Integer.parseInt(p.getName()));
+        return (p==null ? null : p.getName());
     }
 
-    public static int getCurrentUserId()
-    {
-        return getCurrentUserId((HttpServletRequest)FacesContext.getCurrentInstance().getExternalContext().getRequest());
-    }
-    
     public static String removeQuotes(String in)
     {
         if (in.startsWith("\"") || in.startsWith("'"))
@@ -42,6 +39,21 @@ public class WebUtils
         while(ex.getCause() != null) ex = ex.getCause();
         FacesMessage facesMessage = new FacesMessage(FacesMessage.SEVERITY_ERROR,  ex.toString(), "");
     	FacesContext.getCurrentInstance().addMessage(null, facesMessage);
+    }
+    
+    public static HttpServletRequest getHttpServletRequest()
+    {
+        return (HttpServletRequest)FacesContext.getCurrentInstance().getExternalContext().getRequest();
+    }
+    
+    /**
+     * Redirect to the given URL (context root relative)
+     * @param relativeUrl url relative to context path, must start with a slash
+     */
+    public static void redirect(String relativeUrl) throws IOException
+    {
+        ExternalContext ctx = FacesContext.getCurrentInstance().getExternalContext();
+        ctx.redirect(ctx.getRequestContextPath() + relativeUrl);
     }
     
 }
