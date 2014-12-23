@@ -1,0 +1,47 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:ui="http://java.sun.com/jsf/facelets"
+      xmlns:f="http://java.sun.com/jsf/core"
+      xmlns:h="http://java.sun.com/jsf/html"
+      xmlns:p="http://primefaces.org/ui">
+    
+	<ui:composition template="/WEB-INF/facelets/templates/rootlayout.xhtml">
+
+		<ui:define name="pagetitle">Login</ui:define>
+
+		<ui:define name="rootbody">
+			<p:panel header="Login">
+                            <h:form id="login" onsubmit="this.action='j_security_check';" prependId="false">
+                                <p:focus/>
+                                <h:panelGrid columns="2">
+                                    <p:outputLabel for="j_username" value="Email:" />
+                                    <p:inputText id="j_username"/>   
+                                    <p:outputLabel for="j_password" value="Password:" />
+                                    <p:password id="j_password"/>
+                                </h:panelGrid>
+                                <p/>
+                                <p:commandButton id="submit" value="Login" ajax="false"/>
+                                <p/>
+                                <p:outputLabel id="loginFailed" rendered="#{'true' eq param['fail']}" value="Login failed. Please check your login credentials." styleClass="ui-message-error ui-widget"/>
+<f:verbatim rendered="#{'true' ne param['fail']}">
+<!--[if lt IE 11]>
+<span style="color:red;">Note: Your browser is outdated. To avoid serious performance issues while using this application, please use a different browser.</span>
+<![endif]-->
+</f:verbatim>
+                            </h:form>
+			</p:panel>
+		</ui:define>
+
+		<ui:define name="rootfooter">
+                    <div id="root_footer">
+                        <hr/>
+                        <h:outputLink value="#{request.contextPath}/webres/help/about.xhtml">
+                            <h:outputText value="About"/>
+                        </h:outputLink>
+                    </div>
+                </ui:define>
+                
+	</ui:composition>
+    
+</html>
