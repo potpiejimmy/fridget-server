@@ -1,0 +1,78 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:ui="http://java.sun.com/jsf/facelets"
+      xmlns:h="http://java.sun.com/jsf/html"
+      xmlns:f="http://java.sun.com/jsf/core"
+      xmlns:p="http://primefaces.org/ui">
+    
+    <ui:composition template="/WEB-INF/facelets/templates/baselayout.xhtml">
+
+       	<ui:param name="tabIndex" value="0" />
+
+        <ui:define name="pagetitle">Devices Administration</ui:define>
+        
+        <ui:define name="body">
+        
+            <h:form id="editform" rendered="#{request.isUserInRole('superuser') or adminDevicesBean.currentDevice.id ne null}">
+
+                    <p:panelGrid columns="2">
+                            <h:outputText value="Device ID:"/>
+                            <h:outputText value="#{adminDevicesBean.currentDevice.id eq null ? '&lt;New&gt;' : adminDevicesBean.currentDevice.id}"/>
+                            <h:outputText value="Device Name:"/>
+                            <h:panelGroup>
+                                    <p:inputText id="domain" value="#{adminDevicesBean.currentDevice.name}"/>
+                                    <p:message for="domain" display="text"/>
+                            </h:panelGroup>
+                    </p:panelGrid>
+
+                <p>
+                    <p:panel>
+                        <p:pickList id="assignedUsers" value="#{adminDevicesBean.assignedUsers}" var="item"
+                                    itemLabel="#{item}"
+                                    itemValue="#{item}">
+                            <f:facet name="sourceCaption">All Users</f:facet>  
+                            <f:facet name="targetCaption">Device Users</f:facet>  
+                        </p:pickList>
+                        <p:message for="assignedUsers"/>
+                    </p:panel>
+                </p>
+
+                    <p:commandButton value="#{adminDevicesBean.currentDevice.id eq null ? 'Create' : 'Save'}" action="#{adminDevicesBean.save}" ajax="false"/>
+                    <p:commandButton rendered="#{adminDevicesBean.currentDevice.id ne null}" value="Cancel" action="#{adminDevicesBean.clear}" ajax="false"/>
+
+            </h:form>        
+
+            <hr/>
+
+            <h:form id="viewform">
+
+                    <p:dataTable value="#{adminDevicesBean.devices}" var="p">
+                            <p:column headerText="ID">
+                                    <h:outputText value="#{p.id}"/>
+                            </p:column>
+                            <p:column headerText="Serial">
+                                <h:outputText value="#{p.serial}"/>
+                            </p:column>
+                            <p:column headerText="Name">
+                                    <h:outputText value="#{p.name}"/>
+                            </p:column>
+                            <p:column headerText="Device Users">
+                                <h:outputText value="#{adminDevicesBean.getAssignedUsersAsString(p)}" escape="false"/>
+                            </p:column>
+                            <p:column headerText="Actions">
+                <p:commandLink value="Edit" action="#{adminDevicesBean.edit(p)}" ajax="false"> <p:resetInput target=":editform"/> </p:commandLink>
+                <h:panelGroup rendered="#{request.isUserInRole('superuser')}">, 
+                    <p:commandLink value="Delete" action="#{adminDevicesBean.delete(p)}" ajax="false"/>
+                </h:panelGroup>
+                            </p:column>
+                    </p:dataTable>
+
+            </h:form>
+
+        </ui:define>
+        
+    </ui:composition>
+    
+</html>
+

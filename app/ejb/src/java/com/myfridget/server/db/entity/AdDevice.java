@@ -32,6 +32,7 @@ import javax.xml.bind.annotation.XmlRootElement;
     @NamedQuery(name = "AdDevice.findAll", query = "SELECT a FROM AdDevice a"),
     @NamedQuery(name = "AdDevice.findById", query = "SELECT a FROM AdDevice a WHERE a.id = :id"),
     @NamedQuery(name = "AdDevice.findBySerial", query = "SELECT a FROM AdDevice a WHERE a.serial = :serial"),
+    @NamedQuery(name = "AdDevice.findByUserId", query = "SELECT a FROM AdDevice a, UserAdDevice b WHERE a.id = b.adDeviceId AND b.userId = :userId"),
     @NamedQuery(name = "AdDevice.findByLon", query = "SELECT a FROM AdDevice a WHERE a.lon = :lon"),
     @NamedQuery(name = "AdDevice.findByLat", query = "SELECT a FROM AdDevice a WHERE a.lat = :lat")})
 public class AdDevice implements Serializable {
@@ -61,8 +62,7 @@ public class AdDevice implements Serializable {
     @Column(name = "lat")
     private BigDecimal lat;
     
-    @Basic(optional = false)
-    @Null
+    @Basic(optional = true)
     @Size(min = 1, max = 64)
     @Column(name = "name")
     private String name;

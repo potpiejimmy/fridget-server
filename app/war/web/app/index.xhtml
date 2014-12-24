@@ -17,6 +17,12 @@
 
                     <h:panelGrid columns="3">
 
+                        <h:outputLabel for="selectDevice" value="Your Device:"/>
+                        <p:selectOneMenu id="selectDevice" value="#{deviceDebugBean.selectedDevice}" onchange="this.form.submit();">
+                            <f:selectItems value="#{deviceDebugBean.devicesSelectItems}"/>
+                        </p:selectOneMenu>
+                        <p:message for="selectDevice"/>
+                        
                         <h:outputLabel for="connectToCloud" value="Connect to cloud only:"/>
                         <p:selectBooleanCheckbox id="connectToCloud" value="#{deviceDebugBean.connectToCloud}" disabled="#{deviceDebugBean.selectedDevice eq null}"/>
                         <p:message for="connectToCloud"/>

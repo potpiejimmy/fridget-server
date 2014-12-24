@@ -10,6 +10,7 @@ import com.myfridget.server.db.entity.AdDeviceDebugMsg;
 import com.myfridget.server.db.entity.AdDeviceParameter;
 import com.myfridget.server.db.entity.AdDeviceTestImage;
 import com.myfridget.server.ejb.AdDeviceEJBLocal;
+import com.myfridget.server.ejb.UsersEJBLocal;
 import com.myfridget.server.util.Utils;
 import com.myfridget.server.webapp.util.WebUtils;
 import java.io.ByteArrayInputStream;
@@ -39,6 +40,8 @@ public class DeviceDebugBean {
     
     @EJB
     private AdDeviceEJBLocal deviceEjb;
+    @EJB
+    private UsersEJBLocal usersEjb;
     
     private Integer selectedDevice = null;
     
@@ -60,7 +63,7 @@ public class DeviceDebugBean {
     }
     
     public List<SelectItem> getDevicesSelectItems() {
-        List<AdDevice> devices = deviceEjb.getAllDevices();
+        List<AdDevice> devices = deviceEjb.getDevicesForUser(usersEjb.getCurrentUser().getId());
         List<SelectItem> items = new ArrayList<>();
         items.add(new SelectItem(null, "<Select Device>"));
         devices.forEach(i -> items.add(new SelectItem(i.getId(), "#"+i.getSerial())));

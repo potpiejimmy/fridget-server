@@ -9,6 +9,7 @@ import com.myfridget.server.db.entity.AdDevice;
 import com.myfridget.server.db.entity.AdDeviceDebugMsg;
 import com.myfridget.server.db.entity.AdDeviceParameter;
 import com.myfridget.server.db.entity.AdDeviceTestImage;
+import com.myfridget.server.db.entity.User;
 import com.myfridget.server.util.EPDUtils;
 import com.myfridget.server.util.HuffmanCompression;
 import com.myfridget.server.util.Utils;
@@ -73,7 +74,17 @@ public class AdDeviceEJB implements AdDeviceEJBLocal {
     public List<AdDevice> getAllDevices() {
         return em.createNamedQuery("AdDevice.findAll", AdDevice.class).getResultList();
     }
+
+    @Override
+    public List<AdDevice> getDevicesForUser(int userId) {
+        return em.createNamedQuery("AdDevice.findByUserId", AdDevice.class).setParameter("userId", userId).getResultList();
+    }
     
+    @Override
+    public List<User> getAssignedUsers(int deviceId) {
+        return em.createNamedQuery("User.findByDeviceId", User.class).setParameter("adDeviceId", deviceId).getResultList();
+    }
+
     @Override
     public void clearDebugMessages(int deviceId) {
         getDebugMessages(deviceId).forEach(i->em.remove(i));

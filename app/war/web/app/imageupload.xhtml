@@ -15,6 +15,14 @@
 
                 <p:panel id="outputPanel" header="Spark Core Image Upload">
 
+                    <h:panelGrid columns="3">
+                        <h:outputLabel for="selectDevice" value="Your Device:"/>
+                        <p:selectOneMenu id="selectDevice" value="#{deviceDebugBean.selectedDevice}" onchange="this.form.submit();">
+                            <f:selectItems value="#{deviceDebugBean.devicesSelectItems}"/>
+                        </p:selectOneMenu>
+                        <p:message for="selectDevice"/>
+                    </h:panelGrid>
+                        
                     <p:fileUpload id="imgUpload" fileUploadListener="#{deviceDebugBean.handleFileUpload}" mode="advanced" disabled="#{deviceDebugBean.selectedDevice eq null}"
                                  update="messages,imgDisplay" auto="true" sizeLimit="5000000" allowTypes="/(\.|\/)(gif|jpe?g|png)$/"/>
 

@@ -15,6 +15,14 @@
 
                 <p:panel id="outputPanel" header="Spark Core Debug Log">
 
+                    <h:panelGrid columns="3">
+                        <h:outputLabel for="selectDevice" value="Your Device:"/>
+                        <p:selectOneMenu id="selectDevice" value="#{deviceDebugBean.selectedDevice}" onchange="this.form.submit();">
+                            <f:selectItems value="#{deviceDebugBean.devicesSelectItems}"/>
+                        </p:selectOneMenu>
+                        <p:message for="selectDevice"/>
+                    </h:panelGrid>
+                        
                     <p:outputPanel id="logPanel" rendered="#{deviceDebugBean.selectedDevice ne null}">
                         <p:scrollPanel mode="native" style="height:400px">
                             <h:dataTable id="log" styleClass="no-table-header" value="#{deviceDebugBean.debugMessages}" var="msg">

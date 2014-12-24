@@ -30,6 +30,7 @@ import javax.xml.bind.annotation.XmlRootElement;
     @NamedQuery(name = "User.findAll", query = "SELECT u FROM User u"),
     @NamedQuery(name = "User.findById", query = "SELECT u FROM User u WHERE u.id = :id"),
     @NamedQuery(name = "User.findByEmail", query = "SELECT u FROM User u WHERE u.email = :email"),
+    @NamedQuery(name = "User.findByDeviceId", query = "SELECT u FROM User u,UserAdDevice d WHERE u.id = d.userId AND d.adDeviceId = :adDeviceId"),
     @NamedQuery(name = "User.findByPassword", query = "SELECT u FROM User u WHERE u.password = :password"),
     @NamedQuery(name = "User.findByRole", query = "SELECT u FROM User u WHERE u.role = :role")})
 public class User implements Serializable {
@@ -124,7 +125,7 @@ public class User implements Serializable {
 
     @Override
     public String toString() {
-        return "com.myfridget.server.db.entity.User[ id=" + id + " ]";
+        return email + " [id=" + id + "]";
     }
     
 }
