@@ -58,7 +58,6 @@
     <security-constraint>
     	<web-resource-collection>
             <web-resource-name>Fridget App Login</web-resource-name>
-            <url-pattern>/</url-pattern>
             <url-pattern>/login.xhtml</url-pattern>
         </web-resource-collection>
         <user-data-constraint>
