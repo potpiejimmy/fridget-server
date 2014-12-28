@@ -14,15 +14,17 @@
         
         <ui:define name="body">
         
-            <h:form id="editform" rendered="#{request.isUserInRole('superuser') or adminDevicesBean.currentDevice.id ne null}">
+            <h:form id="editform" rendered="#{adminDevicesBean.currentDevice.id ne null}">
 
                     <p:panelGrid columns="2">
                             <h:outputText value="Device ID:"/>
                             <h:outputText value="#{adminDevicesBean.currentDevice.id eq null ? '&lt;New&gt;' : adminDevicesBean.currentDevice.id}"/>
+                            <h:outputText value="Device Serial No.:"/>
+                            <h:outputText value="#{adminDevicesBean.currentDevice.serial}"/>
                             <h:outputText value="Device Name:"/>
                             <h:panelGroup>
-                                    <p:inputText id="domain" value="#{adminDevicesBean.currentDevice.name}"/>
-                                    <p:message for="domain" display="text"/>
+                                    <p:inputText id="name" size="50" value="#{adminDevicesBean.currentDevice.name}"/>
+                                    <p:message for="name" display="text"/>
                             </h:panelGroup>
                     </p:panelGrid>
 
@@ -30,7 +32,8 @@
                     <p:panel>
                         <p:pickList id="assignedUsers" value="#{adminDevicesBean.assignedUsers}" var="item"
                                     itemLabel="#{item}"
-                                    itemValue="#{item}">
+                                    itemValue="#{item}"
+                                    converter="#{adminDevicesBean}">
                             <f:facet name="sourceCaption">All Users</f:facet>  
                             <f:facet name="targetCaption">Device Users</f:facet>  
                         </p:pickList>
@@ -39,7 +42,7 @@
                 </p>
 
                     <p:commandButton value="#{adminDevicesBean.currentDevice.id eq null ? 'Create' : 'Save'}" action="#{adminDevicesBean.save}" ajax="false"/>
-                    <p:commandButton rendered="#{adminDevicesBean.currentDevice.id ne null}" value="Cancel" action="#{adminDevicesBean.clear}" ajax="false"/>
+                    <p:commandButton rendered="#{adminDevicesBean.currentDevice.id ne null}" value="Cancel" action="#{adminDevicesBean.clear}" ajax="false" immediate="true"/>
 
             </h:form>        
 

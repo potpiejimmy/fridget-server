@@ -52,4 +52,6 @@ public interface AdDeviceEJBLocal {
     public List<AdDeviceTestImage> getDeviceTestImages(int deviceId);
     
     public void removeTestImage(int deviceTestImageId) throws IOException;
+    
+    public void saveDevice(AdDevice device, List<User> assignedUsers);
 }

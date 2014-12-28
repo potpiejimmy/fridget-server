@@ -10,6 +10,7 @@ import com.myfridget.server.db.entity.AdDeviceDebugMsg;
 import com.myfridget.server.db.entity.AdDeviceParameter;
 import com.myfridget.server.db.entity.AdDeviceTestImage;
 import com.myfridget.server.db.entity.User;
+import com.myfridget.server.db.entity.UserAdDevice;
 import com.myfridget.server.util.EPDUtils;
 import com.myfridget.server.util.HuffmanCompression;
 import com.myfridget.server.util.Utils;
@@ -133,6 +134,21 @@ public class AdDeviceEJB implements AdDeviceEJBLocal {
         em.persist(adDevice);
         em.flush();
         return adDevice;
+    }
+    
+    @Override
+    public void saveDevice(AdDevice device, List<User> assignedUsers) {
+        // update entity
+        em.merge(device);
+        // delete previous user assignments
+        em.createNamedQuery("UserAdDevice.deleteByAdDeviceId").setParameter("adDeviceId", device.getId()).executeUpdate();
+        // save new user assignements
+        for (User user : assignedUsers) {
+            UserAdDevice assignment = new UserAdDevice();
+            assignment.setAdDeviceId(device.getId());
+            assignment.setUserId(user.getId());
+            em.persist(assignment);
+        }
     }
     
     @Override

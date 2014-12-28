@@ -36,6 +36,12 @@ public class UsersEJB implements UsersEJBLocal {
     
     @Override
     @RolesAllowed({"superuser"})
+    public User getUser(int userId) {
+        return em.find(User.class, userId);
+    }
+    
+    @Override
+    @RolesAllowed({"superuser"})
     public void saveUser(User user) {
         if (user.getId() == null) {
             // new user, set a default password

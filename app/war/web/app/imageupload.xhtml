@@ -11,18 +11,13 @@
        	<ui:param name="tabIndex" value="2" />
         
         <ui:define name="body">
-            <h:form id="configForm">
+    
+            <p:panel id="outputPanel" header="Spark Core Image Upload">
 
-                <p:panel id="outputPanel" header="Spark Core Image Upload">
+                <ui:include src="/WEB-INF/facelets/deviceselect.xhtml"/>
 
-                    <h:panelGrid columns="3">
-                        <h:outputLabel for="selectDevice" value="Your Device:"/>
-                        <p:selectOneMenu id="selectDevice" value="#{deviceDebugBean.selectedDevice}" onchange="this.form.submit();">
-                            <f:selectItems value="#{deviceDebugBean.devicesSelectItems}"/>
-                        </p:selectOneMenu>
-                        <p:message for="selectDevice"/>
-                    </h:panelGrid>
-                        
+                <h:form id="configForm">
+
                     <p:fileUpload id="imgUpload" fileUploadListener="#{deviceDebugBean.handleFileUpload}" mode="advanced" disabled="#{deviceDebugBean.selectedDevice eq null}"
                                  update="messages,imgDisplay" auto="true" sizeLimit="5000000" allowTypes="/(\.|\/)(gif|jpe?g|png)$/"/>
 
@@ -44,8 +39,8 @@
                             <p:commandLink value="Delete" action="#{deviceDebugBean.deleteImage}" update="imgDisplay"/>
                         </p:panelGrid> 
                     </p:outputPanel>
-                </p:panel>
-            </h:form>
+                </h:form>
+            </p:panel>
         </ui:define>
     </ui:composition>
 </html>

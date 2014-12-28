@@ -11,18 +11,14 @@
        	<ui:param name="tabIndex" value="0" />
         
         <ui:define name="body">
-            <h:form id="configForm">
 
-                <p:panel id="outputPanel" header="Spark Core Configuration">
+            <p:panel id="outputPanel" header="Spark Core Configuration">
+                
+                <ui:include src="/WEB-INF/facelets/deviceselect.xhtml"/>
 
+                <h:form id="configForm">
                     <h:panelGrid columns="3">
 
-                        <h:outputLabel for="selectDevice" value="Your Device:"/>
-                        <p:selectOneMenu id="selectDevice" value="#{deviceDebugBean.selectedDevice}" onchange="this.form.submit();">
-                            <f:selectItems value="#{deviceDebugBean.devicesSelectItems}"/>
-                        </p:selectOneMenu>
-                        <p:message for="selectDevice"/>
-                        
                         <h:outputLabel for="connectToCloud" value="Connect to cloud only:"/>
                         <p:selectBooleanCheckbox id="connectToCloud" value="#{deviceDebugBean.connectToCloud}" disabled="#{deviceDebugBean.selectedDevice eq null}"/>
                         <p:message for="connectToCloud"/>
@@ -33,7 +29,7 @@
                         </p:inputText>
                         <p:message for="exec"/>
 
-                        <h:outputLabel for="flashImages" value="Download and flash images (e.g. CDEF):"/>
+                        <h:outputLabel for="flashImages" value="Download and flash images (^([A-Z])*$):"/>
                         <p:inputText id="flashImages" value="#{deviceDebugBean.flashImages}" disabled="#{deviceDebugBean.selectedDevice eq null}">
                             <f:validateRegex pattern="^([A-Z])*$"/>
                         </p:inputText>
@@ -41,10 +37,10 @@
 
                     </h:panelGrid>
 
-                    <p:commandButton action="#{deviceDebugBean.save}" update="outputPanel" value="Save" disabled="#{deviceDebugBean.selectedDevice eq null}"/>
+                    <p:commandButton action="#{deviceDebugBean.save}" update=":outputPanel" value="Save" disabled="#{deviceDebugBean.selectedDevice eq null}"/>
                     
-                </p:panel>
-            </h:form>
+                </h:form>
+            </p:panel>
         </ui:define>
     </ui:composition>
 </html>

@@ -13,11 +13,14 @@ import javax.ejb.EJB;
 import java.util.ArrayList;
 import javax.faces.bean.ManagedBean;
 import javax.faces.bean.SessionScoped;
+import javax.faces.component.UIComponent;
+import javax.faces.context.FacesContext;
+import javax.faces.convert.Converter;
 import org.primefaces.model.DualListModel;
 
 @ManagedBean
 @SessionScoped
-public class AdminDevicesBean implements Serializable {
+public class AdminDevicesBean implements Serializable, Converter {
 
 	private static final long serialVersionUID = 1L;
 
@@ -72,7 +75,7 @@ public class AdminDevicesBean implements Serializable {
         }
         
 	public void save() {
-//            deviceEjb.saveDevice(currentDevice, assignedUsers.getTarget());
+            deviceEjb.saveDevice(currentDevice, assignedUsers.getTarget());
             clear();
 	}
 	
@@ -94,4 +97,14 @@ public class AdminDevicesBean implements Serializable {
                 WebUtils.addFacesMessage(ex);
             }
 	}
+
+    @Override
+    public Object getAsObject(FacesContext context, UIComponent component, String value) {
+        return usersEjb.getUser(Integer.parseInt(value));
+    }
+
+    @Override
+    public String getAsString(FacesContext context, UIComponent component, Object value) {
+        return ((User)value).getId().toString();
+    }
 }

@@ -23,6 +23,13 @@ public interface UsersEJBLocal {
     public List<User> getUsers();
 
     /**
+     * Get user object for given ID
+     * @param userId user ID
+     * @return user
+     */
+    public User getUser(int userId);
+            
+    /**
      * Get the current user
      * @return current user
      */

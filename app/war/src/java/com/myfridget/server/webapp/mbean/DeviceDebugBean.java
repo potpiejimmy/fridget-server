@@ -66,7 +66,7 @@ public class DeviceDebugBean {
         List<AdDevice> devices = deviceEjb.getDevicesForUser(usersEjb.getCurrentUser().getId());
         List<SelectItem> items = new ArrayList<>();
         items.add(new SelectItem(null, "<Select Device>"));
-        devices.forEach(i -> items.add(new SelectItem(i.getId(), "#"+i.getSerial())));
+        devices.forEach(i -> items.add(new SelectItem(i.getId(), i.getName())));
         return items;
     }
     
