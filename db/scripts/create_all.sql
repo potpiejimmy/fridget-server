@@ -33,7 +33,6 @@ ENGINE = InnoDB;
 -- -----------------------------------------------------
 CREATE TABLE IF NOT EXISTS `campaign` (
   `id` INT NOT NULL AUTO_INCREMENT,
-  `campaign_id` CHAR(32) NOT NULL,
   `user_id` INT NOT NULL,
   PRIMARY KEY (`id`),
   INDEX `fk_campaign_user1_idx` (`user_id` ASC),
@@ -46,16 +45,40 @@ ENGINE = InnoDB;
 
 
 -- -----------------------------------------------------
--- Table `campaign_image`
+-- Table `ad_medium`
 -- -----------------------------------------------------
-CREATE TABLE IF NOT EXISTS `campaign_image` (
+CREATE TABLE IF NOT EXISTS `ad_medium` (
+  `id` INT NOT NULL AUTO_INCREMENT,
+  `user_id` INT NOT NULL,
+  PRIMARY KEY (`id`),
+  INDEX `fk_ad_medium_user1_idx` (`user_id` ASC),
+  CONSTRAINT `fk_ad_medium_user1`
+    FOREIGN KEY (`user_id`)
+    REFERENCES `user` (`id`)
+    ON DELETE NO ACTION
+    ON UPDATE NO ACTION)
+ENGINE = InnoDB;
+
+
+-- -----------------------------------------------------
+-- Table `campaign_action`
+-- -----------------------------------------------------
+CREATE TABLE IF NOT EXISTS `campaign_action` (
   `id` INT NOT NULL AUTO_INCREMENT,
   `campaign_id` INT NOT NULL,
+  `ad_medium_id` INT NOT NULL,
+  `time_of_day` SMALLINT NOT NULL,
   PRIMARY KEY (`id`),
   INDEX `fk_campaign_image_campaign_idx` (`campaign_id` ASC),
+  INDEX `fk_campaign_action_ad_medium1_idx` (`ad_medium_id` ASC),
   CONSTRAINT `fk_campaign_image_campaign`
     FOREIGN KEY (`campaign_id`)
     REFERENCES `campaign` (`id`)
+    ON DELETE NO ACTION
+    ON UPDATE NO ACTION,
+  CONSTRAINT `fk_campaign_action_ad_medium1`
+    FOREIGN KEY (`ad_medium_id`)
+    REFERENCES `ad_medium` (`id`)
     ON DELETE NO ACTION
     ON UPDATE NO ACTION)
 ENGINE = InnoDB;
