@@ -12,33 +12,16 @@
         
         <ui:define name="body">
 
-            <p:panel id="outputPanel" header="Spark Core Configuration">
+            <p:panel id="outputPanel">
                 
-                <ui:include src="/WEB-INF/facelets/deviceselect.xhtml"/>
-
-                <h:form id="configForm">
+                <h:form id="selectForm">
                     <h:panelGrid columns="3">
 
-                        <h:outputLabel for="connectToCloud" value="Connect to cloud only:"/>
-                        <p:selectBooleanCheckbox id="connectToCloud" value="#{deviceDebugBean.connectToCloud}" disabled="#{deviceDebugBean.selectedDevice eq null}"/>
-                        <p:message for="connectToCloud"/>
-
-                        <h:outputLabel for="exec" value="Execution plan (^([A-Z|-][0-9A-F]{4})+$):"/>
-                        <p:inputText id="exec" size="75" value="#{deviceDebugBean.exec}" disabled="#{deviceDebugBean.selectedDevice eq null}" >
-                            <f:validateRegex pattern="^([A-Z|-][0-9A-F]{4})+$"/>
-                        </p:inputText>
-                        <p:message for="exec"/>
-
-                        <h:outputLabel for="flashImages" value="Download and flash images (^([A-Z])*$):"/>
-                        <p:inputText id="flashImages" value="#{deviceDebugBean.flashImages}" disabled="#{deviceDebugBean.selectedDevice eq null}">
-                            <f:validateRegex pattern="^([A-Z])*$"/>
-                        </p:inputText>
-                        <p:message for="flashImages"/>
+                        <p:commandLink>
+                            <p:graphicImage styleClass="campaignHover" value="/webres/img/campaign-add.png"/>
+                        </p:commandLink>
 
                     </h:panelGrid>
-
-                    <p:commandButton action="#{deviceDebugBean.save}" update=":outputPanel" value="Save" disabled="#{deviceDebugBean.selectedDevice eq null}"/>
-                    
                 </h:form>
             </p:panel>
         </ui:define>

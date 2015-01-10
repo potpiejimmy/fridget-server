@@ -14,16 +14,22 @@ html {
     float: left;
 }
 
+.whiteForeground {
+    color: white;
+}
+
 #root_header {
-    background-color: #fff;
+    background-color: #c00;
     font-family: Arial;
     font-size: 13pt;
-    padding: 5px;
-    color: black;
+    padding: 10px;
+    color: white;
     height: 42px;
 }
 
 #root_title {
+    font-weight: bold;
+    font-size: 14pt;
     float: left;
     line-height: 28px;
     margin: 7px 20px;
@@ -38,7 +44,7 @@ html {
 }
 
 .ui-widget, .ui-widget .ui-widget {
-    font-size: 85%;
+    font-size: 90%;
 }
 
 .ui-picklist .ui-picklist-list { 
@@ -65,3 +71,6 @@ html {
 .redColoredPanel .ui-panel-content {
    background-color: #FBB;
 }
+
+IMG.campaignHover {border:5px solid #eee;}
+IMG.campaignHover:hover {border:5px solid #c00;}

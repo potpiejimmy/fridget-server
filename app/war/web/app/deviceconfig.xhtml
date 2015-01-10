@@ -1,0 +1,47 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:ui="http://java.sun.com/jsf/facelets"
+      xmlns:h="http://xmlns.jcp.org/jsf/html"
+      xmlns:p="http://primefaces.org/ui"
+      xmlns:f="http://xmlns.jcp.org/jsf/core">
+
+    <ui:composition template="/WEB-INF/facelets/templates/baselayout.xhtml">
+
+       	<ui:param name="tabIndex" value="1" />
+        
+        <ui:define name="body">
+
+            <p:panel id="outputPanel">
+                
+                <ui:include src="/WEB-INF/facelets/deviceselect.xhtml"/>
+
+                <h:form id="configForm">
+                    <h:panelGrid columns="3">
+
+                        <h:outputLabel for="connectToCloud" value="Connect to cloud only:"/>
+                        <p:selectBooleanCheckbox id="connectToCloud" value="#{deviceDebugBean.connectToCloud}" disabled="#{deviceDebugBean.selectedDevice eq null}"/>
+                        <p:message for="connectToCloud"/>
+
+                        <h:outputLabel for="exec" value="Execution plan (^([A-Z|-][0-9A-F]{4})+$):"/>
+                        <p:inputText id="exec" size="75" value="#{deviceDebugBean.exec}" disabled="#{deviceDebugBean.selectedDevice eq null}" >
+                            <f:validateRegex pattern="^([A-Z|-][0-9A-F]{4})+$"/>
+                        </p:inputText>
+                        <p:message for="exec"/>
+
+                        <h:outputLabel for="flashImages" value="Download and flash images (^([A-Z])*$):"/>
+                        <p:inputText id="flashImages" value="#{deviceDebugBean.flashImages}" disabled="#{deviceDebugBean.selectedDevice eq null}">
+                            <f:validateRegex pattern="^([A-Z])*$"/>
+                        </p:inputText>
+                        <p:message for="flashImages"/>
+
+                    </h:panelGrid>
+
+                    <p:commandButton action="#{deviceDebugBean.save}" update=":outputPanel" value="Save" disabled="#{deviceDebugBean.selectedDevice eq null}"/>
+                    
+                </h:form>
+            </p:panel>
+        </ui:define>
+    </ui:composition>
+</html>
+

@@ -13,8 +13,8 @@
         <ui:define name="headerdivright">
             <h:form>
                 <h:panelGrid columns="1">
-                    <p:commandLink id="logoutBtn" value="Logout" action="#{usersBean.logout}" ajax="false" immediate="true"/>
                     <p:outputPanel><h:outputText value="#{request.userPrincipal.name}"/></p:outputPanel>
+                    <p:commandLink id="logoutBtn" styleClass="whiteForeground" value="Logout" action="#{usersBean.logout}" ajax="false" immediate="true"/>
                 </h:panelGrid>
             </h:form>
         </ui:define>
@@ -23,13 +23,12 @@
 
             <h:form id="tabMenuForm">
                 <p:tabMenu id="tabMenu" activeIndex="${tabIndex}">  
-                    <p:menuitem value="Device Configuration" url="/app/index.xhtml"/>
+                    <p:menuitem value="My Campaigns" url="/app/index.xhtml"/>
+                    <p:menuitem value="Device Configuration" url="/app/deviceconfig.xhtml"/>
                     <p:menuitem value="Device Log" url="/app/devicelog.xhtml"/>
                     <p:menuitem value="EPD Image Upload" url="/app/imageupload.xhtml"/>
                 </p:tabMenu>
             </h:form>  
-
-            <p/>
 
             <ui:insert name="body"/>
 
