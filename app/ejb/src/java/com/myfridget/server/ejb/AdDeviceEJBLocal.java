@@ -43,7 +43,7 @@ public interface AdDeviceEJBLocal {
 
     public void setParameter(AdDeviceParameter param);
     
-    public void uploadTestImage(int deviceId, byte[] imgData) throws IOException;
+    public void uploadTestImage(int deviceId, int displayType, byte[] imgData) throws IOException;
     
     public byte[] getTestImage(int deviceTestImageId) throws IOException;
 

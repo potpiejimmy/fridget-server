@@ -11,6 +11,7 @@ import com.myfridget.server.db.entity.AdDeviceParameter;
 import com.myfridget.server.db.entity.AdDeviceTestImage;
 import com.myfridget.server.ejb.AdDeviceEJBLocal;
 import com.myfridget.server.ejb.UsersEJBLocal;
+import com.myfridget.server.util.EPDUtils;
 import com.myfridget.server.util.Utils;
 import com.myfridget.server.webapp.util.WebUtils;
 import java.io.ByteArrayInputStream;
@@ -44,6 +45,8 @@ public class DeviceDebugBean {
     private UsersEJBLocal usersEjb;
     
     private Integer selectedDevice = null;
+    
+    private int selectedDisplayType = EPDUtils.SPECTRA_DISPLAY_TYPE_441;
     
     private String exec = null;
     private boolean connectToCloud = false;
@@ -108,7 +111,7 @@ public class DeviceDebugBean {
     public void handleFileUpload(FileUploadEvent event) {
         try {
             UploadedFile originalImage = event.getFile();
-            deviceEjb.uploadTestImage(selectedDevice, Utils.readAll(originalImage.getInputstream()));
+            deviceEjb.uploadTestImage(selectedDevice, selectedDisplayType, Utils.readAll(originalImage.getInputstream()));
             WebUtils.addFacesMessage("File " + event.getFile().getFileName() + " uploaded successfully.");
             currentImageIndex = deviceEjb.getDeviceTestImages(selectedDevice).size()-1;
         } catch (Exception ex) {
@@ -122,6 +125,13 @@ public class DeviceDebugBean {
         if (imgs != null) {
             for (int i=0; i<imgs.size(); i++) result.add(new SelectItem(i, "Image "+ new String(new byte[] {(byte)(65+i)})));
         }
+        return result;
+    }
+    
+    public List<SelectItem> getDisplayTypesSelectItems() {
+        List<SelectItem> result = new ArrayList<>();
+        result.add(new SelectItem(EPDUtils.SPECTRA_DISPLAY_TYPE_441, "Spectra 4.41\" (400x300)"));
+        result.add(new SelectItem(EPDUtils.SPECTRA_DISPLAY_TYPE_74, "Spectra 7.4\" (480x800)"));
         return result;
     }
     
@@ -202,5 +212,13 @@ public class DeviceDebugBean {
 
     public void setCurrentImageIndex(int currentImageIndex) {
         this.currentImageIndex = currentImageIndex;
+    }
+
+    public int getSelectedDisplayType() {
+        return selectedDisplayType;
+    }
+
+    public void setSelectedDisplayType(int selectedDisplayType) {
+        this.selectedDisplayType = selectedDisplayType;
     }
 }

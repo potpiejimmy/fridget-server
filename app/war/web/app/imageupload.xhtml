@@ -18,6 +18,15 @@
 
                 <h:form id="configForm">
 
+                    <h:panelGrid columns="3">
+                        <h:outputLabel for="selectDisplayType" value="Select Display Type:"/>
+                        <p:selectOneMenu id="selectDisplayType" value="#{deviceDebugBean.selectedDisplayType}">
+                            <f:selectItems value="#{deviceDebugBean.displayTypesSelectItems}"/>
+                            <p:ajax event="change"/>
+                        </p:selectOneMenu>
+                        <p:message for="selectDisplayType"/>
+                    </h:panelGrid>
+                    
                     <p:fileUpload id="imgUpload" fileUploadListener="#{deviceDebugBean.handleFileUpload}" mode="advanced" disabled="#{deviceDebugBean.selectedDevice eq null}"
                                  update="messages,imgDisplay" auto="true" sizeLimit="5000000" allowTypes="/(\.|\/)(gif|jpe?g|png)$/"/>
 

@@ -6,6 +6,7 @@
 package com.myfridget.server.util;
 
 import java.awt.Color;
+import java.awt.Dimension;
 import java.awt.Graphics;
 import java.awt.image.BufferedImage;
 import java.io.ByteArrayOutputStream;
@@ -17,7 +18,20 @@ import java.io.IOException;
  */
 public class EPDUtils {
     
-    public final static Color SPECTRA_RED = new Color(135, 16, 19);
+    public final static int SPECTRA_DISPLAY_TYPE_441 = 0;
+    public final static int SPECTRA_DISPLAY_TYPE_74 = 1;
+    
+    public static Dimension dimensionForDisplayType(int displayType) {
+        switch (displayType) {
+            case SPECTRA_DISPLAY_TYPE_441:
+                return new Dimension(400,300);
+            case SPECTRA_DISPLAY_TYPE_74:
+                return new Dimension(480,800);
+        }
+        return null;
+    }
+    
+    public final static Color SPECTRA_RED = new Color(0xC0, 0, 0);
     
     public static byte[] makeSpectra3Color(BufferedImage img) {
         Graphics gr = img.getGraphics();

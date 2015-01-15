@@ -14,6 +14,7 @@ import com.myfridget.server.db.entity.UserAdDevice;
 import com.myfridget.server.util.EPDUtils;
 import com.myfridget.server.util.HuffmanCompression;
 import com.myfridget.server.util.Utils;
+import java.awt.Dimension;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.FileInputStream;
@@ -152,8 +153,8 @@ public class AdDeviceEJB implements AdDeviceEJBLocal {
     }
     
     @Override
-    public void uploadTestImage(int deviceId, byte[] imgData) throws IOException {
-        BufferedImage img = getResizedImage(imgData);
+    public void uploadTestImage(int deviceId, int displayType, byte[] imgData) throws IOException {
+        BufferedImage img = getResizedImageForDisplay(imgData, displayType);
         byte[] epdData = encodeEPD(img); // Note: converts "img" to 3 colors
         imgData = Utils.encodeImage(img, "png");
         
@@ -167,9 +168,9 @@ public class AdDeviceEJB implements AdDeviceEJBLocal {
         writeCacheFile(testImage, "epd", epdData);
     }
     
-    protected static BufferedImage getResizedImage(byte[] imgData) {
-        // XXX 400x300
-        return Utils.getScaledBufferedImage(imgData, 400, 300);
+    protected static BufferedImage getResizedImageForDisplay(byte[] imgData, int displayType) {
+        Dimension dim = EPDUtils.dimensionForDisplayType(displayType);
+        return Utils.getScaledBufferedImage(imgData, dim.width, dim.height);
     }
     
     protected static byte[] encodeEPD(BufferedImage img) throws IOException {
@@ -196,7 +197,7 @@ public class AdDeviceEJB implements AdDeviceEJBLocal {
         if (imgData == null) {
             // recreate from preview
             imgData = getTestImagePreview(deviceTestImageId);
-            imgData = encodeEPD(getResizedImage(imgData));
+            imgData = encodeEPD(getResizedImageForDisplay(imgData, EPDUtils.SPECTRA_DISPLAY_TYPE_441)); // XXX WARNING REENCODING ALWAYS FOR 4.41, must persist display type
             writeCacheFile(em.find(AdDeviceTestImage.class, deviceTestImageId), "epd", imgData);
         }
         return imgData;
