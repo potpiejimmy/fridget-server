@@ -12,6 +12,7 @@ CREATE TABLE IF NOT EXISTS `ad_device` (
   `lon` DECIMAL(18,14) NOT NULL,
   `lat` DECIMAL(18,14) NOT NULL,
   `name` VARCHAR(64) NULL,
+  `type` SMALLINT NOT NULL DEFAULT 0,
   PRIMARY KEY (`id`))
 ENGINE = InnoDB;
 
@@ -34,6 +35,7 @@ ENGINE = InnoDB;
 CREATE TABLE IF NOT EXISTS `campaign` (
   `id` INT NOT NULL AUTO_INCREMENT,
   `user_id` INT NOT NULL,
+  `name` VARCHAR(64) NOT NULL,
   PRIMARY KEY (`id`),
   INDEX `fk_campaign_user1_idx` (`user_id` ASC),
   CONSTRAINT `fk_campaign_user1`
@@ -50,6 +52,7 @@ ENGINE = InnoDB;
 CREATE TABLE IF NOT EXISTS `ad_medium` (
   `id` INT NOT NULL AUTO_INCREMENT,
   `user_id` INT NOT NULL,
+  `name` VARCHAR(64) NOT NULL,
   PRIMARY KEY (`id`),
   INDEX `fk_ad_medium_user1_idx` (`user_id` ASC),
   CONSTRAINT `fk_ad_medium_user1`
@@ -154,6 +157,23 @@ CREATE TABLE IF NOT EXISTS `ad_device_test_image` (
   CONSTRAINT `fk_ad_device_test_image_ad_device1`
     FOREIGN KEY (`ad_device_id`)
     REFERENCES `ad_device` (`id`)
+    ON DELETE NO ACTION
+    ON UPDATE NO ACTION)
+ENGINE = InnoDB;
+
+
+-- -----------------------------------------------------
+-- Table `ad_medium_item`
+-- -----------------------------------------------------
+CREATE TABLE IF NOT EXISTS `ad_medium_item` (
+  `id` INT NOT NULL AUTO_INCREMENT,
+  `ad_medium_id` INT NOT NULL,
+  `type` SMALLINT NOT NULL DEFAULT 0,
+  PRIMARY KEY (`id`),
+  INDEX `fk_ad_medium_item_ad_medium1_idx` (`ad_medium_id` ASC),
+  CONSTRAINT `fk_ad_medium_item_ad_medium1`
+    FOREIGN KEY (`ad_medium_id`)
+    REFERENCES `ad_medium` (`id`)
     ON DELETE NO ACTION
     ON UPDATE NO ACTION)
 ENGINE = InnoDB;

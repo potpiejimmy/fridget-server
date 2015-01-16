@@ -16,7 +16,6 @@ import javax.persistence.NamedQueries;
 import javax.persistence.NamedQuery;
 import javax.persistence.Table;
 import javax.validation.constraints.NotNull;
-import javax.validation.constraints.Size;
 import javax.xml.bind.annotation.XmlRootElement;
 
 /**
@@ -24,12 +23,13 @@ import javax.xml.bind.annotation.XmlRootElement;
  * @author thorsten
  */
 @Entity
-@Table(name = "campaign")
+@Table(name = "ad_medium_item")
 @XmlRootElement
 @NamedQueries({
-    @NamedQuery(name = "Campaign.findAll", query = "SELECT c FROM Campaign c"),
-    @NamedQuery(name = "Campaign.findById", query = "SELECT c FROM Campaign c WHERE c.id = :id")})
-public class Campaign implements Serializable {
+    @NamedQuery(name = "AdMediumItem.findAll", query = "SELECT a FROM AdMediumItem a"),
+    @NamedQuery(name = "AdMediumItem.findById", query = "SELECT a FROM AdMediumItem a WHERE a.id = :id"),
+    @NamedQuery(name = "AdMediumItem.findByType", query = "SELECT a FROM AdMediumItem a WHERE a.type = :type")})
+public class AdMediumItem implements Serializable {
     private static final long serialVersionUID = 1L;
     
     @Id
@@ -38,20 +38,25 @@ public class Campaign implements Serializable {
     @Column(name = "id")
     private Integer id;
     
-    @Column(name = "user_id")
+    @Column(name = "ad_medium_id")
     @NotNull
-    private Integer userId;
-
-    @Basic(optional = true)
-    @Size(min = 1, max = 64)
-    @Column(name = "name")
-    private String name;
+    private Integer adMediumId;
     
-    public Campaign() {
+    @Basic(optional = false)
+    @NotNull
+    @Column(name = "type")
+    private short type;
+
+    public AdMediumItem() {
     }
 
-    public Campaign(Integer id) {
+    public AdMediumItem(Integer id) {
         this.id = id;
+    }
+
+    public AdMediumItem(Integer id, short type) {
+        this.id = id;
+        this.type = type;
     }
 
     public Integer getId() {
@@ -62,20 +67,20 @@ public class Campaign implements Serializable {
         this.id = id;
     }
 
-    public Integer getUserId() {
-        return userId;
+    public Integer getAdMediumId() {
+        return adMediumId;
     }
 
-    public void setUserId(Integer userId) {
-        this.userId = userId;
+    public void setAdMediumId(Integer adMediumId) {
+        this.adMediumId = adMediumId;
     }
 
-    public String getName() {
-        return name;
+    public short getType() {
+        return type;
     }
 
-    public void setName(String name) {
-        this.name = name;
+    public void setType(short type) {
+        this.type = type;
     }
 
     @Override
@@ -88,10 +93,10 @@ public class Campaign implements Serializable {
     @Override
     public boolean equals(Object object) {
         // TODO: Warning - this method won't work in the case the id fields are not set
-        if (!(object instanceof Campaign)) {
+        if (!(object instanceof AdMediumItem)) {
             return false;
         }
-        Campaign other = (Campaign) object;
+        AdMediumItem other = (AdMediumItem) object;
         if ((this.id == null && other.id != null) || (this.id != null && !this.id.equals(other.id))) {
             return false;
         }
@@ -100,7 +105,7 @@ public class Campaign implements Serializable {
 
     @Override
     public String toString() {
-        return "com.myfridget.server.db.entity.Campaign[ id=" + id + " ]";
+        return "com.myfridget.server.db.entity.AdMediumItem[ id=" + id + " ]";
     }
     
 }

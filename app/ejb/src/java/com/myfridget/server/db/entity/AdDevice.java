@@ -67,6 +67,11 @@ public class AdDevice implements Serializable {
     @Column(name = "name")
     private String name;
     
+    @Basic(optional = false)
+    @NotNull
+    @Column(name = "type")
+    private short type;
+    
     public AdDevice() {
     }
 
@@ -119,6 +124,14 @@ public class AdDevice implements Serializable {
 
     public void setName(String name) {
         this.name = name;
+    }
+
+    public short getType() {
+        return type;
+    }
+
+    public void setType(short type) {
+        this.type = type;
     }
 
     @Override

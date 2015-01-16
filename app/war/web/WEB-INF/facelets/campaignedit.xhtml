@@ -1,0 +1,36 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:ui="http://java.sun.com/jsf/facelets"
+      xmlns:h="http://java.sun.com/jsf/html"
+      xmlns:p="http://primefaces.org/ui"
+      xmlns:f="http://xmlns.jcp.org/jsf/core">
+    
+    <ui:composition>
+        
+        <h:form id="campaigneditform">
+            
+            <p:outputPanel id="campaigneditpanel" style="display:none;">
+                
+                <p:effect type="blind" event="load" speed="500">
+                    <f:param name="mode" value="'show'" />
+                    <f:param name="direction" value="'vertical'" />
+                </p:effect>
+                
+                <h:panelGrid columns="3">
+                    <h:outputLabel for="campaignName" value="Campaign Name / Description:"/>
+                    <p:inputText id="campaignName" value="#{deviceDebugBean.flashImages}"/>
+                    <p:message for="campaignName"/>
+                </h:panelGrid>
+    
+                <hr/>
+                <p:commandButton value="Save" action="#{campaignsBean.cancelEditing}" update=":outputPanel"/>
+                <p:commandButton value="Cancel" immediate="true" action="#{campaignsBean.cancelEditing}" update=":outputPanel"/>
+            </p:outputPanel>
+            
+        </h:form>        
+        
+    </ui:composition>
+    
+</html>
+

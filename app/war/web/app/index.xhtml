@@ -14,16 +14,24 @@
 
             <p:panel id="outputPanel">
                 
-                <h:form id="selectForm">
-                    <h:panelGrid columns="3">
+                <p:outputPanel rendered="#{campaignsBean.currentCampaign eq null}">
+                    <h:form id="selectForm">
+                        <h:panelGrid columns="3">
 
-                        <p:commandLink>
-                            <p:graphicImage styleClass="campaignHover" value="/webres/img/campaign-add.png"/>
-                        </p:commandLink>
+                            <p:commandLink action="#{campaignsBean.newCampaign}" update=":outputPanel">
+                                <p:graphicImage styleClass="campaignHover" value="/webres/img/campaign-add.png"/>
+                            </p:commandLink>
 
-                    </h:panelGrid>
-                </h:form>
+                        </h:panelGrid>
+                    </h:form>
+                </p:outputPanel>
+                
+                <p:outputPanel rendered="#{campaignsBean.currentCampaign ne null}">
+                    <ui:include src="/WEB-INF/facelets/campaignedit.xhtml"/>
+                </p:outputPanel>
+                
             </p:panel>
+            
         </ui:define>
     </ui:composition>
 </html>

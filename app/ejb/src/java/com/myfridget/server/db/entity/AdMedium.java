@@ -16,6 +16,7 @@ import javax.persistence.NamedQueries;
 import javax.persistence.NamedQuery;
 import javax.persistence.Table;
 import javax.validation.constraints.NotNull;
+import javax.validation.constraints.Size;
 import javax.xml.bind.annotation.XmlRootElement;
 
 /**
@@ -41,6 +42,11 @@ public class AdMedium implements Serializable {
     @NotNull
     private Integer userId;
     
+    @Basic(optional = true)
+    @Size(min = 1, max = 64)
+    @Column(name = "name")
+    private String name;
+    
     public AdMedium() {
     }
 
@@ -62,6 +68,14 @@ public class AdMedium implements Serializable {
 
     public void setUserId(Integer userId) {
         this.userId = userId;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
     }
 
     @Override
