@@ -6,6 +6,9 @@
 package com.myfridget.server.webapp.mbean;
 
 import com.myfridget.server.db.entity.Campaign;
+import com.myfridget.server.ejb.CampaignsEJBLocal;
+import java.util.List;
+import javax.ejb.EJB;
 import javax.faces.bean.ManagedBean;
 import javax.faces.bean.SessionScoped;
 
@@ -16,6 +19,9 @@ import javax.faces.bean.SessionScoped;
 @ManagedBean
 @SessionScoped
 public class CampaignsBean {
+    
+    @EJB
+    private CampaignsEJBLocal campaignsEjb;
     
     private Campaign currentCampaign = null;
 
@@ -31,8 +37,25 @@ public class CampaignsBean {
         currentCampaign = new Campaign();
     }
     
+    public void editCampaign(Campaign campaign) {
+        currentCampaign = campaign;
+    }
+    
     public void cancelEditing() {
         setCurrentCampaign(null);
     }
     
+    public void save() {
+        campaignsEjb.saveCampaign(currentCampaign);
+        setCurrentCampaign(null);
+    }
+    
+    public void delete() {
+        campaignsEjb.deleteCampaign(currentCampaign.getId());
+        setCurrentCampaign(null);
+    }
+    
+    public List<Campaign> getCampaigns() {
+        return campaignsEjb.getCampaigns();
+    }
 }

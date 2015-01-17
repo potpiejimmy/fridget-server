@@ -60,6 +60,13 @@ html {
     display: none;
 }
 
+.ui-datatable.borderless thead th,
+.ui-datatable.borderless tbody,
+.ui-datatable.borderless tbody tr,
+.ui-datatable.borderless tbody td {
+    border-style: none;
+}
+
 .topAlign {
     vertical-align: top;
 }
@@ -72,5 +79,7 @@ html {
    background-color: #FBB;
 }
 
-IMG.campaignHover {border:5px solid #eee;}
-IMG.campaignHover:hover {border:5px solid #c00;}
+.campaignstable {width: 480px;border:0;}
+.gridCell {display:block; text-decoration: none; font-weight: bold; font-size: 20px; height:150px;}
+.campaignHover {border:5px solid #eee;}
+.campaignHover:hover {border:5px solid #c00;}

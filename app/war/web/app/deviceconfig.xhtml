@@ -12,6 +12,10 @@
         
         <ui:define name="body">
 
+            <ui:include src="/WEB-INF/facelets/devicedebugmenu.xhtml">
+                <ui:param name="tabIndex" value="0"/>
+            </ui:include>
+            
             <p:panel id="outputPanel">
                 
                 <ui:include src="/WEB-INF/facelets/deviceselect.xhtml"/>

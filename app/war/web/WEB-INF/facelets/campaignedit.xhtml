@@ -19,13 +19,15 @@
                 
                 <h:panelGrid columns="3">
                     <h:outputLabel for="campaignName" value="Campaign Name / Description:"/>
-                    <p:inputText id="campaignName" value="#{deviceDebugBean.flashImages}"/>
+                    <p:inputText id="campaignName" value="#{campaignsBean.currentCampaign.name}"/>
                     <p:message for="campaignName"/>
                 </h:panelGrid>
     
                 <hr/>
-                <p:commandButton value="Save" action="#{campaignsBean.cancelEditing}" update=":outputPanel"/>
+                <p:commandButton value="Save" action="#{campaignsBean.save}" update=":outputPanel"/>
                 <p:commandButton value="Cancel" immediate="true" action="#{campaignsBean.cancelEditing}" update=":outputPanel"/>
+                <p/>
+                <p:commandLink value="Delete campaign" action="#{campaignsBean.delete}" update=":outputPanel" rendered="#{campaignsBean.currentCampaign.id ne null}"/>
             </p:outputPanel>
             
         </h:form>        

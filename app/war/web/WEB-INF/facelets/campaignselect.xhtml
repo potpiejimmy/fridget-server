@@ -1,0 +1,27 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:ui="http://java.sun.com/jsf/facelets"
+      xmlns:h="http://java.sun.com/jsf/html"
+      xmlns:p="http://primefaces.org/ui"
+      xmlns:f="http://xmlns.jcp.org/jsf/core">
+    
+    <ui:composition>
+        
+        <h:form id="selectForm">
+            <p:dataTable styleClass="campaignstable no-table-header borderless" value="#{campaignsBean.campaigns}" var="campaign">
+                <p:column>
+                    <ui:include src="/WEB-INF/facelets/campaigncell.xhtml"><ui:param name="campaign" value="#{campaign}"/></ui:include>
+                </p:column>
+            </p:dataTable>
+            
+            <p:commandLink action="#{campaignsBean.newCampaign}" update=":outputPanel">
+                <p:graphicImage styleClass="campaignHover" value="/webres/img/campaign-add.png"/>
+            </p:commandLink>
+
+        </h:form>
+        
+    </ui:composition>
+    
+</html>
+

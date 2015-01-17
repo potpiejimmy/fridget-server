@@ -15,15 +15,7 @@
             <p:panel id="outputPanel">
                 
                 <p:outputPanel rendered="#{campaignsBean.currentCampaign eq null}">
-                    <h:form id="selectForm">
-                        <h:panelGrid columns="3">
-
-                            <p:commandLink action="#{campaignsBean.newCampaign}" update=":outputPanel">
-                                <p:graphicImage styleClass="campaignHover" value="/webres/img/campaign-add.png"/>
-                            </p:commandLink>
-
-                        </h:panelGrid>
-                    </h:form>
+                    <ui:include src="/WEB-INF/facelets/campaignselect.xhtml"/>
                 </p:outputPanel>
                 
                 <p:outputPanel rendered="#{campaignsBean.currentCampaign ne null}">
