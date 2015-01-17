@@ -65,6 +65,7 @@ html {
 .ui-datatable.borderless tbody tr,
 .ui-datatable.borderless tbody td {
     border-style: none;
+    padding: 5px 0px;
 }
 
 .topAlign {

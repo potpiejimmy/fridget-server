@@ -6,8 +6,8 @@
 package com.myfridget.server.ejb;
 
 import com.myfridget.server.db.entity.Campaign;
+import com.myfridget.server.db.entity.CampaignAction;
 import java.util.List;
-import javax.annotation.security.RolesAllowed;
 import javax.ejb.EJB;
 import javax.ejb.Stateless;
 import javax.persistence.EntityManager;
@@ -29,6 +29,11 @@ public class CampaignsEJB implements CampaignsEJBLocal {
     @Override
     public List<Campaign> getCampaigns() {
         return em.createNamedQuery("Campaign.findByUserId", Campaign.class).setParameter("userId", usersEjb.getCurrentUser().getId()).getResultList();
+    }
+
+    @Override
+    public List<CampaignAction> getCampaignActionsForCampaign(int campaignId) {
+        return em.createNamedQuery("CampaignAction.findByCampaignId", CampaignAction.class).setParameter("campaignId", campaignId).getResultList();
     }
 
     @Override

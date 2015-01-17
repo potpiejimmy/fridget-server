@@ -6,7 +6,9 @@
 package com.myfridget.server.webapp.mbean;
 
 import com.myfridget.server.db.entity.Campaign;
+import com.myfridget.server.db.entity.CampaignAction;
 import com.myfridget.server.ejb.CampaignsEJBLocal;
+import java.util.ArrayList;
 import java.util.List;
 import javax.ejb.EJB;
 import javax.faces.bean.ManagedBean;
@@ -24,7 +26,8 @@ public class CampaignsBean {
     private CampaignsEJBLocal campaignsEjb;
     
     private Campaign currentCampaign = null;
-
+    private List<CampaignAction> currentActions = null;
+            
     public Campaign getCurrentCampaign() {
         return currentCampaign;
     }
@@ -35,10 +38,12 @@ public class CampaignsBean {
     
     public void newCampaign() {
         currentCampaign = new Campaign();
+        currentActions = new ArrayList<>();
     }
     
     public void editCampaign(Campaign campaign) {
         currentCampaign = campaign;
+        currentActions = campaignsEjb.getCampaignActionsForCampaign(currentCampaign.getId());
     }
     
     public void cancelEditing() {
@@ -57,5 +62,9 @@ public class CampaignsBean {
     
     public List<Campaign> getCampaigns() {
         return campaignsEjb.getCampaigns();
+    }
+    
+    public List<CampaignAction> getCampaignActions() {
+        return currentActions;
     }
 }

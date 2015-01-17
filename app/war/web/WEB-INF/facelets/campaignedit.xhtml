@@ -24,6 +24,17 @@
                 </h:panelGrid>
     
                 <hr/>
+                
+                <p:dataTable value="#{campaignsBean.campaignActions}" var="action">
+                    <p:column headerText="Time">
+                        
+                    </p:column>
+                    <p:column headerText="Action / Display">
+                        
+                    </p:column>
+                </p:dataTable>
+                
+                <hr/>
                 <p:commandButton value="Save" action="#{campaignsBean.save}" update=":outputPanel"/>
                 <p:commandButton value="Cancel" immediate="true" action="#{campaignsBean.cancelEditing}" update=":outputPanel"/>
                 <p/>

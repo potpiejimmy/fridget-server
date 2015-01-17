@@ -6,6 +6,7 @@
 package com.myfridget.server.ejb;
 
 import com.myfridget.server.db.entity.Campaign;
+import com.myfridget.server.db.entity.CampaignAction;
 import java.util.List;
 import javax.ejb.Local;
 
@@ -17,6 +18,8 @@ import javax.ejb.Local;
 public interface CampaignsEJBLocal {
     
     public List<Campaign> getCampaigns();
+    
+    public List<CampaignAction> getCampaignActionsForCampaign(int campaignId);
     
     public void saveCampaign(Campaign campaign);
     
