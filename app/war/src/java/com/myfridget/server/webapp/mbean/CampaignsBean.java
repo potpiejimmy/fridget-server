@@ -26,6 +26,8 @@ public class CampaignsBean {
     private CampaignsEJBLocal campaignsEjb;
     
     private Campaign currentCampaign = null;
+    private CampaignAction currentAction = null;
+    private String currentActionTime = null;
     private List<CampaignAction> currentActions = null;
             
     public Campaign getCurrentCampaign() {
@@ -34,6 +36,22 @@ public class CampaignsBean {
 
     public void setCurrentCampaign(Campaign currentCampaign) {
         this.currentCampaign = currentCampaign;
+    }
+
+    public CampaignAction getCurrentAction() {
+        return currentAction;
+    }
+
+    public void setCurrentAction(CampaignAction currentAction) {
+        this.currentAction = currentAction;
+    }
+
+    public String getCurrentActionTime() {
+        return currentActionTime;
+    }
+
+    public void setCurrentActionTime(String currentActionTime) {
+        this.currentActionTime = currentActionTime;
     }
     
     public void newCampaign() {
@@ -67,4 +85,22 @@ public class CampaignsBean {
     public List<CampaignAction> getCampaignActions() {
         return currentActions;
     }
+    
+    // ------------
+    
+    public void newAction() {
+        currentAction = new CampaignAction();
+    }
+
+    public void saveAction() {
+        currentAction.setTimeOfDay(Short.parseShort(currentActionTime.replace(":", "")));
+        currentActions.add(currentAction);
+        cancelAction();
+    }
+
+    public void cancelAction() {
+        currentAction = null;
+        currentActionTime = null;
+    }
+
 }
