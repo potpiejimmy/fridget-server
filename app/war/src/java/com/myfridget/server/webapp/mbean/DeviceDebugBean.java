@@ -35,7 +35,7 @@ import org.primefaces.model.UploadedFile;
  */
 @ManagedBean
 @SessionScoped
-public class DeviceDebugBean {
+public class DeviceDebugBean extends ImageUploadBean {
     
     protected final static DateFormat DATE_FORMAT = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss.SSS");
     
@@ -45,8 +45,6 @@ public class DeviceDebugBean {
     private UsersEJBLocal usersEjb;
     
     private Integer selectedDevice = null;
-    
-    private int selectedDisplayType = EPDUtils.SPECTRA_DISPLAY_TYPE_441;
     
     private String exec = null;
     private boolean connectToCloud = false;
@@ -108,6 +106,7 @@ public class DeviceDebugBean {
         deviceEjb.clearDebugMessages(selectedDevice!=null ? selectedDevice : 0);
     }
     
+    @Override
     public void handleFileUpload(FileUploadEvent event) {
         try {
             UploadedFile originalImage = event.getFile();
@@ -125,13 +124,6 @@ public class DeviceDebugBean {
         if (imgs != null) {
             for (int i=0; i<imgs.size(); i++) result.add(new SelectItem(i, "Image "+ new String(new byte[] {(byte)(65+i)})));
         }
-        return result;
-    }
-    
-    public List<SelectItem> getDisplayTypesSelectItems() {
-        List<SelectItem> result = new ArrayList<>();
-        result.add(new SelectItem(EPDUtils.SPECTRA_DISPLAY_TYPE_441, "Spectra 4.41\" (400x300)"));
-        result.add(new SelectItem(EPDUtils.SPECTRA_DISPLAY_TYPE_74, "Spectra 7.4\" (480x800)"));
         return result;
     }
     
@@ -212,13 +204,5 @@ public class DeviceDebugBean {
 
     public void setCurrentImageIndex(int currentImageIndex) {
         this.currentImageIndex = currentImageIndex;
-    }
-
-    public int getSelectedDisplayType() {
-        return selectedDisplayType;
-    }
-
-    public void setSelectedDisplayType(int selectedDisplayType) {
-        this.selectedDisplayType = selectedDisplayType;
     }
 }

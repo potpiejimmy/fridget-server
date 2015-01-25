@@ -7,6 +7,7 @@ package com.myfridget.server.webapp.mbean;
 
 import com.myfridget.server.db.entity.Campaign;
 import com.myfridget.server.db.entity.CampaignAction;
+import com.myfridget.server.ejb.AdMediumEJBLocal;
 import com.myfridget.server.ejb.CampaignsEJBLocal;
 import java.util.ArrayList;
 import java.util.List;
@@ -24,6 +25,9 @@ public class CampaignsBean {
     
     @EJB
     private CampaignsEJBLocal campaignsEjb;
+    
+    @EJB
+    protected AdMediumEJBLocal mediumEjb;
     
     private Campaign currentCampaign = null;
     private CampaignAction currentAction = null;
@@ -53,7 +57,7 @@ public class CampaignsBean {
     public void setCurrentActionTime(String currentActionTime) {
         this.currentActionTime = currentActionTime;
     }
-    
+
     public void newCampaign() {
         currentCampaign = new Campaign();
         currentActions = new ArrayList<>();
@@ -102,5 +106,4 @@ public class CampaignsBean {
         currentAction = null;
         currentActionTime = null;
     }
-
 }

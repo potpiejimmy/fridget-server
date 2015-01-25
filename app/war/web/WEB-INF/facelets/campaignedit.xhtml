@@ -19,7 +19,7 @@
                 
                 <h:panelGrid columns="3">
                     <h:outputLabel for="campaignName" value="Campaign Name / Description:"/>
-                    <p:inputText id="campaignName" value="#{campaignsBean.currentCampaign.name}"/>
+                    <p:inputText id="campaignName" value="#{campaignsBean.currentCampaign.name}" size="60"/>
                     <p:message for="campaignName"/>
                 </h:panelGrid>
     
@@ -42,11 +42,38 @@
                     <p:outputPanel rendered="#{campaignsBean.currentAction ne null}">
                         <h:panelGrid columns="3">
                             <h:outputLabel for="actionTime" value="Time (HH:MM):"/>
-                            <p:inputMask id="actionTime" value="#{campaignsBean.currentActionTime}" mask="99:99">
+                            <p:inputMask id="actionTime" value="#{campaignsBean.currentActionTime}" mask="99:99" size="5">
                                 <f:validateRegex pattern="^[0-2][0-9]:[0-5][0-9]$"/>
                             </p:inputMask>
                             <p:message for="actionTime"/>
+                            
+                            <h:outputLabel for="mediumName" value="Action Description:"/>
+                            <p:inputText id="mediumName" value="#{campaignsBean.currentActionMedium.name}" size="60"/>
+                            <p:message for="mediumName"/>
                         </h:panelGrid>
+                        
+                        <h:panelGrid columns="3">
+                            <h:outputLabel for="selectDisplayType" value="Select Upload Display Type:"/>
+                            <p:selectOneMenu id="selectDisplayType" value="#{campaignsBean.selectedDisplayType}">
+                                <f:selectItems value="#{campaignsBean.displayTypesSelectItems}"/>
+                                <p:ajax event="change"/>
+                            </p:selectOneMenu>
+                            <p:message for="selectDisplayType"/>
+                        </h:panelGrid>
+                        <p:fileUpload id="imgUpload" fileUploadListener="#{campaignsBean.handleFileUpload}" mode="advanced"
+                                     update="messages,medium4,medium7" auto="true" sizeLimit="5000000" allowTypes="/(\.|\/)(gif|jpe?g|png)$/"/>
+                        <p:growl id="messages" showDetail="true"/>  
+                        
+                        <h:panelGrid columns="3">
+                            <h:outputLabel for="medium4" value="Medium 4.41&quot;:"/>
+                            <p:graphicImage id="medium4" value="#{campaignsBean.currentMedium4}" cache="false"/>
+                            <p:message for="medium4"/>
+                            
+                            <h:outputLabel for="medium7" value="Medium 7.4&quot;:"/>
+                            <p:graphicImage id="medium7" value="#{campaignsBean.currentMedium7}" cache="false"/>
+                            <p:message for="medium7"/>
+                        </h:panelGrid>
+                        
                         <p:commandButton value="Save Action" action="#{campaignsBean.saveAction}" update="actionTable,actionbuttonpanel,editActionPanel"/>
                         <p:commandButton value="Cancel" immediate="true" action="#{campaignsBean.cancelAction}" update="actionTable,actionbuttonpanel,editActionPanel"/>
                     </p:outputPanel>

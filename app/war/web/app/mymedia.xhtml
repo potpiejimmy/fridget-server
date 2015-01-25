@@ -1,0 +1,76 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:ui="http://java.sun.com/jsf/facelets"
+      xmlns:h="http://java.sun.com/jsf/html"
+      xmlns:f="http://java.sun.com/jsf/core"
+      xmlns:p="http://primefaces.org/ui">
+    
+    <ui:composition template="/WEB-INF/facelets/templates/baselayout.xhtml">
+
+       	<ui:param name="tabIndex" value="0" />
+
+        <ui:define name="pagetitle">My Media</ui:define>
+        
+        <ui:define name="body">
+        
+            <h:form id="editform">
+
+                <h:panelGrid columns="3">
+                    <h:outputLabel for="mediumName" value="Medium Description:"/>
+                    <p:inputText id="mediumName" value="#{mediaBean.currentMedium.name}" size="60"/>
+                    <p:message for="mediumName"/>
+                </h:panelGrid>
+
+                <h:panelGrid columns="3">
+                    <h:outputLabel for="selectDisplayType" value="Select Upload Display Type:"/>
+                    <p:selectOneMenu id="selectDisplayType" value="#{mediaBean.selectedDisplayType}">
+                        <f:selectItems value="#{mediaBean.displayTypesSelectItems}"/>
+                        <p:ajax event="change"/>
+                    </p:selectOneMenu>
+                    <p:message for="selectDisplayType"/>
+                </h:panelGrid>
+                <p:fileUpload id="imgUpload" fileUploadListener="#{mediaBean.handleFileUpload}" mode="advanced"
+                             update="messages,medium4,medium7" auto="true" sizeLimit="5000000" allowTypes="/(\.|\/)(gif|jpe?g|png)$/"/>
+                <p:growl id="messages" showDetail="true"/>  
+
+                <h:panelGrid columns="3">
+                    <h:outputLabel for="medium4" value="Medium 4.41&quot;:"/>
+                    <p:graphicImage id="medium4" value="#{mediaBean.currentMedium4}" cache="false"/>
+                    <p:message for="medium4"/>
+
+                    <h:outputLabel for="medium7" value="Medium 7.4&quot;:"/>
+                    <p:graphicImage id="medium7" value="#{mediaBean.currentMedium7}" cache="false"/>
+                    <p:message for="medium7"/>
+                </h:panelGrid>
+
+
+                <p:commandButton value="Save" action="#{mediaBean.save}" ajax="false"/>
+
+            </h:form>        
+			
+			<hr/>
+			
+			<h:form id="viewform">
+			
+				<p:dataTable value="#{mediaBean.media}" var="p">
+					<p:column headerText="ID">
+						<h:outputText value="#{p.id}"/>
+					</p:column>
+					<p:column headerText="Name">
+						<h:outputText value="#{p.name}"/>
+					</p:column>
+					<p:column headerText="Actions">
+	                    <p:commandLink value="Edit" action="#{mediaBean.edit(p)}" ajax="false"/>,
+	                    <p:commandLink value="Delete" action="#{mediaBean.delete(p)}" ajax="false"/>
+					</p:column>
+				</p:dataTable>
+			
+			</h:form>
+
+        </ui:define>
+        
+    </ui:composition>
+    
+</html>
+

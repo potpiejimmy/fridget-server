@@ -39,7 +39,7 @@
         </form-login-config>
     </login-config>
     <welcome-file-list>
-        <welcome-file>app/index.xhtml</welcome-file>
+        <welcome-file>app/mymedia.xhtml</welcome-file>
     </welcome-file-list>
     <security-constraint>
         <web-resource-collection>
