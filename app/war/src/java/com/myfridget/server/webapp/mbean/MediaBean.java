@@ -42,6 +42,10 @@ public class MediaBean extends ImageUploadBean {
         return mediumEjb.getMediaForCurrentUser();
     }
     
+    public void newMedium() {
+        currentMedium = new AdMedium();
+    }
+    
     public void save() {
         
     }
