@@ -20,6 +20,11 @@ public class EPDUtils {
     
     public final static int SPECTRA_DISPLAY_TYPE_441 = 0;
     public final static int SPECTRA_DISPLAY_TYPE_74 = 1;
+
+    public final static int[] SPECTRA_DISPLAY_DEFAULT_TYPES = new int[] {
+        SPECTRA_DISPLAY_TYPE_441,
+        SPECTRA_DISPLAY_TYPE_74
+    };
     
     public static Dimension dimensionForDisplayType(int displayType) {
         switch (displayType) {
@@ -32,6 +37,11 @@ public class EPDUtils {
     }
     
     public final static Color SPECTRA_RED = new Color(0xC0, 0, 0);
+    
+    public static BufferedImage getResizedImageForDisplay(byte[] imgData, int displayType) {
+        Dimension dim = dimensionForDisplayType(displayType);
+        return Utils.getScaledBufferedImage(imgData, dim.width, dim.height);
+    }
     
     public static byte[] makeSpectra3Color(BufferedImage img) {
         Graphics gr = img.getGraphics();

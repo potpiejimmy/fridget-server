@@ -154,7 +154,7 @@ public class AdDeviceEJB implements AdDeviceEJBLocal {
     
     @Override
     public void uploadTestImage(int deviceId, int displayType, byte[] imgData) throws IOException {
-        BufferedImage img = getResizedImageForDisplay(imgData, displayType);
+        BufferedImage img = EPDUtils.getResizedImageForDisplay(imgData, displayType);
         byte[] epdData = encodeEPD(img); // Note: converts "img" to 3 colors
         imgData = Utils.encodeImage(img, "png");
         
@@ -164,23 +164,12 @@ public class AdDeviceEJB implements AdDeviceEJBLocal {
         em.persist(testImage);
         em.flush(); // fetch new ID
         
-        writeCacheFile(testImage, "png", imgData);
-        writeCacheFile(testImage, "epd", epdData);
-    }
-    
-    protected static BufferedImage getResizedImageForDisplay(byte[] imgData, int displayType) {
-        Dimension dim = EPDUtils.dimensionForDisplayType(displayType);
-        return Utils.getScaledBufferedImage(imgData, dim.width, dim.height);
+        Utils.writeFile(cacheFileForImage(testImage, "png"), imgData);
+        Utils.writeFile(cacheFileForImage(testImage, "epd"), epdData);
     }
     
     protected static byte[] encodeEPD(BufferedImage img) throws IOException {
         return HuffmanCompression.compress(EPDUtils.compressRLE(EPDUtils.makeSpectra3Color(img)));
-    }
-    
-    protected void writeCacheFile(AdDeviceTestImage img, String type, byte[] data) throws IOException {
-        FileOutputStream fos = new FileOutputStream(cacheFileForImage(img, type));
-        fos.write(data);
-        fos.close();
     }
     
     protected void removeDeviceTestImage(AdDeviceTestImage img) {
@@ -197,8 +186,8 @@ public class AdDeviceEJB implements AdDeviceEJBLocal {
         if (imgData == null) {
             // recreate from preview
             imgData = getTestImagePreview(deviceTestImageId);
-            imgData = encodeEPD(getResizedImageForDisplay(imgData, EPDUtils.SPECTRA_DISPLAY_TYPE_441)); // XXX WARNING REENCODING ALWAYS FOR 4.41, must persist display type
-            writeCacheFile(em.find(AdDeviceTestImage.class, deviceTestImageId), "epd", imgData);
+            imgData = encodeEPD(EPDUtils.getResizedImageForDisplay(imgData, EPDUtils.SPECTRA_DISPLAY_TYPE_441)); // XXX WARNING REENCODING ALWAYS FOR 4.41, must persist display type
+            Utils.writeFile(cacheFileForImage(em.find(AdDeviceTestImage.class, deviceTestImageId), "epd"), imgData);
         }
         return imgData;
     }

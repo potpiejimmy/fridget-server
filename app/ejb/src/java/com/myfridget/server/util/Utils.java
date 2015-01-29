@@ -9,6 +9,8 @@ import java.awt.Color;
 import java.awt.Image;
 import java.awt.image.BufferedImage;
 import java.io.ByteArrayOutputStream;
+import java.io.File;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -41,6 +43,12 @@ public class Utils {
             os.write(buf, 0, read);
             read = is.read(buf);
         }
+    }
+    
+    public static void writeFile(File file, byte[] data) throws IOException {
+        FileOutputStream fos = new FileOutputStream(file);
+        fos.write(data);
+        fos.close();
     }
     
     /**
