@@ -5,12 +5,16 @@
  */
 package com.myfridget.server.webapp.mbean;
 
+import com.myfridget.server.db.entity.AdMedium;
 import com.myfridget.server.ejb.AdMediumEJBLocal;
 import com.myfridget.server.util.EPDUtils;
 import com.myfridget.server.util.Utils;
 import com.myfridget.server.webapp.util.WebUtils;
+import java.io.IOException;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import javax.ejb.EJB;
 import javax.faces.bean.ManagedBean;
 import javax.faces.bean.SessionScoped;
@@ -31,11 +35,53 @@ public class ImageUploadBean {
     
     protected int selectedDisplayType = -1;
     
+    protected AdMedium currentMedium = null;
+    
+    protected Map<Integer,byte[]> imageData = new HashMap<>();
+
+    public AdMedium getCurrentMedium() {
+        return currentMedium;
+    }
+
+    public void setCurrentMedium(AdMedium currentMedium) {
+        this.currentMedium = currentMedium;
+        
+        if (currentMedium == null) {
+            imageData.clear();
+            return;
+        }
+        
+        try {
+            for (int type : EPDUtils.SPECTRA_DISPLAY_DEFAULT_TYPES) {
+                byte[] data = mediumEjb.getMediumPreview(currentMedium.getId(), type);
+                if (data != null) imageData.put(type, data);
+            }
+        } catch (IOException ex) {
+            WebUtils.addFacesMessage(ex);
+        }
+    }
+    
     public void handleFileUpload(FileUploadEvent event) {
         try {
             UploadedFile originalImage = event.getFile();
-            mediumEjb.uploadImage(selectedDisplayType, Utils.readAll(originalImage.getInputstream()));
+            byte[] data = Utils.readAll(originalImage.getInputstream());
+            if (selectedDisplayType < 0) {
+                for (int type : EPDUtils.SPECTRA_DISPLAY_DEFAULT_TYPES)
+                    imageData.put(type, mediumEjb.convertImage(data, type));
+            } else {
+                imageData.put(selectedDisplayType, mediumEjb.convertImage(data, selectedDisplayType));
+            }
             WebUtils.addFacesMessage("File " + event.getFile().getFileName() + " uploaded successfully.");
+        } catch (Exception ex) {
+            WebUtils.addFacesMessage(ex);
+        }
+    }
+    
+    public void save() {
+        try {
+            for (int type : imageData.keySet()) {
+                mediumEjb.setMediumPreview(currentMedium, imageData.get(type), type);
+            }
         } catch (Exception ex) {
             WebUtils.addFacesMessage(ex);
         }

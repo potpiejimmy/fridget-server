@@ -18,9 +18,14 @@ import javax.ejb.Local;
 public interface AdMediumEJBLocal {
     
     public List<AdMedium> getMediaForCurrentUser();
+
+    public byte[] convertImage(byte[] imgData, int displayType) throws IOException;
     
-    public void uploadImage(int displayType, byte[] imgData) throws IOException;
+    public void setMediumPreview(AdMedium medium, byte[] imgData, int displayType) throws IOException;
     
-    public byte[] getMediumPreview(int adMediumId, int mediumType) throws IOException;
+    public byte[] getMediumPreview(int adMediumId, int displayType) throws IOException;
     
+    public AdMedium saveMedium(AdMedium medium);
+    
+    public void deleteMedium(int mediumId);
 }

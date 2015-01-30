@@ -28,16 +28,6 @@ public class MediaBean extends ImageUploadBean {
     @EJB
     protected AdMediumEJBLocal mediumEjb;
     
-    private AdMedium currentMedium = null;
-
-    public AdMedium getCurrentMedium() {
-        return currentMedium;
-    }
-
-    public void setCurrentMedium(AdMedium currentMedium) {
-        this.currentMedium = currentMedium;
-    }
-    
     public List<AdMedium> getMedia() {
         return mediumEjb.getMediaForCurrentUser();
     }
@@ -47,14 +37,21 @@ public class MediaBean extends ImageUploadBean {
     }
     
     public void save() {
-        
+        mediumEjb.saveMedium(currentMedium);
+        super.save();
+        setCurrentMedium(null);
     }
     
-    public StreamedContent getCurrentMedium4() throws IOException {return getCurrentMedium(EPDUtils.SPECTRA_DISPLAY_TYPE_441);}
-    public StreamedContent getCurrentMedium7() throws IOException {return getCurrentMedium(EPDUtils.SPECTRA_DISPLAY_TYPE_74);}
-    public StreamedContent getCurrentMedium(int displayType) throws IOException {
-        if (currentMedium == null || currentMedium.getId() == null) return null;
-        byte[] image = mediumEjb.getMediumPreview(currentMedium.getId(), displayType);
+    public void edit(AdMedium medium) {
+        setCurrentMedium(medium);
+    }
+    
+    public void cancel() {
+        setCurrentMedium(null);
+    }
+    
+    public StreamedContent getCurrentMediumDisplay(int displayType) throws IOException {
+        byte[] image = imageData.get(displayType);
         if (image == null) return null;
         return new DefaultStreamedContent(new ByteArrayInputStream(image), "image/png");
     }

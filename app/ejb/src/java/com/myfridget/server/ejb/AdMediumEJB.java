@@ -5,13 +5,13 @@
  */
 package com.myfridget.server.ejb;
 
-import com.myfridget.server.db.entity.AdDeviceTestImage;
 import com.myfridget.server.db.entity.AdMedium;
 import com.myfridget.server.db.entity.AdMediumItem;
 import com.myfridget.server.util.EPDUtils;
 import com.myfridget.server.util.Utils;
 import java.awt.image.BufferedImage;
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.IOException;
 import java.util.List;
 import javax.ejb.EJB;
@@ -34,38 +34,53 @@ public class AdMediumEJB implements AdMediumEJBLocal {
     
     @Override
     public List<AdMedium> getMediaForCurrentUser() {
-        return null;
+        return em.createNamedQuery("AdMedium.findByUserId", AdMedium.class).setParameter("userId", usersEjb.getCurrentUser().getId()).getResultList();
     }
     
     @Override
-    public void uploadImage(int displayType, byte[] imgData) throws IOException {
-        if (displayType < 0)
-            handleImageUploads(imgData, EPDUtils.SPECTRA_DISPLAY_DEFAULT_TYPES);
-        else
-            handleImageUploads(imgData, displayType);
+    public AdMedium saveMedium(AdMedium medium) {
+        if (medium.getId() == null) {
+            medium.setUserId(usersEjb.getCurrentUser().getId());
+            em.persist(medium);
+        } else {
+            em.merge(medium);
+        }
+        return medium;
     }
     
-    protected void handleImageUploads(byte[] imgData, int... displayTypes) throws IOException {
-        for (int displayType : displayTypes)
-            handleImageUpload(imgData, displayType);
+    @Override
+    public void deleteMedium(int mediumId) {
+        em.remove(em.find(AdMedium.class, mediumId));
     }
-    protected void handleImageUpload(byte[] imgData, int displayType) throws IOException {
+
+    @Override
+    public byte[] convertImage(byte[] imgData, int displayType) throws IOException {
         BufferedImage img = EPDUtils.getResizedImageForDisplay(imgData, displayType);
         EPDUtils.makeSpectra3Color(img); // Note: converts "img" to 3 colors
-        imgData = Utils.encodeImage(img, "png"); // encode PNG
-        
+        return Utils.encodeImage(img, "png"); // encode PNG
+    }
+    
+    @Override
+    public void setMediumPreview(AdMedium medium, byte[] imgData, int displayType) throws IOException {
         AdMediumItem item = new AdMediumItem();
-        //item.setAdMediumId(0);
+        item.setAdMediumId(medium.getId());
         item.setType((short)displayType);
         em.persist(item);
-        em.flush(); // fetch new ID
         
         Utils.writeFile(cacheFileForImage(item, "png"), imgData);
     }
     
     @Override
-    public byte[] getMediumPreview(int adMediumId, int mediumType) throws IOException {
-        return null;
+    public byte[] getMediumPreview(int adMediumId, int displayType) throws IOException {
+        AdMediumItem img = null;
+        try {
+            img = em.createNamedQuery("AdMediumItem.findByMediumAndType", AdMediumItem.class).setParameter("adMediumId", adMediumId).setParameter("type", displayType).getSingleResult();
+        } catch (Exception ex) {
+            return null; // not found
+        }
+        File file = cacheFileForImage(img, "png");
+        if (!file.exists()) return null;
+        return Utils.readAll(new FileInputStream(file));
     }    
     
     protected static File cacheFileForImage(AdMediumItem item, String type) {

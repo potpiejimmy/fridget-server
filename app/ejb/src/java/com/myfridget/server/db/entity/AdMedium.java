@@ -28,7 +28,7 @@ import javax.xml.bind.annotation.XmlRootElement;
 @XmlRootElement
 @NamedQueries({
     @NamedQuery(name = "AdMedium.findAll", query = "SELECT a FROM AdMedium a"),
-    @NamedQuery(name = "AdMedium.findById", query = "SELECT a FROM AdMedium a WHERE a.id = :id")})
+    @NamedQuery(name = "AdMedium.findByUserId", query = "SELECT a FROM AdMedium a WHERE a.userId = :userId")})
 public class AdMedium implements Serializable {
     private static final long serialVersionUID = 1L;
     
