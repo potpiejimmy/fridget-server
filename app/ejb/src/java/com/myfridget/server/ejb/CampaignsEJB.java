@@ -37,12 +37,18 @@ public class CampaignsEJB implements CampaignsEJBLocal {
     }
 
     @Override
-    public void saveCampaign(Campaign campaign) {
+    public void saveCampaign(Campaign campaign, List<CampaignAction> actions) {
         if (campaign.getId() == null) {
             campaign.setUserId(usersEjb.getCurrentUser().getId());
             em.persist(campaign);
+            em.flush(); //pre-fetch ID
         } else {
             em.merge(campaign);
+            for (CampaignAction a : getCampaignActionsForCampaign(campaign.getId())) em.remove(a);
+        }
+        for (CampaignAction a : actions) {
+            a.setCampaignId(campaign.getId());
+            em.persist(a);
         }
     }
 

@@ -17,7 +17,7 @@
                     <f:param name="direction" value="'vertical'" />
                 </p:effect>
                 
-                <h:panelGrid columns="3">
+                <h:panelGrid id="genericFieldsPanel" columns="3">
                     <h:outputLabel for="campaignName" value="Campaign Name / Description:"/>
                     <p:inputText id="campaignName" value="#{campaignsBean.currentCampaign.name}" size="60"/>
                     <p:message for="campaignName"/>
@@ -29,15 +29,18 @@
                     <p:column headerText="Time">
                         <h:outputText value="#{action.timeOfDay}"/>
                     </p:column>
-                    <p:column headerText="Action / Display">
+                    <p:column headerText="Display">
                         <p:graphicImage value="#{mediaBean.mediumPreview}" width="200px;">
                             <f:param name="adMediumId" value="#{action.adMediumId}"/>
                         </p:graphicImage>
                     </p:column>
+                    <p:column headerText="">
+                        <p:commandLink value="Delete" action="#{campaignsBean.deleteAction(action)}" update="actionTable"/>
+                    </p:column>
                 </p:dataTable>
                 
                 <p:outputPanel id="actionbuttonpanel">
-                    <p:commandButton value="New Action" action="#{campaignsBean.newAction}" rendered="#{campaignsBean.currentAction eq null}" update="actionbuttonpanel,editActionPanel"/>
+                    <p:commandButton value="New Action" action="#{campaignsBean.newAction}" rendered="#{campaignsBean.currentAction eq null}" update="actionbuttonpanel,editActionPanel,genericFieldsPanel"/>
                 </p:outputPanel>
                     
                 <p:outputPanel id="editActionPanel">
@@ -50,8 +53,13 @@
                             <p:message for="actionTime"/>
                             
                             <h:outputLabel for="medium" value="Medium / Display:"/>
-                            <p:selectOneMenu id="medium" value="#{campaignsBean.currentAction.adMediumId}">
+                            <p:selectOneMenu id="medium" value="#{campaignsBean.currentAction.adMediumId}" var="m">
                                 <f:selectItems value="#{campaignsBean.mediaItems}"/>
+                                <p:column>
+                                    <p:graphicImage value="#{mediaBean.mediumPreview}" width="100px;">
+                                        <f:param name="adMediumId" value="#{m}"/>
+                                    </p:graphicImage>
+                                </p:column>
                             </p:selectOneMenu>
                             <p:message for="medium"/>
                         </h:panelGrid>

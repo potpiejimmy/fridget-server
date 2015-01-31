@@ -83,7 +83,7 @@ public class CampaignsBean {
     }
     
     public void save() {
-        campaignsEjb.saveCampaign(currentCampaign);
+        campaignsEjb.saveCampaign(currentCampaign, currentActions);
         setCurrentCampaign(null);
     }
     
@@ -104,6 +104,10 @@ public class CampaignsBean {
     
     public void newAction() {
         currentAction = new CampaignAction();
+    }
+
+    public void deleteAction(CampaignAction action) {
+        currentActions.remove(action);
     }
 
     public void saveAction() {

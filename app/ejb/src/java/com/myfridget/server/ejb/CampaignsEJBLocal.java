@@ -21,7 +21,7 @@ public interface CampaignsEJBLocal {
     
     public List<CampaignAction> getCampaignActionsForCampaign(int campaignId);
     
-    public void saveCampaign(Campaign campaign);
+    public void saveCampaign(Campaign campaign, List<CampaignAction> actions);
     
     public void deleteCampaign(int id);
 }

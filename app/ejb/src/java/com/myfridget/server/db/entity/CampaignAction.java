@@ -27,7 +27,7 @@ import javax.xml.bind.annotation.XmlRootElement;
 @XmlRootElement
 @NamedQueries({
     @NamedQuery(name = "CampaignAction.findAll", query = "SELECT c FROM CampaignAction c"),
-    @NamedQuery(name = "CampaignAction.findByCampaignId", query = "SELECT c FROM CampaignAction c WHERE c.campaignId = :campaignId"),
+    @NamedQuery(name = "CampaignAction.findByCampaignId", query = "SELECT c FROM CampaignAction c WHERE c.campaignId = :campaignId ORDER BY c.timeOfDay"),
     @NamedQuery(name = "CampaignAction.findByTimeOfDay", query = "SELECT c FROM CampaignAction c WHERE c.timeOfDay = :timeOfDay")})
 public class CampaignAction implements Serializable {
     private static final long serialVersionUID = 1L;
