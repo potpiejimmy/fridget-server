@@ -11,7 +11,6 @@ import com.myfridget.server.db.entity.AdDeviceParameter;
 import com.myfridget.server.db.entity.AdDeviceTestImage;
 import com.myfridget.server.ejb.AdDeviceEJBLocal;
 import com.myfridget.server.ejb.UsersEJBLocal;
-import com.myfridget.server.util.EPDUtils;
 import com.myfridget.server.util.Utils;
 import com.myfridget.server.webapp.util.WebUtils;
 import java.io.ByteArrayInputStream;

@@ -40,7 +40,7 @@ public class EPDUtils {
     
     public static BufferedImage getResizedImageForDisplay(byte[] imgData, int displayType) {
         Dimension dim = dimensionForDisplayType(displayType);
-        return Utils.getScaledBufferedImage(imgData, dim.width, dim.height);
+        return Utils.getScaledBufferedImage(imgData, dim.width, dim.height, true);
     }
     
     public static byte[] makeSpectra3Color(BufferedImage img) {
@@ -69,6 +69,7 @@ public class EPDUtils {
                 gr.drawLine(x, y, x, y);
             }
         }
+        gr.dispose();
         return result;
     }
     

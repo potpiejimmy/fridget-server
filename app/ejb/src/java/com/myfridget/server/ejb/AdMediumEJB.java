@@ -44,8 +44,17 @@ public class AdMediumEJB implements AdMediumEJBLocal {
             em.persist(medium);
         } else {
             em.merge(medium);
+            // when updating, remove existing items:
+            removeMediumItemsForMedium(medium);
         }
         return medium;
+    }
+    
+    protected void removeMediumItemsForMedium(AdMedium medium) {
+        for (AdMediumItem item : em.createNamedQuery("AdMediumItem.findByMedium", AdMediumItem.class).setParameter("adMediumId", medium.getId()).getResultList()) {
+            cacheFileForImage(item, "png").delete();
+            em.remove(item);
+        }
     }
     
     @Override
@@ -57,6 +66,7 @@ public class AdMediumEJB implements AdMediumEJBLocal {
     public byte[] convertImage(byte[] imgData, int displayType) throws IOException {
         BufferedImage img = EPDUtils.getResizedImageForDisplay(imgData, displayType);
         EPDUtils.makeSpectra3Color(img); // Note: converts "img" to 3 colors
+        img = Utils.setImageOrientation(img, false); // force landscape mode
         return Utils.encodeImage(img, "png"); // encode PNG
     }
     
@@ -66,6 +76,7 @@ public class AdMediumEJB implements AdMediumEJBLocal {
         item.setAdMediumId(medium.getId());
         item.setType((short)displayType);
         em.persist(item);
+        em.flush(); // pre-fetch ID
         
         Utils.writeFile(cacheFileForImage(item, "png"), imgData);
     }

@@ -10,19 +10,16 @@
         
         <h:form id="viewform">
 
-                <p:dataTable value="#{mediaBean.media}" var="p">
-                        <p:column headerText="ID">
-                                <h:outputText value="#{p.id}"/>
-                        </p:column>
-                        <p:column headerText="Name">
-                                <h:outputText value="#{p.name}"/>
-                        </p:column>
-                        <p:column headerText="Actions">
-            <p:commandLink value="Edit" action="#{mediaBean.edit(p)}" ajax="false"/>,
-            <p:commandLink value="Delete" action="#{mediaBean.delete(p)}" ajax="false"/>
-                        </p:column>
-                </p:dataTable>
-
+            <ui:repeat value="#{mediaBean.media}" var="m">
+                <p:commandLink action="#{mediaBean.edit(m)}" ajax="false">
+                    <p:graphicImage styleClass="mediaSelectHover" value="#{mediaBean.mediumPreview}" width="200px;" alt="#{m.name}">
+                        <f:param name="adMediumId" value="#{m.id}"/>
+                    </p:graphicImage>
+                </p:commandLink>
+            </ui:repeat>
+            
+            <hr/>
+            
             <p:commandLink value="New..." action="#{mediaBean.newMedium}" update=":outputPanel"/>
             
         </h:form>

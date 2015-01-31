@@ -84,3 +84,6 @@ html {
 .gridCell {display:block; text-decoration: none; font-weight: bold; font-size: 20px; height:150px;}
 .campaignHover {border:5px solid #eee;}
 .campaignHover:hover {border:5px solid #c00;}
+
+.mediaSelectHover {border:5px solid #eee; padding: 5px; margin: 5px;}
+.mediaSelectHover:hover {border:5px solid #c00; padding: 5px; margin: 5px;}

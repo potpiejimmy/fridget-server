@@ -27,7 +27,7 @@ import javax.xml.bind.annotation.XmlRootElement;
 @XmlRootElement
 @NamedQueries({
     @NamedQuery(name = "AdMediumItem.findAll", query = "SELECT a FROM AdMediumItem a"),
-    @NamedQuery(name = "AdMediumItem.findByType", query = "SELECT a FROM AdMediumItem a WHERE a.type = :type"),
+    @NamedQuery(name = "AdMediumItem.findByMedium", query = "SELECT a FROM AdMediumItem a WHERE a.adMediumId = :adMediumId"),
     @NamedQuery(name = "AdMediumItem.findByMediumAndType", query = "SELECT a FROM AdMediumItem a WHERE a.adMediumId = :adMediumId AND a.type = :type")})
 public class AdMediumItem implements Serializable {
     private static final long serialVersionUID = 1L;

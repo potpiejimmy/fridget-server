@@ -14,11 +14,9 @@ import com.myfridget.server.db.entity.UserAdDevice;
 import com.myfridget.server.util.EPDUtils;
 import com.myfridget.server.util.HuffmanCompression;
 import com.myfridget.server.util.Utils;
-import java.awt.Dimension;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.FileInputStream;
-import java.io.FileOutputStream;
 import java.io.IOException;
 import java.math.BigDecimal;
 import java.util.List;
@@ -154,6 +152,8 @@ public class AdDeviceEJB implements AdDeviceEJBLocal {
     
     @Override
     public void uploadTestImage(int deviceId, int displayType, byte[] imgData) throws IOException {
+        if (displayType < 0) throw new RuntimeException("Sorry, invalid display size for test upload: "+displayType);
+
         BufferedImage img = EPDUtils.getResizedImageForDisplay(imgData, displayType);
         byte[] epdData = encodeEPD(img); // Note: converts "img" to 3 colors
         imgData = Utils.encodeImage(img, "png");

@@ -5,6 +5,7 @@
  */
 package com.myfridget.server.webapp.mbean;
 
+import com.myfridget.server.db.entity.AdMedium;
 import com.myfridget.server.db.entity.Campaign;
 import com.myfridget.server.db.entity.CampaignAction;
 import com.myfridget.server.ejb.AdMediumEJBLocal;
@@ -14,6 +15,7 @@ import java.util.List;
 import javax.ejb.EJB;
 import javax.faces.bean.ManagedBean;
 import javax.faces.bean.SessionScoped;
+import javax.faces.model.SelectItem;
 
 /**
  *
@@ -56,6 +58,14 @@ public class CampaignsBean {
 
     public void setCurrentActionTime(String currentActionTime) {
         this.currentActionTime = currentActionTime;
+    }
+    
+    public List<SelectItem> getMediaItems() {
+        List<SelectItem> result = new ArrayList<>();
+        for (AdMedium m : mediumEjb.getMediaForCurrentUser()) {
+            result.add(new SelectItem(m.getId(), m.getName()));
+        }
+        return result;
     }
 
     public void newCampaign() {
