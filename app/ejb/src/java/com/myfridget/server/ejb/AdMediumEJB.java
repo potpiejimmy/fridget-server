@@ -44,8 +44,6 @@ public class AdMediumEJB implements AdMediumEJBLocal {
             em.persist(medium);
         } else {
             em.merge(medium);
-            // when updating, remove existing items:
-            removeMediumItemsForMedium(medium);
         }
         return medium;
     }
@@ -59,7 +57,9 @@ public class AdMediumEJB implements AdMediumEJBLocal {
     
     @Override
     public void deleteMedium(int mediumId) {
-        em.remove(em.find(AdMedium.class, mediumId));
+        AdMedium medium = em.find(AdMedium.class, mediumId);
+        removeMediumItemsForMedium(medium);
+        em.remove(medium);
     }
 
     @Override
@@ -71,28 +71,36 @@ public class AdMediumEJB implements AdMediumEJBLocal {
     }
     
     @Override
-    public void setMediumPreview(AdMedium medium, byte[] imgData, int displayType) throws IOException {
-        AdMediumItem item = new AdMediumItem();
-        item.setAdMediumId(medium.getId());
-        item.setType((short)displayType);
-        em.persist(item);
-        em.flush(); // pre-fetch ID
+    public void setMediumPreview(int adMediumId, int displayType, byte[] imgData) throws IOException {
         
+        AdMediumItem item = findMediumItem(adMediumId, displayType);
+        if (item == null) {
+            // not found, create a new one
+            item = new AdMediumItem();
+            item.setAdMediumId(adMediumId);
+            item.setType((short)displayType);
+            em.persist(item);
+            em.flush(); // pre-fetch ID
+        }
         Utils.writeFile(cacheFileForImage(item, "png"), imgData);
     }
     
     @Override
     public byte[] getMediumPreview(int adMediumId, int displayType) throws IOException {
-        AdMediumItem img = null;
-        try {
-            img = em.createNamedQuery("AdMediumItem.findByMediumAndType", AdMediumItem.class).setParameter("adMediumId", adMediumId).setParameter("type", displayType).getSingleResult();
-        } catch (Exception ex) {
-            return null; // not found
-        }
+        AdMediumItem img = findMediumItem(adMediumId, displayType);
+        if (img == null) return null; // not found
         File file = cacheFileForImage(img, "png");
         if (!file.exists()) return null;
         return Utils.readAll(new FileInputStream(file));
     }    
+    
+    protected AdMediumItem findMediumItem(int adMediumId, int displayType) {
+        try {
+            return em.createNamedQuery("AdMediumItem.findByMediumAndType", AdMediumItem.class).setParameter("adMediumId", adMediumId).setParameter("type", displayType).getSingleResult();
+        } catch (Exception ex) {
+            return null; // not found
+        }
+    }
     
     protected static File cacheFileForImage(AdMediumItem item, String type) {
         return new File("fridget_item_"+item.getId()+"."+type);

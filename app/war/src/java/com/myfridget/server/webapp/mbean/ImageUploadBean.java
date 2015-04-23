@@ -80,7 +80,7 @@ public class ImageUploadBean {
     public void save() {
         try {
             for (int type : imageData.keySet()) {
-                mediumEjb.setMediumPreview(currentMedium, imageData.get(type), type);
+                mediumEjb.setMediumPreview(currentMedium.getId(), type, imageData.get(type));
             }
         } catch (Exception ex) {
             WebUtils.addFacesMessage(ex);

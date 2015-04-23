@@ -21,7 +21,7 @@ public interface AdMediumEJBLocal {
 
     public byte[] convertImage(byte[] imgData, int displayType) throws IOException;
     
-    public void setMediumPreview(AdMedium medium, byte[] imgData, int displayType) throws IOException;
+    public void setMediumPreview(int adMediumId, int displayType, byte[] imgData) throws IOException;
     
     public byte[] getMediumPreview(int adMediumId, int displayType) throws IOException;
     
