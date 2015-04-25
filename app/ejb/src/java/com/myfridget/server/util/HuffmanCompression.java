@@ -103,7 +103,7 @@ public class HuffmanCompression
     public static byte[] encodeDictionary(List<DictionaryEntry> dictionary) {
         ByteArrayOutputStream baos = new ByteArrayOutputStream(dictionary.size()*2);
         // write out number of symbols (=dictionary size)
-        baos.write(dictionary.size());
+        baos.write(dictionary.size()); // Warning: 256 results in encoded 0x00
         int currentLen = 0;
         int currentCount = 0;
         // write out number of symbols of length 1,2,3...n (n=maximum prefix length)
