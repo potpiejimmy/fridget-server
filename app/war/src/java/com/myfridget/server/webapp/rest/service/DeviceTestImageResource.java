@@ -9,8 +9,10 @@ import com.myfridget.server.db.entity.AdDevice;
 import com.myfridget.server.db.entity.AdDeviceParameter;
 import com.myfridget.server.db.entity.AdDeviceTestImage;
 import com.myfridget.server.ejb.AdDeviceEJBLocal;
+import com.myfridget.server.util.EPDUtils;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.util.Base64;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -18,11 +20,15 @@ import javax.faces.bean.RequestScoped;
 import javax.naming.Context;
 import javax.naming.InitialContext;
 import javax.naming.NamingException;
+import javax.ws.rs.Consumes;
 import javax.ws.rs.GET;
+import javax.ws.rs.POST;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
 import javax.ws.rs.QueryParam;
+import javax.ws.rs.core.MediaType;
+import javax.ws.rs.core.Response;
 
 /**
  *
@@ -70,6 +76,19 @@ public class DeviceTestImageResource {
         }
     }
     
+    @POST
+    @Consumes({MediaType.TEXT_PLAIN})
+    public Response uploadFile(String file) throws IOException
+    {
+        // quick and dirty hack for wolfram to upload 7.4" test images
+        byte[] imgIn = Base64.getDecoder().decode(file);
+        AdDevice device = deviceEjb.getBySerial(serial);
+        if (device == null) return null; // unknown device
+        List<AdDeviceTestImage> images = deviceEjb.getDeviceTestImages(device.getId());
+        if (images.size()>0) deviceEjb.removeTestImage(images.get(images.size()-1).getId());
+        deviceEjb.uploadTestImage(device.getId(), EPDUtils.SPECTRA_DISPLAY_TYPE_74, imgIn);
+        return Response.ok("File uploaded successfully.\n").build();
+    }
     
     private AdDeviceEJBLocal lookupAdDeviceEJBLocal() {
         try {

@@ -7,11 +7,10 @@ package com.myfridget.server.webapp.rest.service;
 
 import com.myfridget.server.ejb.AdMediumEJBLocal;
 import com.myfridget.server.util.EPDUtils;
-import com.sun.org.apache.xerces.internal.impl.dv.util.Base64;
 import java.io.IOException;
+import java.util.Base64;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import javax.ejb.EJB;
 import javax.faces.bean.RequestScoped;
 import javax.naming.Context;
 import javax.naming.InitialContext;
@@ -37,19 +36,19 @@ public class MediumResource {
     @Consumes({MediaType.TEXT_PLAIN})
     public Response uploadFile(@PathParam("id") Integer adMediumId, @QueryParam("type") Integer type, String file) throws IOException
     {
-        byte[] imgIn = Base64.decode(file);
+        byte[] imgIn = Base64.getDecoder().decode(file);
         
         if (type == null) for (int t : EPDUtils.SPECTRA_DISPLAY_DEFAULT_TYPES) setMediumPreview(adMediumId, t, imgIn);
         else setMediumPreview(adMediumId, type, imgIn);
  
-        return Response.ok("File uploaded via Jersey based RESTFul Webservice to ").build();
+        return Response.ok("File uploaded successfully.\n").build();
  
     }
     
     protected void setMediumPreview(int adMediumId, int type, byte[] imgIn) throws IOException {
-        byte[] image = mediumEjb.convertImage(imgIn, EPDUtils.SPECTRA_DISPLAY_TYPE_441);
+        byte[] image = mediumEjb.convertImage(imgIn, type);
         
-        mediumEjb.setMediumPreview(adMediumId, EPDUtils.SPECTRA_DISPLAY_TYPE_441, image);
+        mediumEjb.setMediumPreview(adMediumId, type, image);
     }
 
     private AdMediumEJBLocal lookupAdMediumEJBLocal() {
