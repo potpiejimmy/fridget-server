@@ -38,10 +38,12 @@
                 <p:message for="medium7"/>
             </h:panelGrid>
 
-
             <p:commandButton value="Save" action="#{mediaBean.save}" ajax="false"/>
             <p:commandButton value="Cancel" action="#{mediaBean.cancel}" immediate="true" ajax="false"/>
-
+            
+            <hr/>
+            
+            <h:outputText value="#{request.contextPath}/res/media/#{mediaBean.currentMedium.id}/"/>
         </h:form>        
         
     </ui:composition>
