@@ -56,7 +56,7 @@ public class ChangePasswordBean {
             req.logout();
             req.login(userName, newPassword);
             
-            return "index";
+            return "mymedia";
         } catch (Exception ex) {
             WebUtils.addFacesMessage(ex);
             return null;

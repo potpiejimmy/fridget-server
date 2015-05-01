@@ -179,6 +179,16 @@ CREATE TABLE IF NOT EXISTS `ad_medium_item` (
 ENGINE = InnoDB;
 
 
+-- -----------------------------------------------------
+-- Table `system_parameter`
+-- -----------------------------------------------------
+CREATE TABLE IF NOT EXISTS `system_parameter` (
+  `param` VARCHAR(45) NOT NULL,
+  `value` VARCHAR(128) NOT NULL,
+  PRIMARY KEY (`param`))
+ENGINE = InnoDB;
+
+
 SET SQL_MODE=@OLD_SQL_MODE;
 SET FOREIGN_KEY_CHECKS=@OLD_FOREIGN_KEY_CHECKS;
 SET UNIQUE_CHECKS=@OLD_UNIQUE_CHECKS;

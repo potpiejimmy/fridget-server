@@ -1,0 +1,60 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:ui="http://java.sun.com/jsf/facelets"
+      xmlns:h="http://java.sun.com/jsf/html"
+      xmlns:f="http://java.sun.com/jsf/core"
+      xmlns:p="http://primefaces.org/ui">
+    
+    <ui:composition template="/WEB-INF/facelets/templates/baselayout.xhtml">
+
+       	<ui:param name="tabIndex" value="0" />
+
+        <ui:define name="pagetitle">System Administration</ui:define>
+        
+        <ui:define name="body">
+        
+            <h:form id="editform">
+
+                <p:panelGrid columns="2">
+                    <h:outputText value="Parameter:"/>
+                    <h:panelGroup>
+                        <p:inputText id="param" value="#{systemBean.currentParameter.param}" required="true"/>
+                        <p:message for="param" display="text"/>
+                    </h:panelGroup>
+                    <h:outputText value="Value:"/>
+                    <h:panelGroup>
+                        <p:inputText id="value" value="#{systemBean.currentParameter.value}" required="true"/>
+                        <p:message for="value" display="text"/>
+                    </h:panelGroup>
+                </p:panelGrid>
+
+                <p:commandButton value="Save" action="#{systemBean.saveParameter}" ajax="false"/>
+                <p:commandButton value="Cancel" action="#{systemBean.clearParameter}" ajax="false" rendered="#{systemBean.currentParameter.param ne null}"/>
+
+            </h:form>        
+
+            <hr/>
+
+            <h:form id="viewform">
+
+                <p:dataTable value="#{systemBean.parameters}" var="p">
+                    <p:column headerText="Parameter">
+                        <h:outputText value="#{p.param}"/>
+                    </p:column>
+                    <p:column headerText="Value">
+                        <h:outputText value="#{p.value}"/>
+                    </p:column>
+                    <p:column headerText="Actions">
+                        <p:commandLink value="Edit" action="#{systemBean.editParameter(p)}" ajax="false"/>,
+                    </p:column>
+                </p:dataTable>
+
+            </h:form>
+
+        </ui:define>
+        
+    </ui:composition>
+    
+</html>
+
