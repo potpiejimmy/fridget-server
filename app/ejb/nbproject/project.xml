@@ -18,6 +18,7 @@
             <included-library dirs="200">file.reference.httpclient-4.4.1.jar</included-library>
             <included-library dirs="200">file.reference.httpmime-4.4.1.jar</included-library>
             <included-library dirs="200">file.reference.httpcore-4.4.1.jar</included-library>
+            <included-library dirs="200">file.reference.commons-logging-1.2.jar</included-library>
             <source-roots>
                 <root id="src.dir"/>
             </source-roots>

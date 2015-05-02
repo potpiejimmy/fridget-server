@@ -70,9 +70,12 @@ public class SystemEJB implements SystemEJBLocal {
         builder.addTextBody("file_type", "binary", ContentType.TEXT_PLAIN);
         builder.addBinaryBody("file", fwFile);
         
-        WebRequester curl = new WebRequester();
-        curl.setParam("access_token", deviceEjb.getParameter(adDeviceId, "accesstoken").getValue());
-        
-        return "Flashing " + fileName + ", result: " + curl.put(url, builder.build());
+        try (WebRequester curl = new WebRequester()) {
+            curl.setParam("access_token", deviceEjb.getParameter(adDeviceId, "accesstoken").getValue());
+
+            String result = curl.put(url, builder.build());
+
+            return "Flashing " + fileName + ", result: " + result;
+        }
     }
 }

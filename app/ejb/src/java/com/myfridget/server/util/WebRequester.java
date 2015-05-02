@@ -19,7 +19,6 @@ import java.util.Map;
 
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
-import org.apache.http.client.HttpClient;
 import org.apache.http.client.ResponseHandler;
 import org.apache.http.client.methods.HttpDelete;
 import org.apache.http.client.methods.HttpEntityEnclosingRequestBase;
@@ -28,9 +27,10 @@ import org.apache.http.client.methods.HttpPost;
 import org.apache.http.client.methods.HttpPut;
 import org.apache.http.client.methods.HttpRequestBase;
 import org.apache.http.client.methods.HttpUriRequest;
+import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClientBuilder;
 
-public class WebRequester implements ResponseHandler<String>
+public class WebRequester implements ResponseHandler<String>, AutoCloseable
 {
     private final static String CHAR_ENCODING = "UTF-8";
 
@@ -44,7 +44,7 @@ public class WebRequester implements ResponseHandler<String>
  
     private String response;
     
-    private HttpClient client = null;
+    private CloseableHttpClient client = null;
  
     public String getResponse()
     {
@@ -99,10 +99,9 @@ public class WebRequester implements ResponseHandler<String>
     	headers.remove(name);
     }
  
-    public String get(String url) throws Exception
-    {
+    protected String appendRequestParameters(String url) throws UnsupportedEncodingException {
         //add parameters
-        StringBuffer combinedParams = new StringBuffer();
+        StringBuilder combinedParams = new StringBuilder(url);
         if (!params.isEmpty())
         {
             combinedParams.append('?');
@@ -113,8 +112,13 @@ public class WebRequester implements ResponseHandler<String>
                 combinedParams.append(paramString);
             }
         }
+        return combinedParams.toString();
+    }
+    
+    public String get(String url) throws Exception
+    {
  
-       HttpGet request = new HttpGet(url + combinedParams);
+       HttpGet request = new HttpGet(appendRequestParameters(url));
  
        setRequestHeaders(request);
        
@@ -123,12 +127,12 @@ public class WebRequester implements ResponseHandler<String>
 
     public String put(String url, HttpEntity msg) throws Exception
     {
-        return putImpl(new HttpPut(url), msg);
+        return putImpl(new HttpPut(appendRequestParameters(url)), msg);
     }
 
     public String post(String url, HttpEntity msg) throws Exception
     {
-        return putImpl(new HttpPost(url), msg);
+        return putImpl(new HttpPost(appendRequestParameters(url)), msg);
     }
 
     protected String putImpl(HttpEntityEnclosingRequestBase request, HttpEntity msg) throws Exception
@@ -221,5 +225,10 @@ public class WebRequester implements ResponseHandler<String>
     {
         if (responseCode >= 300)
         	throw new IOException(responseCode + " " + message);
+    }
+
+    @Override
+    public void close() throws Exception {
+        client.close();
     }
 }

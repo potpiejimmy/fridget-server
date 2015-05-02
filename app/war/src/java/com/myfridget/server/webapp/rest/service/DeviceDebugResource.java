@@ -55,7 +55,7 @@ public class DeviceDebugResource {
      */
     @GET
     @Produces("text/plain")
-    public String flashFirmware() {
+    public String flashFirmware() throws Exception {
         return systemEjb.flashFirmware(deviceEjb.getBySerial(serial).getId());
     }
     
