@@ -9,6 +9,7 @@ import com.myfridget.server.db.entity.AdDeviceParameter;
 import com.myfridget.server.ejb.AdDeviceEJBLocal;
 import com.myfridget.server.ejb.SystemEJBLocal;
 import com.myfridget.server.webapp.util.WebUtils;
+import java.io.IOException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.faces.bean.RequestScoped;
@@ -39,8 +40,14 @@ public class DeviceDebugResource {
     @POST
     @Consumes({"application/json"})
     @Produces({"application/json"})
-    public String hello(String msg) {
-        deviceEjb.addDebugMessage(serial, WebUtils.removeQuotes(msg));
+    public String hello(String msg) throws IOException {
+        msg = WebUtils.removeQuotes(msg);
+        deviceEjb.addDebugMessage(serial, ">>>" + msg);
+
+        // verify client params string, flash firmware if necessary:
+        systemEjb.verifyDeviceParams(deviceEjb.getBySerial(serial).getId(), msg);
+        
+        // send server params:
         StringBuilder result = new StringBuilder();
         for (AdDeviceParameter param : deviceEjb.getParameters(deviceEjb.getBySerial(serial).getId())) {
             result.append(param.getParam()).append('=').append(param.getValue()).append(';');

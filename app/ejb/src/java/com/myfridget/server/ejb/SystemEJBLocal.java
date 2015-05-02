@@ -6,6 +6,7 @@
 package com.myfridget.server.ejb;
 
 import com.myfridget.server.db.entity.SystemParameter;
+import java.io.IOException;
 import java.util.List;
 import javax.ejb.Local;
 
@@ -23,4 +24,6 @@ public interface SystemEJBLocal {
     public void setSystemParameter(SystemParameter param);
     
     public String flashFirmware(int adDeviceId) throws Exception;
+    
+    public boolean verifyDeviceParams(int adDeviceId, String deviceParamsString) throws IOException;
 }
