@@ -4,6 +4,7 @@ import com.myfridget.server.db.entity.AdDevice;
 import com.myfridget.server.db.entity.User;
 import com.myfridget.server.ejb.AdDeviceEJBLocal;
 import com.myfridget.server.ejb.UsersEJBLocal;
+import com.myfridget.server.util.EPDUtils;
 import com.myfridget.server.webapp.util.WebUtils;
 import java.io.Serializable;
 import java.util.List;
@@ -16,6 +17,7 @@ import javax.faces.bean.SessionScoped;
 import javax.faces.component.UIComponent;
 import javax.faces.context.FacesContext;
 import javax.faces.convert.Converter;
+import javax.faces.model.SelectItem;
 import org.primefaces.model.DualListModel;
 
 @ManagedBean
@@ -31,7 +33,14 @@ public class AdminDevicesBean implements Serializable, Converter {
 	
 	private AdDevice currentDevice = null;
 
-        private DualListModel<User> assignedUsers = new DualListModel<User>();
+        private DualListModel<User> assignedUsers = new DualListModel<>();
+    
+        public List<SelectItem> getDeviceTypesSelectItems() {
+            List<SelectItem> result = new ArrayList<>();
+            result.add(new SelectItem(EPDUtils.SPECTRA_DISPLAY_TYPE_441, "Spark Core with Spectra 4.41\" (400x300)"));
+            result.add(new SelectItem(EPDUtils.SPECTRA_DISPLAY_TYPE_74, "Spark Core with Spectra 7.4\" (480x800)"));
+            return result;
+        }
     
 	public void clear() {
                 newDevice();

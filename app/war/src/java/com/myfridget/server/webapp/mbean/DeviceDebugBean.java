@@ -48,6 +48,7 @@ public class DeviceDebugBean extends ImageUploadBean {
     private String exec = null;
     private boolean connectToCloud = false;
     private String flashImages = null;
+    private String cloudAccessToken = null;
     
     private int currentImageIndex = 0;
     
@@ -74,12 +75,15 @@ public class DeviceDebugBean extends ImageUploadBean {
         if (selectedDevice == null) {
             exec = null;
             connectToCloud = false;
+            cloudAccessToken = null;
             flashImages = null;
         } else {
             AdDeviceParameter param = deviceEjb.getParameter(selectedDevice, "exec");
             exec = (param != null) ? param.getValue() : null;
             param = deviceEjb.getParameter(selectedDevice, "connectmode");
             connectToCloud = (param != null) ? "1".equals(param.getValue()) : true;
+            param = deviceEjb.getParameter(selectedDevice, "accesstoken");
+            cloudAccessToken = (param != null) ? param.getValue() : null;
             param = deviceEjb.getParameter(selectedDevice, "flashimages");
             flashImages = (param != null) ? param.getValue() : null;
         }
@@ -89,6 +93,7 @@ public class DeviceDebugBean extends ImageUploadBean {
         if (selectedDevice == null) return;
         deviceEjb.setParameter(new AdDeviceParameter(null, selectedDevice, "exec", exec));
         deviceEjb.setParameter(new AdDeviceParameter(null, selectedDevice, "connectmode", connectToCloud ? "1" : "2"));
+        deviceEjb.setParameter(new AdDeviceParameter(null, selectedDevice, "accesstoken", cloudAccessToken == null ? "" : cloudAccessToken));
         deviceEjb.setParameter(new AdDeviceParameter(null, selectedDevice, "flashimages", flashImages == null ? "" : flashImages));
     }
     
@@ -179,6 +184,14 @@ public class DeviceDebugBean extends ImageUploadBean {
 
     public void setConnectToCloud(boolean connectToCloud) {
         this.connectToCloud = connectToCloud;
+    }
+
+    public String getCloudAccessToken() {
+        return cloudAccessToken;
+    }
+
+    public void setCloudAccessToken(String cloudAccessToken) {
+        this.cloudAccessToken = cloudAccessToken;
     }
 
     public String getFlashImages() {

@@ -18,5 +18,9 @@ public interface SystemEJBLocal {
     
     public List<SystemParameter> getSystemParameters();
     
+    public SystemParameter getSystemParameter(String param);
+    
     public void setSystemParameter(SystemParameter param);
+    
+    public String flashFirmware(int adDeviceId) throws Exception;
 }

@@ -5,10 +5,9 @@
  */
 package com.myfridget.server.webapp.rest.service;
 
-import com.myfridget.server.db.entity.AdDevice;
-import com.myfridget.server.db.entity.AdDeviceDebugMsg;
 import com.myfridget.server.db.entity.AdDeviceParameter;
 import com.myfridget.server.ejb.AdDeviceEJBLocal;
+import com.myfridget.server.ejb.SystemEJBLocal;
 import com.myfridget.server.webapp.util.WebUtils;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -22,7 +21,6 @@ import javax.ws.rs.POST;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
-import javax.ws.rs.QueryParam;
 
 /**
  *
@@ -35,7 +33,8 @@ public class DeviceDebugResource {
     @PathParam("serial")
     private String serial;
     
-    protected AdDeviceEJBLocal deviceEjb = lookupAdDeviceEJBLocal();
+    protected AdDeviceEJBLocal deviceEjb = lookupEjb("java:app/Fridget_EJBs/AdDeviceEJB!com.myfridget.server.ejb.AdDeviceEJBLocal");
+    protected SystemEJBLocal systemEjb = lookupEjb("java:global/Fridget_EA/Fridget_EJBs/SystemEJB!com.myfridget.server.ejb.SystemEJBLocal");
     
     @POST
     @Consumes({"application/json"})
@@ -50,12 +49,22 @@ public class DeviceDebugResource {
         return result.toString();
     }
     
-    private AdDeviceEJBLocal lookupAdDeviceEJBLocal() {
+    /**
+     * This is for testing only.
+     * @return result message
+     */
+    @GET
+    @Produces("text/plain")
+    public String flashFirmware() {
+        return systemEjb.flashFirmware(deviceEjb.getBySerial(serial).getId());
+    }
+    
+    private static <T> T lookupEjb(String name) {
         try {
             Context c = new InitialContext();
-            return (AdDeviceEJBLocal) c.lookup("java:app/Fridget_EJBs/AdDeviceEJB!com.myfridget.server.ejb.AdDeviceEJBLocal");
+            return (T) c.lookup(name);
         } catch (NamingException ne) {
-            Logger.getLogger(getClass().getName()).log(Level.SEVERE, "exception caught", ne);
+            Logger.getLogger(DeviceDebugResource.class.getName()).log(Level.SEVERE, "exception caught", ne);
             throw new RuntimeException(ne);
         }
     }

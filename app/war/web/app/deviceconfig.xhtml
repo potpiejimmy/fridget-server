@@ -23,17 +23,21 @@
                 <h:form id="configForm">
                     <h:panelGrid columns="3">
 
-                        <h:outputLabel for="connectToCloud" value="Connect to cloud only:"/>
+                        <h:outputLabel for="connectToCloud" value="Connect to Cloud Only:"/>
                         <p:selectBooleanCheckbox id="connectToCloud" value="#{deviceDebugBean.connectToCloud}" disabled="#{deviceDebugBean.selectedDevice eq null}"/>
                         <p:message for="connectToCloud"/>
 
-                        <h:outputLabel for="exec" value="Execution plan (^([A-Z|-][0-9A-F]{4})+$):"/>
+                        <h:outputLabel for="accesstoken" value="Cloud Access Token:"/>
+                        <p:inputText id="accesstoken" size="60" value="#{deviceDebugBean.cloudAccessToken}" disabled="#{deviceDebugBean.selectedDevice eq null}"/>
+                        <p:message for="accesstoken"/>
+
+                        <h:outputLabel for="exec" value="Execution Plan (^([A-Z|-][0-9A-F]{4})+$):"/>
                         <p:inputText id="exec" size="75" value="#{deviceDebugBean.exec}" disabled="#{deviceDebugBean.selectedDevice eq null}" >
                             <f:validateRegex pattern="^([A-Z|-][0-9A-F]{4})+$"/>
                         </p:inputText>
                         <p:message for="exec"/>
 
-                        <h:outputLabel for="flashImages" value="Download and flash images (^([A-Z])*$):"/>
+                        <h:outputLabel for="flashImages" value="Download and Flash Images (^([A-Z])*$):"/>
                         <p:inputText id="flashImages" value="#{deviceDebugBean.flashImages}" disabled="#{deviceDebugBean.selectedDevice eq null}">
                             <f:validateRegex pattern="^([A-Z])*$"/>
                         </p:inputText>

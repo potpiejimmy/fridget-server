@@ -26,6 +26,14 @@
                                     <p:inputText id="name" size="50" value="#{adminDevicesBean.currentDevice.name}"/>
                                     <p:message for="name" display="text"/>
                             </h:panelGroup>
+                            <h:outputLabel for="deviceType" value="Device Type:"/>
+                            <h:panelGroup>
+                                <p:selectOneMenu id="deviceType" value="#{adminDevicesBean.currentDevice.type}">
+                                    <f:selectItems value="#{adminDevicesBean.deviceTypesSelectItems}"/>
+                                    <p:ajax event="change"/>
+                                </p:selectOneMenu>
+                                <p:message for="deviceType"/>
+                            </h:panelGroup>
                     </p:panelGrid>
 
                 <p>
