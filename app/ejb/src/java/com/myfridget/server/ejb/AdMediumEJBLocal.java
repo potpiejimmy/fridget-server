@@ -25,6 +25,8 @@ public interface AdMediumEJBLocal {
     
     public byte[] getMediumPreview(int adMediumId, int displayType) throws IOException;
     
+    public byte[] getMediumEPD(int adMediumId, int displayType) throws IOException;
+    
     public AdMedium saveMedium(AdMedium medium);
     
     public void deleteMedium(int mediumId);

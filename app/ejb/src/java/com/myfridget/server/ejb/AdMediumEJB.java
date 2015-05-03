@@ -8,6 +8,7 @@ package com.myfridget.server.ejb;
 import com.myfridget.server.db.entity.AdMedium;
 import com.myfridget.server.db.entity.AdMediumItem;
 import com.myfridget.server.util.EPDUtils;
+import com.myfridget.server.util.HuffmanCompression;
 import com.myfridget.server.util.Utils;
 import java.awt.image.BufferedImage;
 import java.io.File;
@@ -93,6 +94,13 @@ public class AdMediumEJB implements AdMediumEJBLocal {
         if (!file.exists()) return null;
         return Utils.readAll(new FileInputStream(file));
     }    
+    
+    @Override
+    public byte[] getMediumEPD(int adMediumId, int displayType) throws IOException {
+        byte[] preview = getMediumPreview(adMediumId, displayType); // encode from preview
+        if (preview == null) return null; // not found
+        return HuffmanCompression.compress(EPDUtils.compressRLE(EPDUtils.makeSpectra3Color(EPDUtils.getResizedImageForDisplay(preview, displayType))));
+    }
     
     protected AdMediumItem findMediumItem(int adMediumId, int displayType) {
         try {

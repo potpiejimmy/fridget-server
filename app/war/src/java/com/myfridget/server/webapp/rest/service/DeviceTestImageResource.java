@@ -9,6 +9,7 @@ import com.myfridget.server.db.entity.AdDevice;
 import com.myfridget.server.db.entity.AdDeviceParameter;
 import com.myfridget.server.db.entity.AdDeviceTestImage;
 import com.myfridget.server.ejb.AdDeviceEJBLocal;
+import com.myfridget.server.ejb.AdMediumEJBLocal;
 import com.myfridget.server.util.EPDUtils;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
@@ -41,7 +42,8 @@ public class DeviceTestImageResource {
     @PathParam("serial")
     private String serial;
     
-    protected AdDeviceEJBLocal deviceEjb = lookupAdDeviceEJBLocal();
+    protected AdDeviceEJBLocal deviceEjb = lookupEjb("java:app/Fridget_EJBs/AdDeviceEJB!com.myfridget.server.ejb.AdDeviceEJBLocal");
+    protected AdMediumEJBLocal mediumEjb = lookupEjb("java:global/Fridget_EA/Fridget_EJBs/AdMediumEJB!com.myfridget.server.ejb.AdMediumEJBLocal");
     
     @GET
     @Produces({"application/binary"})
@@ -49,9 +51,8 @@ public class DeviceTestImageResource {
         AdDevice device = deviceEjb.getBySerial(serial);
         if (device == null) return null; // unknown device
         List<AdDeviceTestImage> images = deviceEjb.getDeviceTestImages(device.getId());
-        if (images == null) return null; // no images;
         if (index !=null) {
-            if (index < 0 || index >= images.size()) return null; // no image at that index
+            if (images == null || index < 0 || index >= images.size()) return null; // no image at that index
             return deviceEjb.getTestImage(images.get(index).getId());
         } else {
             // return the images listed in parameter "flashimages":
@@ -60,8 +61,14 @@ public class DeviceTestImageResource {
             ByteArrayOutputStream baos = new ByteArrayOutputStream();
             for (byte b : imgList.getValue().getBytes()) {
                 int imgIndex = b - 65; //'A'
-                if (imgIndex < 0 || imgIndex >= images.size()) continue; // no such image
-                byte[] imgData = deviceEjb.getTestImage(images.get(imgIndex).getId());
+                byte[] imgData;
+                AdDeviceParameter pImg = deviceEjb.getParameter(device.getId(), "p");
+                if (imgIndex == 15 /*'P'*/ && pImg != null) {
+                    imgData = mediumEjb.getMediumEPD(Integer.parseInt(pImg.getValue()), device.getType());
+                } else {
+                    if (images == null || imgIndex < 0 || imgIndex >= images.size()) continue; // no such image
+                    imgData = deviceEjb.getTestImage(images.get(imgIndex).getId());
+                }
                 int size = imgData.length;
                 // write one byte image index
                 baos.write(imgIndex);
@@ -90,12 +97,12 @@ public class DeviceTestImageResource {
         return Response.ok("File uploaded successfully.\n").build();
     }
     
-    private AdDeviceEJBLocal lookupAdDeviceEJBLocal() {
+    private static <T> T lookupEjb(String name) {
         try {
             Context c = new InitialContext();
-            return (AdDeviceEJBLocal) c.lookup("java:global/Fridget_EA/Fridget_EJBs/AdDeviceEJB!com.myfridget.server.ejb.AdDeviceEJBLocal");
+            return (T) c.lookup(name);
         } catch (NamingException ne) {
-            Logger.getLogger(getClass().getName()).log(Level.SEVERE, "exception caught", ne);
+            Logger.getLogger(DeviceTestImageResource.class.getName()).log(Level.SEVERE, "exception caught", ne);
             throw new RuntimeException(ne);
         }
     }

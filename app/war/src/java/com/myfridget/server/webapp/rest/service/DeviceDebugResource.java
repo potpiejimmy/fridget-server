@@ -5,9 +5,11 @@
  */
 package com.myfridget.server.webapp.rest.service;
 
+import com.myfridget.server.db.entity.AdDevice;
 import com.myfridget.server.db.entity.AdDeviceParameter;
 import com.myfridget.server.db.entity.SystemParameter;
 import com.myfridget.server.ejb.AdDeviceEJBLocal;
+import com.myfridget.server.ejb.CampaignsEJBLocal;
 import com.myfridget.server.ejb.SystemEJB;
 import com.myfridget.server.ejb.SystemEJBLocal;
 import com.myfridget.server.webapp.util.WebUtils;
@@ -37,7 +39,8 @@ public class DeviceDebugResource {
     private String serial;
     
     protected AdDeviceEJBLocal deviceEjb = lookupEjb("java:app/Fridget_EJBs/AdDeviceEJB!com.myfridget.server.ejb.AdDeviceEJBLocal");
-    protected SystemEJBLocal systemEjb = lookupEjb("java:global/Fridget_EA/Fridget_EJBs/SystemEJB!com.myfridget.server.ejb.SystemEJBLocal");
+    protected SystemEJBLocal systemEjb = lookupEjb("java:app/Fridget_EJBs/SystemEJB!com.myfridget.server.ejb.SystemEJBLocal");
+    protected CampaignsEJBLocal campaignsEjb = lookupEjb("java:app/Fridget_EJBs/CampaignsEJB!com.myfridget.server.ejb.CampaignsEJBLocal");
     
     @POST
     @Consumes({"application/json"})
@@ -45,21 +48,29 @@ public class DeviceDebugResource {
     public String hello(String msg) throws IOException {
         msg = WebUtils.removeQuotes(msg);
         deviceEjb.addDebugMessage(serial, ">>>" + msg);
+        
+        AdDevice device = deviceEjb.getBySerial(serial);
 
         // verify client params string, flash firmware if necessary:
-        systemEjb.verifyDeviceParams(deviceEjb.getBySerial(serial).getId(), msg);
+        systemEjb.verifyDeviceParams(device.getId(), msg);
         
         // send server params:
         StringBuilder result = new StringBuilder();
         for (AdDeviceParameter param : deviceEjb.getParameters(deviceEjb.getBySerial(serial).getId())) {
-            if (!"accesstoken".equals(param.getParam()))
-                result.append(param.getParam()).append('=').append(param.getValue()).append(';');
+            if ("exec".equals(param.getParam()))
+                appendParam(result, param.getParam(), getDemoProgram(device.getId(), param.getValue()));
+            else if (!"accesstoken".equals(param.getParam()))
+                appendParam(result, param.getParam(), param.getValue());
         }
         SystemParameter firmware = systemEjb.getSystemParameter(SystemEJB.PARAMETER_FIRMWARE_VERSION);
         result.append("firmware").append('=').append(firmware.getValue()).append(';');
         
         deviceEjb.addDebugMessage(serial, "<<< " + result);
         return result.toString();
+    }
+    
+    protected static void appendParam(StringBuilder result, String param, String value) {
+        result.append(param).append('=').append(value).append(';');
     }
     
     /**
@@ -70,6 +81,13 @@ public class DeviceDebugResource {
     @Produces("text/plain")
     public String flashFirmware() throws Exception {
         return systemEjb.flashFirmware(deviceEjb.getBySerial(serial).getId());
+    }
+    
+    protected String getDemoProgram(int adDeviceId, String program) {
+        // if a program is set in "exec" device configuration parameter, use it
+        if (program!=null && program.length()>0) return program;
+        // otherwise calculate a real campaign program
+        return campaignsEjb.getProgramForDevice(adDeviceId);
     }
     
     private static <T> T lookupEjb(String name) {

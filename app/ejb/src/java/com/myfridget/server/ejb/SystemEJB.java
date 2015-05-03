@@ -94,8 +94,9 @@ public class SystemEJB implements SystemEJBLocal {
         Properties deviceParams = new Properties();
         deviceParams.load(new StringReader(deviceParamsString.replace(',', '\n')));
         
-        String firmwareVersion = getSystemParameter(PARAMETER_FIRMWARE_VERSION).getValue();
-        if (!firmwareVersion.equals(deviceParams.getProperty("firmware")))
+        String serverFirmware = getSystemParameter(PARAMETER_FIRMWARE_VERSION).getValue();
+        String deviceFirmware = deviceParams.getProperty("firmware");
+        if (deviceFirmware!=null && !deviceFirmware.equals(serverFirmware))
             timerService.createSingleActionTimer(10000, new TimerConfig(adDeviceId, true));
         
         return true;

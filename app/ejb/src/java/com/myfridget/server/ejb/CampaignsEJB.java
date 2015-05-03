@@ -5,9 +5,18 @@
  */
 package com.myfridget.server.ejb;
 
+import com.myfridget.server.db.entity.AdDeviceParameter;
 import com.myfridget.server.db.entity.Campaign;
 import com.myfridget.server.db.entity.CampaignAction;
+import com.myfridget.server.db.entity.User;
+import java.text.DateFormat;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javax.ejb.EJB;
 import javax.ejb.Stateless;
 import javax.persistence.EntityManager;
@@ -26,9 +35,17 @@ public class CampaignsEJB implements CampaignsEJBLocal {
     @EJB
     private UsersEJBLocal usersEjb;
 
+    @EJB
+    private AdDeviceEJBLocal deviceEjb;
+    
     @Override
     public List<Campaign> getCampaigns() {
-        return em.createNamedQuery("Campaign.findByUserId", Campaign.class).setParameter("userId", usersEjb.getCurrentUser().getId()).getResultList();
+        return getCampaigns(usersEjb.getCurrentUser().getId());
+    }
+
+    @Override
+    public List<Campaign> getCampaigns(int userId) {
+        return em.createNamedQuery("Campaign.findByUserId", Campaign.class).setParameter("userId", userId).getResultList();
     }
 
     @Override
@@ -57,4 +74,25 @@ public class CampaignsEJB implements CampaignsEJBLocal {
         em.remove(em.find(Campaign.class, id));
     }
     
+    @Override
+    public String getProgramForDevice(int adDeviceId) {
+        List<User> deviceUsers = deviceEjb.getAssignedUsers(adDeviceId);
+        List<Campaign> deviceCampaigns = new ArrayList<>();
+        deviceUsers.forEach(u -> deviceCampaigns.addAll(getCampaigns(u.getId())));
+        List<CampaignAction> deviceActions = new ArrayList<>();
+        deviceCampaigns.forEach(c -> deviceActions.addAll(getCampaignActionsForCampaign(c.getId())));
+        if (deviceActions.isEmpty()) return "A0070"; // XXX
+        // XXX just a demo, use first action of first campaign:
+        CampaignAction demoAction = deviceActions.get(0);
+        Calendar cal = Calendar.getInstance();
+        cal.set(Calendar.HOUR_OF_DAY, demoAction.getTimeOfDay()/100);
+        cal.set(Calendar.MINUTE, demoAction.getTimeOfDay()%100);
+        if (cal.before(System.currentTimeMillis())) cal.add(Calendar.DAY_OF_YEAR, 1);
+        long offset = cal.getTimeInMillis() - System.currentTimeMillis();
+        long cycles = Math.round(((double)offset)/8104);
+        String delayString = (Long.toHexString(0x10000+cycles).substring(1));
+        // XXX: remember used medium ID in parameter "p"
+        deviceEjb.setParameter(new AdDeviceParameter(null, adDeviceId, "p", ""+demoAction.getAdMediumId()));
+        return "-" + delayString + "P0001";
+    }
 }
