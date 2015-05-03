@@ -6,7 +6,9 @@
 package com.myfridget.server.webapp.rest.service;
 
 import com.myfridget.server.db.entity.AdDeviceParameter;
+import com.myfridget.server.db.entity.SystemParameter;
 import com.myfridget.server.ejb.AdDeviceEJBLocal;
+import com.myfridget.server.ejb.SystemEJB;
 import com.myfridget.server.ejb.SystemEJBLocal;
 import com.myfridget.server.webapp.util.WebUtils;
 import java.io.IOException;
@@ -50,8 +52,12 @@ public class DeviceDebugResource {
         // send server params:
         StringBuilder result = new StringBuilder();
         for (AdDeviceParameter param : deviceEjb.getParameters(deviceEjb.getBySerial(serial).getId())) {
-            result.append(param.getParam()).append('=').append(param.getValue()).append(';');
+            if (!"accesstoken".equals(param.getParam()))
+                result.append(param.getParam()).append('=').append(param.getValue()).append(';');
         }
+        SystemParameter firmware = systemEjb.getSystemParameter(SystemEJB.PARAMETER_FIRMWARE_VERSION);
+        result.append("firmware").append('=').append(firmware.getValue()).append(';');
+        
         deviceEjb.addDebugMessage(serial, "<<< " + result);
         return result.toString();
     }
