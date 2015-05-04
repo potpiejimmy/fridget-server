@@ -8,15 +8,11 @@ package com.myfridget.server.ejb;
 import com.myfridget.server.db.entity.AdDeviceParameter;
 import com.myfridget.server.db.entity.Campaign;
 import com.myfridget.server.db.entity.CampaignAction;
+import com.myfridget.server.db.entity.SystemParameter;
 import com.myfridget.server.db.entity.User;
-import java.text.DateFormat;
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.List;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import javax.ejb.EJB;
 import javax.ejb.Stateless;
 import javax.persistence.EntityManager;
@@ -37,6 +33,9 @@ public class CampaignsEJB implements CampaignsEJBLocal {
 
     @EJB
     private AdDeviceEJBLocal deviceEjb;
+    
+    @EJB
+    private SystemEJBLocal systemEjb;
     
     @Override
     public List<Campaign> getCampaigns() {
@@ -76,6 +75,13 @@ public class CampaignsEJB implements CampaignsEJBLocal {
     
     @Override
     public String getProgramForDevice(int adDeviceId) {
+        SystemParameter cycleLenParam = systemEjb.getSystemParameter("attiny.cycle.len");
+        int cycleLen = 0;
+        try {
+            cycleLen = Integer.parseInt(cycleLenParam.getValue());
+        } catch (Exception e) {
+            cycleLen = 8870;  // use a default
+        }
         List<User> deviceUsers = deviceEjb.getAssignedUsers(adDeviceId);
         List<Campaign> deviceCampaigns = new ArrayList<>();
         deviceUsers.forEach(u -> deviceCampaigns.addAll(getCampaigns(u.getId())));
@@ -87,10 +93,12 @@ public class CampaignsEJB implements CampaignsEJBLocal {
         Calendar cal = Calendar.getInstance();
         cal.set(Calendar.HOUR_OF_DAY, demoAction.getTimeOfDay()/100);
         cal.set(Calendar.MINUTE, demoAction.getTimeOfDay()%100);
-        if (cal.before(System.currentTimeMillis())) cal.add(Calendar.DAY_OF_YEAR, 1);
-        long offset = cal.getTimeInMillis() - System.currentTimeMillis();
-        long cycles = Math.round(((double)offset)/8104);
-        String delayString = (Long.toHexString(0x10000+cycles).substring(1));
+        cal.set(Calendar.SECOND, 0);
+        long now = System.currentTimeMillis();
+        if (cal.getTimeInMillis() < now) cal.add(Calendar.DAY_OF_YEAR, 1);
+        long offset = cal.getTimeInMillis() - now;
+        long cycles = Math.round(((double)offset)/cycleLen);
+        String delayString = Long.toHexString(0x10000+cycles).substring(1);
         // XXX: remember used medium ID in parameter "p"
         deviceEjb.setParameter(new AdDeviceParameter(null, adDeviceId, "p", ""+demoAction.getAdMediumId()));
         return "-" + delayString + "P0001";

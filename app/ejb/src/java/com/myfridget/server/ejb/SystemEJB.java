@@ -22,6 +22,7 @@ import javax.ejb.Timer;
 import javax.ejb.TimerConfig;
 import javax.ejb.TimerService;
 import javax.persistence.EntityManager;
+import javax.persistence.NoResultException;
 import javax.persistence.PersistenceContext;
 import org.apache.http.entity.ContentType;
 import org.apache.http.entity.mime.MultipartEntityBuilder;
@@ -53,7 +54,11 @@ public class SystemEJB implements SystemEJBLocal {
     
     @Override
     public SystemParameter getSystemParameter(String param) {
-        return em.createNamedQuery("SystemParameter.findByParam", SystemParameter.class).setParameter("param", param).getSingleResult();
+        try {
+            return em.createNamedQuery("SystemParameter.findByParam", SystemParameter.class).setParameter("param", param).getSingleResult();
+        } catch (NoResultException nre) {
+            return null; // parameter not found
+        }
     }
 
     @Override
