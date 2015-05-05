@@ -10,8 +10,10 @@ import com.myfridget.server.db.entity.Campaign;
 import com.myfridget.server.db.entity.CampaignAction;
 import com.myfridget.server.db.entity.SystemParameter;
 import com.myfridget.server.db.entity.User;
+import com.myfridget.server.vo.ScheduledCampaignAction;
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.Collections;
 import java.util.List;
 import javax.ejb.EJB;
 import javax.ejb.Stateless;
@@ -88,19 +90,29 @@ public class CampaignsEJB implements CampaignsEJBLocal {
         List<CampaignAction> deviceActions = new ArrayList<>();
         deviceCampaigns.forEach(c -> deviceActions.addAll(getCampaignActionsForCampaign(c.getId())));
         if (deviceActions.isEmpty()) return "A0070"; // XXX
-        // XXX just a demo, use first action of first campaign:
-        CampaignAction demoAction = deviceActions.get(0);
-        Calendar cal = Calendar.getInstance();
-        cal.set(Calendar.HOUR_OF_DAY, demoAction.getTimeOfDay()/100);
-        cal.set(Calendar.MINUTE, demoAction.getTimeOfDay()%100);
-        cal.set(Calendar.SECOND, 0);
+        
         long now = System.currentTimeMillis();
-        if (cal.getTimeInMillis() < now) cal.add(Calendar.DAY_OF_YEAR, 1);
-        long offset = cal.getTimeInMillis() - now;
+            
+        List<ScheduledCampaignAction> schedule = new ArrayList<>();
+        for (CampaignAction action : deviceActions) {
+            Calendar cal = Calendar.getInstance();
+            cal.set(Calendar.HOUR_OF_DAY, action.getTimeOfDay()/100);
+            cal.set(Calendar.MINUTE, action.getTimeOfDay()%100);
+            cal.set(Calendar.SECOND, 0);
+            if (cal.getTimeInMillis() < now) cal.add(Calendar.DAY_OF_YEAR, 1);
+            schedule.add(new ScheduledCampaignAction(action, cal.getTimeInMillis()));
+        }
+        // now sort the schedule:
+        Collections.sort(schedule);
+        
+        // XXX for now, just program the next action in time:
+        ScheduledCampaignAction nextScheduledAction = schedule.get(0); // first in the list
+        CampaignAction nextAction = nextScheduledAction.getAction();
+        long offset = nextScheduledAction.getScheduledTime() - now;
         long cycles = Math.round(((double)offset)/cycleLen);
         String delayString = Long.toHexString(0x10000+cycles).substring(1);
         // XXX: remember used medium ID in parameter "p"
-        deviceEjb.setParameter(new AdDeviceParameter(null, adDeviceId, "p", ""+demoAction.getAdMediumId()));
+        deviceEjb.setParameter(new AdDeviceParameter(null, adDeviceId, "p", ""+nextAction.getAdMediumId()));
         return "-" + delayString + "P0001";
     }
 }
