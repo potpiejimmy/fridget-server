@@ -15,6 +15,8 @@
             <included-library dirs="200">file.reference.google-api-services-calendar-v3-rev124-1.20.0.jar</included-library>
             <included-library dirs="200">file.reference.jsr305-1.3.9.jar</included-library>
             <included-library dirs="200">file.reference.jackson-core-2.1.3.jar</included-library>
+            <included-library dirs="200">file.reference.jetty-6.1.26.jar</included-library>
+            <included-library dirs="200">file.reference.jetty-util-6.1.26.jar</included-library>
             <included-library dirs="200">file.reference.httpclient-4.4.1.jar</included-library>
             <included-library dirs="200">file.reference.httpmime-4.4.1.jar</included-library>
             <included-library dirs="200">file.reference.httpcore-4.4.1.jar</included-library>

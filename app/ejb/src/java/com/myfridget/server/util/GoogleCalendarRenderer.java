@@ -9,8 +9,8 @@ import com.myfridget.server.util.GoogleCalendar.CalendarItem;
 import java.awt.Color;
 import java.awt.Font;
 import java.awt.Graphics2D;
-import java.awt.Image;
 import java.awt.image.BufferedImage;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
@@ -48,7 +48,7 @@ public class GoogleCalendarRenderer {
      * Renders the Google Calendar as an image.
      * @return an image
      */
-    public Image renderCalendar() throws IOException {
+    public BufferedImage renderCalendar() throws IOException {
 
         BufferedImage result = new BufferedImage(WIDTH, HEIGHT, BufferedImage.TYPE_INT_RGB);
         
@@ -100,14 +100,14 @@ public class GoogleCalendarRenderer {
         Font font = graphics.getFont();
         font = font.deriveFont(Font.BOLD);
         
-        graphics.setFont(font.deriveFont(10f));
-        graphics.drawString(formatterDayOfWeek.format(now.getTime()), 10, currentLine + 2);
+        graphics.setFont(font.deriveFont(14f));
+        graphics.drawString(formatterDayOfWeek.format(now.getTime()), 10, currentLine + 16);
 
-        graphics.setFont(font.deriveFont(24f));
-        graphics.drawString(formatterDate.format(now.getTime()), 10, currentLine + 10);
+        graphics.setFont(font.deriveFont(28f));
+        graphics.drawString(formatterDate.format(now.getTime()), 10, currentLine + 44);
 
-        graphics.setFont(font.deriveFont(10f));
-        graphics.drawString("Kalenderwoche " + now.get(Calendar.WEEK_OF_YEAR), 335, currentLine + 2);
+        graphics.setFont(font.deriveFont(14f));
+        graphics.drawString("Kalenderwoche " + now.get(Calendar.WEEK_OF_YEAR), 335, currentLine + 16);
     }
 
     private void drawColoredLines(int n, Color c)
@@ -125,17 +125,19 @@ public class GoogleCalendarRenderer {
     private void drawDateLine(Calendar d)
     {
         int currentLine = this.lineNumber;
-        graphics.setColor(Color.WHITE);
         if (d.get(Calendar.DAY_OF_WEEK) == Calendar.MONDAY)
         {
             drawColoredLines(2, Color.WHITE);
             drawColoredLines(22, Color.BLACK);
-            graphics.setFont(graphics.getFont().deriveFont(10f));
-            graphics.drawString("Kalenderwoche " + d.get(Calendar.WEEK_OF_YEAR), 12, currentLine+4);
+            graphics.setColor(Color.WHITE);
+            graphics.setFont(graphics.getFont().deriveFont(12f));
+            graphics.drawString("Kalenderwoche " + d.get(Calendar.WEEK_OF_YEAR), 12, currentLine+16);
         }
+        currentLine = this.lineNumber;
         drawColoredLines(24, Color.RED);
-        graphics.setFont(graphics.getFont().deriveFont(14f));
-        graphics.drawString(formatterDateline.format(d.getTime()), 10, currentLine);
+        graphics.setColor(Color.WHITE);
+        graphics.setFont(graphics.getFont().deriveFont(16f));
+        graphics.drawString(formatterDateline.format(d.getTime()), 10, currentLine+16);
         drawColoredLines(1, Color.WHITE);		
     }
 		
@@ -154,29 +156,29 @@ public class GoogleCalendarRenderer {
         if (i.wholeDay)
         {
             graphics.setColor(Color.RED);
-            graphics.setFont(graphics.getFont().deriveFont(18f));
-            graphics.drawString(i.title, 10, currentLine);				
+            graphics.setFont(graphics.getFont().deriveFont(20f));
+            graphics.drawString(i.title, 10, currentLine+20);				
             currentLine += 25;		
         }
         else
         {
             graphics.setColor(Color.BLACK);
-            graphics.setFont(graphics.getFont().deriveFont(24f));
-            graphics.drawString(formatTimes(i), 0, currentLine);
-            graphics.drawString(i.title, 180, currentLine);
+            graphics.setFont(graphics.getFont().deriveFont(25f));
+            graphics.drawString(formatTimes(i), 10, currentLine+26);
+            graphics.drawString(i.title, 180, currentLine+26);
             currentLine += 35;				
         }
-        graphics.setFont(graphics.getFont().deriveFont(12f));
+        graphics.setFont(graphics.getFont().deriveFont(14f));
         if (i.description != null && i.description.length() > 0)
         {
             graphics.setColor(Color.BLACK);
-            graphics.drawString(i.description, 10, currentLine);
+            graphics.drawString(i.description, 10, currentLine+14);
             currentLine += 18;
         }
         if (i.location != null && i.location.length() > 0)
         {
             graphics.setColor(Color.RED);
-            graphics.drawString(i.location, 10, currentLine);
+            graphics.drawString(i.location, 10, currentLine+14);
             currentLine += 18;
         }
     }
@@ -189,5 +191,12 @@ public class GoogleCalendarRenderer {
     private void fillUpWithWhite()
     {
         while (this.lineNumber<800) drawColoredLines(1, Color.WHITE);
+    }
+    
+    public static void main(String[] args) throws Exception 
+    {
+        GoogleCalendarRenderer renderer = new GoogleCalendarRenderer();
+        FileOutputStream fos = new FileOutputStream("/Users/thorsten/calendar.png");
+        fos.write(Utils.encodeImage(renderer.renderCalendar(), "png"));
     }
 }
