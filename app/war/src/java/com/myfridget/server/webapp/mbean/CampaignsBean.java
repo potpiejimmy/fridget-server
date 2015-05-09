@@ -10,12 +10,19 @@ import com.myfridget.server.db.entity.Campaign;
 import com.myfridget.server.db.entity.CampaignAction;
 import com.myfridget.server.ejb.AdMediumEJBLocal;
 import com.myfridget.server.ejb.CampaignsEJBLocal;
+import com.myfridget.server.util.EPDUtils;
+import java.io.ByteArrayInputStream;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import javax.ejb.EJB;
 import javax.faces.bean.ManagedBean;
 import javax.faces.bean.SessionScoped;
+import javax.faces.context.FacesContext;
+import javax.faces.event.PhaseId;
 import javax.faces.model.SelectItem;
+import org.primefaces.model.DefaultStreamedContent;
+import org.primefaces.model.StreamedContent;
 
 /**
  *
@@ -100,7 +107,24 @@ public class CampaignsBean {
         return currentActions;
     }
     
+    public StreamedContent getCampaignPreviewImage() throws IOException {
+        FacesContext context = FacesContext.getCurrentInstance();
+        if (context.getCurrentPhaseId() == PhaseId.RENDER_RESPONSE) {
+            // Rendering the view. Return a stub StreamedContent so that it will generate URL.
+            return new DefaultStreamedContent();
+        } else {
+            String campaignId = FacesContext.getCurrentInstance().getExternalContext().getRequestParameterMap().get("campaignId");
+            List<CampaignAction> actions = campaignsEjb.getCampaignActionsForCampaign(Integer.parseInt(campaignId));
+            if (actions.isEmpty()) return null;
+            byte[] image = mediumEjb.getMediumPreview(actions.get(0).getAdMediumId(), EPDUtils.SPECTRA_DISPLAY_TYPE_441);
+            return new DefaultStreamedContent(new ByteArrayInputStream(image), "image/png");
+        }
+    }
     // ------------
+    // actions
+    // ------------
+    
+    private boolean editingAction = false;
     
     public void newAction() {
         currentAction = new CampaignAction();
@@ -110,14 +134,34 @@ public class CampaignsBean {
         currentActions.remove(action);
     }
 
+    public void editAction(CampaignAction action) {
+        currentAction = action;
+        currentActionTime = getFormattedActionTime(action);
+        editingAction = true;
+    }
+
     public void saveAction() {
-        currentAction.setTimeOfDay(Short.parseShort(currentActionTime.replace(":", "")));
-        currentActions.add(currentAction);
+        currentAction.setTimeOfDay(parseActionTime(currentActionTime));
+        if (!editingAction) currentActions.add(currentAction);
         cancelAction();
     }
 
     public void cancelAction() {
         currentAction = null;
         currentActionTime = null;
+        editingAction = false;
+    }
+    
+    public String getFormattedActionTime(CampaignAction action) {
+        return formatActionTime(action.getTimeOfDay());
+    }
+    
+    protected static String formatActionTime(short actionTime) {
+        return String.valueOf(100+actionTime/100).substring(1) + ":" +
+               String.valueOf(100+actionTime%100).substring(1);
+    }
+    
+    protected static short parseActionTime(String actionTime) {
+        return Short.parseShort(actionTime.replace(":", ""));
     }
 }

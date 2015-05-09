@@ -62,16 +62,16 @@ public class CampaignsEJB implements CampaignsEJBLocal {
             em.flush(); //pre-fetch ID
         } else {
             em.merge(campaign);
-            for (CampaignAction a : getCampaignActionsForCampaign(campaign.getId())) em.remove(a);
         }
         for (CampaignAction a : actions) {
             a.setCampaignId(campaign.getId());
-            em.persist(a);
+            em.merge(a);
         }
     }
 
     @Override
     public void deleteCampaign(int id) {
+        getCampaignActionsForCampaign(id).forEach(a->em.remove(a));
         em.remove(em.find(Campaign.class, id));
     }
     

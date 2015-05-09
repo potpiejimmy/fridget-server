@@ -8,10 +8,10 @@
     
     <ui:composition>
         
-        <p:commandLink action="#{campaignsBean.editCampaign(campaign)}" update=":outputPanel" styleClass="gridCell campaignHover">
-            <h:panelGroup layout="block" style="position: relative; top:65px; text-align: center;">
-                <h:outputText styleClass="gridCell" value="#{campaign.name}"/>
-            </h:panelGroup>
+        <p:commandLink action="#{campaignsBean.editCampaign(campaign)}" update=":outputPanel">
+            <p:graphicImage  styleClass="mediaSelectHover" value="#{campaignsBean.campaignPreviewImage}" width="100px;" alt="#{campaign.name}" title="#{campaign.name}">
+                <f:param name="campaignId" value="#{campaign.id}"/>
+            </p:graphicImage>
         </p:commandLink>
         
     </ui:composition>

@@ -54,6 +54,11 @@ public class MediaBean extends ImageUploadBean {
         setCurrentMedium(null);
     }
     
+    public void delete() {
+        mediumEjb.deleteMedium(currentMedium.getId());
+        cancel();
+    }
+    
     public StreamedContent getCurrentMediumDisplay(int displayType) throws IOException {
         byte[] image = imageData.get(displayType);
         if (image == null) return null;

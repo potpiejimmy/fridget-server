@@ -40,6 +40,8 @@
 
             <p:commandButton value="Save" action="#{mediaBean.save}" ajax="false"/>
             <p:commandButton value="Cancel" action="#{mediaBean.cancel}" immediate="true" ajax="false"/>
+            <p/>
+            <p:commandLink value="Delete Medium" action="#{mediaBean.delete}" update=":outputPanel" rendered="#{mediaBean.currentMedium.id ne null}"/>
             
             <hr/>
             
