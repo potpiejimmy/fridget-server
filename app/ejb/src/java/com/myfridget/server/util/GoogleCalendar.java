@@ -5,32 +5,13 @@
  */
 package com.myfridget.server.util;
 
-import com.google.api.client.auth.oauth2.AuthorizationCodeFlow;
-import com.google.api.client.auth.oauth2.BearerToken;
 import com.google.api.client.auth.oauth2.Credential;
-import com.google.api.client.auth.oauth2.StoredCredential;
-import com.google.api.client.auth.oauth2.TokenResponse;
-import com.google.api.client.extensions.java6.auth.oauth2.AuthorizationCodeInstalledApp;
-import com.google.api.client.extensions.jetty.auth.oauth2.LocalServerReceiver;
-import com.google.api.client.googleapis.auth.oauth2.GoogleAuthorizationCodeFlow;
-import com.google.api.client.googleapis.auth.oauth2.GoogleClientSecrets;
-import com.google.api.client.googleapis.javanet.GoogleNetHttpTransport;
-import com.google.api.client.http.HttpTransport;
-import com.google.api.client.json.JsonFactory;
-import com.google.api.client.json.jackson2.JacksonFactory;
 import com.google.api.client.util.DateTime;
-import com.google.api.client.util.store.FileDataStoreFactory;
-import com.google.api.services.calendar.CalendarScopes;
 import com.google.api.services.calendar.model.CalendarListEntry;
 import com.google.api.services.calendar.model.Event;
 import com.google.api.services.calendar.model.Events;
-import java.io.File;
-import java.io.FileOutputStream;
 import java.io.IOException;
-import java.io.ObjectOutputStream;
-import java.io.StringReader;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Collections;
 import java.util.Date;
@@ -44,21 +25,6 @@ public class GoogleCalendar
 {
     private List<CalendarItem> items;
     private com.google.api.services.calendar.Calendar calendarConnection;
-
-    /** Global instance of the JSON factory. */
-    private static final JsonFactory JSON_FACTORY = JacksonFactory.getDefaultInstance();
-    
-    /** Global instance of the HTTP transport. */
-    private static HttpTransport HTTP_TRANSPORT;
-    
-    static {
-        try {
-            HTTP_TRANSPORT = GoogleNetHttpTransport.newTrustedTransport();
-        } catch (Throwable t) {
-            t.printStackTrace();
-            System.exit(1);
-        }
-    }
 
     public GoogleCalendar() throws IOException
     {
@@ -128,18 +94,6 @@ public class GoogleCalendar
     {
         try
         {
-            GoogleClientSecrets secrets = GoogleClientSecrets.load(JSON_FACTORY, new StringReader(
-                "{\"installed\":{\"auth_uri\":\"https://accounts.google.com/o/oauth2/auth\",\"client_secret\":\"i-zz2ycj20GIl19t7tkiT60e\",\"token_uri\":\"https://accounts.google.com/o/oauth2/token\",\"client_email\":\"\",\"redirect_uris\":[\"urn:ietf:wg:oauth:2.0:oob\",\"oob\"],\"client_x509_cert_url\":\"\",\"client_id\":\"742875388091-ibb4pcogvh1qgac7sglmv0kasq0f4qvb.apps.googleusercontent.com\",\"auth_provider_x509_cert_url\":\"https://www.googleapis.com/oauth2/v1/certs\"}}"));
-
-            // Build flow and trigger user authorization request.
-            GoogleAuthorizationCodeFlow flow =
-                    new GoogleAuthorizationCodeFlow.Builder(
-                            HTTP_TRANSPORT, JSON_FACTORY, secrets, Arrays.asList(CalendarScopes.CALENDAR_READONLY))
-                           .setDataStoreFactory(new FileDataStoreFactory(new File("/Users/thorsten/google-calendar-credentials")))
-                           .setAccessType("offline")
-                           .build();
-            Credential credential = new AuthorizationCodeInstalledApp(
-                flow, new LocalServerReceiver()).authorize("user");
             
 //            TokenResponse tr = new TokenResponse();
 //            tr.set("access_token", "ya29.awGXJuacjC_fYaOhMuZv2gkj3k5WMSmQyC2CFKk5IfNzd4hLv88swYEnCQ5PeHPAf5Z7wUdSeOHZJQ");
@@ -149,8 +103,11 @@ public class GoogleCalendar
 //            tr.set("Issued", "2015-05-06T23:29:00.540+02:00");
 //            credential.setFromTokenResponse(tr);
 
+            GoogleAuthorizationHelper helper = new GoogleAuthorizationHelper("thorsten@potpiejimmy.de");
+            Credential credential = (Credential)helper.getCredentials();
+            
             calendarConnection = new com.google.api.services.calendar.Calendar.Builder(
-                HTTP_TRANSPORT, JSON_FACTORY, credential)
+                GoogleAuthorizationHelper.HTTP_TRANSPORT, GoogleAuthorizationHelper.JSON_FACTORY, credential)
                 .setApplicationName("MyProject")
                 .build();
         }

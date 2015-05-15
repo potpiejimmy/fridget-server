@@ -17,24 +17,26 @@
             </h:panelGrid>
 
             <h:panelGrid columns="3">
-                <h:outputLabel for="selectDisplayType" value="Select Upload Display Type:"/>
+                <h:outputLabel for="selectDisplayType" value="Generate for Display Type:"/>
                 <p:selectOneMenu id="selectDisplayType" value="#{mediaBean.selectedDisplayType}">
                     <f:selectItems value="#{mediaBean.displayTypesSelectItems}"/>
                     <p:ajax event="change"/>
                 </p:selectOneMenu>
                 <p:message for="selectDisplayType"/>
             </h:panelGrid>
-            <p:fileUpload id="imgUpload" fileUploadListener="#{mediaBean.handleFileUpload}" mode="advanced"
+            <p:fileUpload id="imgUpload" label="Upload file..." fileUploadListener="#{mediaBean.handleFileUpload}" mode="advanced"
                          update="messages,medium4,medium7" auto="true" sizeLimit="5000000" allowTypes="/(\.|\/)(gif|jpe?g|png)$/"/>
             <p:growl id="messages" showDetail="true"/>  
 
+            <p:commandButton value="Generate Google Calendar" action="#{mediaBean.generateCalendar}" ajax="false"/>
+            
             <h:panelGrid columns="3">
                 <h:outputLabel for="medium4" value="Display 4.41&quot;:"/>
-                <p:graphicImage id="medium4" value="#{mediaBean.getCurrentMediumDisplay(0)}" cache="false"/>
+                <p:graphicImage id="medium4" value="#{mediaBean.getCurrentMediumDisplay(0)}" cache="false" styleClass="mediaSelectHover"/>
                 <p:message for="medium4"/>
 
                 <h:outputLabel for="medium7" value="Display 7.4&quot;:"/>
-                <p:graphicImage id="medium7" value="#{mediaBean.getCurrentMediumDisplay(1)}" cache="false"/>
+                <p:graphicImage id="medium7" value="#{mediaBean.getCurrentMediumDisplay(1)}" cache="false" styleClass="mediaSelectHover"/>
                 <p:message for="medium7"/>
             </h:panelGrid>
 

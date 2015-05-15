@@ -7,6 +7,9 @@ package com.myfridget.server.webapp.mbean;
 
 import com.myfridget.server.db.entity.AdMedium;
 import com.myfridget.server.util.EPDUtils;
+import com.myfridget.server.util.GoogleCalendarRenderer;
+import com.myfridget.server.util.Utils;
+import com.myfridget.server.webapp.util.GoogleAuthorizationServlet;
 import com.myfridget.server.webapp.util.WebUtils;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
@@ -36,11 +39,6 @@ public class MediaBean extends ImageUploadBean {
     
     @Override
     public void save() {
-        if (imageData.get(EPDUtils.SPECTRA_DISPLAY_TYPE_441) == null) {
-            WebUtils.addFacesMessage("Please upload a 4.41\" display image.");
-            return;
-        }
-        
         currentMedium = mediumEjb.saveMedium(currentMedium);
         super.save();
         setCurrentMedium(null);
@@ -73,7 +71,22 @@ public class MediaBean extends ImageUploadBean {
         } else {
             String id = FacesContext.getCurrentInstance().getExternalContext().getRequestParameterMap().get("adMediumId");
             byte[] image = mediumEjb.getMediumPreview(Integer.parseInt(id), EPDUtils.SPECTRA_DISPLAY_TYPE_441);
+            if (image == null) image = mediumEjb.getMediumPreview(Integer.parseInt(id), EPDUtils.SPECTRA_DISPLAY_TYPE_74);
             return new DefaultStreamedContent(new ByteArrayInputStream(image), "image/png");
+        }
+    }
+    
+    // ---------------
+    
+    public void generateCalendar() {
+        try {
+            if (GoogleAuthorizationServlet.startAuthorizationRequest(WebUtils.getHttpServletRequest(), WebUtils.getHttpServletResponse())) {
+                // okay, do it:
+                GoogleCalendarRenderer renderer = new GoogleCalendarRenderer();
+                setImageData((Utils.encodeImage(renderer.renderCalendar(), "png")));
+            }
+        } catch (Exception e) {
+            WebUtils.addFacesMessage(e);
         }
     }
 }

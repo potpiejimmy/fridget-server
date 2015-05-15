@@ -10,6 +10,7 @@ import javax.faces.application.FacesMessage;
 import javax.faces.context.ExternalContext;
 import javax.faces.context.FacesContext;
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 
 /**
  * Contains static utility methods.
@@ -44,6 +45,11 @@ public class WebUtils
     public static HttpServletRequest getHttpServletRequest()
     {
         return (HttpServletRequest)FacesContext.getCurrentInstance().getExternalContext().getRequest();
+    }
+    
+    public static HttpServletResponse getHttpServletResponse()
+    {
+        return (HttpServletResponse)FacesContext.getCurrentInstance().getExternalContext().getResponse();
     }
     
     /**

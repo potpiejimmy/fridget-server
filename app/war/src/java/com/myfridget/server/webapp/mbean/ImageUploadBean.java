@@ -65,15 +65,19 @@ public class ImageUploadBean {
         try {
             UploadedFile originalImage = event.getFile();
             byte[] data = Utils.readAll(originalImage.getInputstream());
-            if (selectedDisplayType < 0) {
-                for (int type : EPDUtils.SPECTRA_DISPLAY_DEFAULT_TYPES)
-                    imageData.put(type, mediumEjb.convertImage(data, type));
-            } else {
-                imageData.put(selectedDisplayType, mediumEjb.convertImage(data, selectedDisplayType));
-            }
+            setImageData(data);
             WebUtils.addFacesMessage("File " + event.getFile().getFileName() + " uploaded successfully.");
         } catch (Exception ex) {
             WebUtils.addFacesMessage(ex);
+        }
+    }
+    
+    protected void setImageData(byte[] data) throws IOException {
+        if (selectedDisplayType < 0) {
+            for (int type : EPDUtils.SPECTRA_DISPLAY_DEFAULT_TYPES)
+                imageData.put(type, mediumEjb.convertImage(data, type));
+        } else {
+            imageData.put(selectedDisplayType, mediumEjb.convertImage(data, selectedDisplayType));
         }
     }
     
