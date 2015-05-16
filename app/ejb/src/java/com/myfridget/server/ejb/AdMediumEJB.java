@@ -68,7 +68,7 @@ public class AdMediumEJB implements AdMediumEJBLocal {
     public byte[] convertImage(byte[] imgData, int displayType) throws IOException {
         BufferedImage img = EPDUtils.getResizedImageForDisplay(imgData, displayType);
         EPDUtils.makeSpectra3Color(img); // Note: converts "img" to 3 colors
-        img = Utils.setImageOrientation(img, false); // force landscape mode
+        //img = Utils.setImageOrientation(img, false); // force landscape mode
         return Utils.encodeImage(img, "png"); // encode PNG
     }
     

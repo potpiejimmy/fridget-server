@@ -7,6 +7,7 @@ package com.myfridget.server.util;
 
 import com.myfridget.server.util.GoogleCalendar.CalendarItem;
 import java.awt.Color;
+import java.awt.Dimension;
 import java.awt.Font;
 import java.awt.Graphics2D;
 import java.awt.image.BufferedImage;
@@ -22,8 +23,7 @@ import java.util.Calendar;
  */
 public class GoogleCalendarRenderer {
     
-    public final static int WIDTH = 480;
-    public final static int HEIGHT = 800;
+    public Dimension dimension = null;
     
     private GoogleCalendar calendar = null;
     private Graphics2D graphics = null;
@@ -34,7 +34,8 @@ public class GoogleCalendarRenderer {
     private DateFormat formatterDateline = null;
     private DateFormat formatterTime = null;
     
-    public GoogleCalendarRenderer() {
+    public GoogleCalendarRenderer(Dimension dimension) {
+        this.dimension = dimension;
         this.calendar = null;
         this.lineNumber = 0;
         
@@ -51,7 +52,7 @@ public class GoogleCalendarRenderer {
      */
     public BufferedImage renderCalendar(String userId) throws IOException {
 
-        BufferedImage result = new BufferedImage(WIDTH, HEIGHT, BufferedImage.TYPE_INT_RGB);
+        BufferedImage result = new BufferedImage(dimension.width, dimension.height, BufferedImage.TYPE_INT_RGB);
         
         this.graphics = (Graphics2D)result.getGraphics();
 
@@ -108,18 +109,18 @@ public class GoogleCalendarRenderer {
         graphics.drawString(formatterDate.format(now.getTime()), 10, currentLine + 44);
 
         graphics.setFont(font.deriveFont(14f));
-        graphics.drawString("Kalenderwoche " + now.get(Calendar.WEEK_OF_YEAR), 335, currentLine + 16);
+        graphics.drawString("Kalenderwoche " + now.get(Calendar.WEEK_OF_YEAR), dimension.width - 150, currentLine + 16);
     }
 
     private void drawColoredLines(int n, Color c)
     {
-        if (this.lineNumber == 800) return;
+        if (this.lineNumber == dimension.height) return;
         this.graphics.setColor(c);
         for (int i=0; i<n; i++)
         {
-            this.graphics.drawLine(0, this.lineNumber, WIDTH-1, this.lineNumber);
+            this.graphics.drawLine(0, this.lineNumber, dimension.width-1, this.lineNumber);
             this.lineNumber++;
-            if (this.lineNumber == 800) return;
+            if (this.lineNumber == dimension.height) return;
         }
     }
     
@@ -191,13 +192,14 @@ public class GoogleCalendarRenderer {
 
     private void fillUpWithWhite()
     {
-        while (this.lineNumber<800) drawColoredLines(1, Color.WHITE);
+        while (this.lineNumber<dimension.height) drawColoredLines(1, Color.WHITE);
     }
     
     public static void main(String[] args) throws Exception 
     {
-        GoogleCalendarRenderer renderer = new GoogleCalendarRenderer();
+        GoogleCalendarRenderer renderer = new GoogleCalendarRenderer(new Dimension(480, 800));
         FileOutputStream fos = new FileOutputStream("/Users/thorsten/calendar.png");
         fos.write(Utils.encodeImage(renderer.renderCalendar("thorsten@potpiejimmy.de"), "png"));
+        fos.close();
     }
 }

@@ -86,11 +86,21 @@ public class MediaBean extends ImageUploadBean {
             HttpServletRequest req = WebUtils.getHttpServletRequest();
             if (GoogleAuthorizationServlet.authorize(req, WebUtils.getHttpServletResponse())) {
                 // okay, do it:
-                GoogleCalendarRenderer renderer = new GoogleCalendarRenderer();
-                setImageData(Utils.encodeImage(renderer.renderCalendar(WebUtils.getCurrentPerson(req)), "png"), AdMediumItem.GENERATION_TYPE_AUTO_GCAL);
+                if (selectedDisplayType < 0) {
+                    for (int type : EPDUtils.SPECTRA_DISPLAY_DEFAULT_TYPES)
+                        doGenerateCalendar(type, WebUtils.getCurrentPerson(req));
+                } else {
+                    doGenerateCalendar(selectedDisplayType, WebUtils.getCurrentPerson(req));
+                }
             }
         } catch (Exception e) {
             WebUtils.addFacesMessage(e);
         }
+    }
+    
+    protected void doGenerateCalendar(int displayType, String userId) throws IOException {
+        GoogleCalendarRenderer renderer = new GoogleCalendarRenderer(EPDUtils.dimensionForDisplayType(displayType));
+        byte[] data = Utils.encodeImage(renderer.renderCalendar(userId), "png");
+        imageData.put(displayType, new AdMediumPreviewImageData(mediumEjb.convertImage(data, displayType), AdMediumItem.GENERATION_TYPE_AUTO_GCAL));
     }
 }

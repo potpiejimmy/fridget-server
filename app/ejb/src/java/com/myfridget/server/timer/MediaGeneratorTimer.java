@@ -9,6 +9,7 @@ import com.myfridget.server.db.entity.AdMedium;
 import com.myfridget.server.db.entity.AdMediumItem;
 import com.myfridget.server.ejb.AdMediumEJBLocal;
 import com.myfridget.server.ejb.UsersEJBLocal;
+import com.myfridget.server.util.EPDUtils;
 import com.myfridget.server.util.GoogleCalendarRenderer;
 import com.myfridget.server.util.Utils;
 import com.myfridget.server.vo.AdMediumPreviewImageData;
@@ -59,7 +60,7 @@ public class MediaGeneratorTimer {
                 System.out.println("--------MediaGeneratorTimer: Generating item " + item.getId() + " for " + userId);
 
                 try {
-                    GoogleCalendarRenderer renderer = new GoogleCalendarRenderer();
+                    GoogleCalendarRenderer renderer = new GoogleCalendarRenderer(EPDUtils.dimensionForDisplayType(item.getType()));
                     byte[] img = mediumEjb.convertImage(Utils.encodeImage(renderer.renderCalendar(userId), "png"), item.getType());
                     mediumEjb.setMediumPreview(medium.getId(), item.getType(), new AdMediumPreviewImageData(img, item.getGentype()));
                 } catch (IOException e) {
