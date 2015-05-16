@@ -116,7 +116,7 @@ public class CampaignsBean {
             String campaignId = FacesContext.getCurrentInstance().getExternalContext().getRequestParameterMap().get("campaignId");
             List<CampaignAction> actions = campaignsEjb.getCampaignActionsForCampaign(Integer.parseInt(campaignId));
             if (actions.isEmpty()) return null;
-            byte[] image = mediumEjb.getMediumPreview(actions.get(0).getAdMediumId(), EPDUtils.SPECTRA_DISPLAY_TYPE_441);
+            byte[] image = mediumEjb.getMediumPreview(actions.get(0).getAdMediumId(), EPDUtils.SPECTRA_DISPLAY_TYPE_441).data;
             return new DefaultStreamedContent(new ByteArrayInputStream(image), "image/png");
         }
     }

@@ -32,6 +32,9 @@ import javax.xml.bind.annotation.XmlRootElement;
 public class AdMediumItem implements Serializable {
     private static final long serialVersionUID = 1L;
     
+    public final static short GENERATION_TYPE_MANUAL = (short)0;
+    public final static short GENERATION_TYPE_AUTO_GCAL = (short)1;
+    
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Basic(optional = false)
@@ -46,6 +49,11 @@ public class AdMediumItem implements Serializable {
     @NotNull
     @Column(name = "type")
     private short type;
+
+    @Basic(optional = false)
+    @NotNull
+    @Column(name = "gentype")
+    private short gentype;
 
     public AdMediumItem() {
     }
@@ -81,6 +89,14 @@ public class AdMediumItem implements Serializable {
 
     public void setType(short type) {
         this.type = type;
+    }
+
+    public short getGentype() {
+        return gentype;
+    }
+
+    public void setGentype(short gentype) {
+        this.gentype = gentype;
     }
 
     @Override

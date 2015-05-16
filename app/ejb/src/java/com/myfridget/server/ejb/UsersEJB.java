@@ -13,6 +13,7 @@ import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.List;
 import javax.annotation.Resource;
+import javax.annotation.security.PermitAll;
 import javax.annotation.security.RolesAllowed;
 import javax.ejb.SessionContext;
 import javax.ejb.Stateless;
@@ -35,7 +36,7 @@ public class UsersEJB implements UsersEJBLocal {
     }
     
     @Override
-    @RolesAllowed({"superuser"})
+    @PermitAll
     public User getUser(int userId) {
         return em.find(User.class, userId);
     }

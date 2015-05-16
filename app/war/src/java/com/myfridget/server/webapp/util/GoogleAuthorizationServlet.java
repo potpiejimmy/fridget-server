@@ -7,7 +7,6 @@ package com.myfridget.server.webapp.util;
 
 import com.myfridget.server.util.GoogleAuthorizationHelper;
 import java.io.IOException;
-import java.net.URL;
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
@@ -27,13 +26,12 @@ public class GoogleAuthorizationServlet extends HttpServlet {
         return url + req.getContextPath() + "/gauth";
     }
     
-    public static boolean startAuthorizationRequest(HttpServletRequest req, HttpServletResponse resp) {
+    public static boolean authorize(HttpServletRequest req, HttpServletResponse resp) {
         // load credential from persistence store
         String userId = req.getUserPrincipal().getName();
 
         GoogleAuthorizationHelper helper = new GoogleAuthorizationHelper(userId);
-        
-        if (helper.getCredentials() != null) return true;
+        if (helper.hasCredentials()) return true;
 
         // redirect to the authorization flow
         try {

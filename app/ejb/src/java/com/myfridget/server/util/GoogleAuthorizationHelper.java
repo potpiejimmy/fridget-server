@@ -13,7 +13,6 @@ import com.google.api.client.googleapis.auth.oauth2.GoogleAuthorizationCodeFlow;
 import com.google.api.client.googleapis.auth.oauth2.GoogleClientSecrets;
 import com.google.api.client.googleapis.javanet.GoogleNetHttpTransport;
 import com.google.api.client.http.HttpTransport;
-import com.google.api.client.json.JsonFactory;
 import com.google.api.client.json.jackson2.JacksonFactory;
 import com.google.api.client.util.store.FileDataStoreFactory;
 import com.google.api.services.calendar.CalendarScopes;
@@ -27,8 +26,9 @@ import java.util.Arrays;
  * @author thorsten
  */
 public class GoogleAuthorizationHelper {
-    /** Global instance of the JSON factory. */
-    public static final JsonFactory JSON_FACTORY = JacksonFactory.getDefaultInstance();
+    
+    /** OAuth client ID JSON */
+    public final static String CLIENT_ID = "{\"web\":{\"auth_uri\":\"https://accounts.google.com/o/oauth2/auth\",\"client_secret\":\"YI5-RHyCR5g3ka8EONQosdqg\",\"token_uri\":\"https://accounts.google.com/o/oauth2/token\",\"client_email\":\"742875388091-gi4eube4sr25jd94doluln4jrd62i37t@developer.gserviceaccount.com\",\"redirect_uris\":[\"https://localhost:8181/fridget/gauth\",\"https://www.doogetha.com/fridget/gauth\"],\"client_x509_cert_url\":\"https://www.googleapis.com/robot/v1/metadata/x509/742875388091-gi4eube4sr25jd94doluln4jrd62i37t@developer.gserviceaccount.com\",\"client_id\":\"742875388091-gi4eube4sr25jd94doluln4jrd62i37t.apps.googleusercontent.com\",\"auth_provider_x509_cert_url\":\"https://www.googleapis.com/oauth2/v1/certs\",\"javascript_origins\":[\"https://localhost:8181\",\"https://www.doogetha.com\"]}}";
     
     /** Global instance of the HTTP transport. */
     public static HttpTransport HTTP_TRANSPORT;
@@ -48,12 +48,14 @@ public class GoogleAuthorizationHelper {
     
     public GoogleAuthorizationHelper(String userId) {
         try {
-            GoogleClientSecrets secrets = GoogleClientSecrets.load(JSON_FACTORY, new StringReader(
-                "{\"web\":{\"auth_uri\":\"https://accounts.google.com/o/oauth2/auth\",\"client_secret\":\"YI5-RHyCR5g3ka8EONQosdqg\",\"token_uri\":\"https://accounts.google.com/o/oauth2/token\",\"client_email\":\"742875388091-gi4eube4sr25jd94doluln4jrd62i37t@developer.gserviceaccount.com\",\"redirect_uris\":[\"https://localhost:8181/fridget/gauth\",\"https://www.doogetha.com/fridget/gauth\"],\"client_x509_cert_url\":\"https://www.googleapis.com/robot/v1/metadata/x509/742875388091-gi4eube4sr25jd94doluln4jrd62i37t@developer.gserviceaccount.com\",\"client_id\":\"742875388091-gi4eube4sr25jd94doluln4jrd62i37t.apps.googleusercontent.com\",\"auth_provider_x509_cert_url\":\"https://www.googleapis.com/oauth2/v1/certs\",\"javascript_origins\":[\"https://localhost:8181\",\"https://www.doogetha.com\"]}}"));
+            GoogleClientSecrets secrets = GoogleClientSecrets.load(JacksonFactory.getDefaultInstance(), new StringReader(CLIENT_ID));
             this.userId = userId;
             this.flow =
                     new GoogleAuthorizationCodeFlow.Builder(
-                            HTTP_TRANSPORT, JSON_FACTORY, secrets, Arrays.asList(CalendarScopes.CALENDAR_READONLY))
+                            HTTP_TRANSPORT,
+                            JacksonFactory.getDefaultInstance(),
+                            secrets,
+                            Arrays.asList(CalendarScopes.CALENDAR_READONLY))
                            .setDataStoreFactory(new FileDataStoreFactory(new File("google-calendar-credentials/"+userId)))
                            .setAccessType("offline")
                            .build();
@@ -62,18 +64,19 @@ public class GoogleAuthorizationHelper {
         }
     }
 
-    public Object getCredentials() {
+    public boolean hasCredentials() {
+        Credential credential = getCredentials();
+        return (credential != null && credential.getAccessToken() != null); 
+    }
+    
+    public Credential getCredentials() {
         try {
             Credential credential = flow.loadCredential(userId);
-            
-            // if credential found with an access token, return it
-            if (credential != null && credential.getAccessToken() != null) 
-                return credential;
-
+            return credential;
         } catch (IOException e) {
             e.printStackTrace();
+            return null;
         }
-        return null;
     }
     
     public String getAuthorizationUrl(String url) {

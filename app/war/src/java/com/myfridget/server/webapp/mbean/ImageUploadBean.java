@@ -6,9 +6,11 @@
 package com.myfridget.server.webapp.mbean;
 
 import com.myfridget.server.db.entity.AdMedium;
+import com.myfridget.server.db.entity.AdMediumItem;
 import com.myfridget.server.ejb.AdMediumEJBLocal;
 import com.myfridget.server.util.EPDUtils;
 import com.myfridget.server.util.Utils;
+import com.myfridget.server.vo.AdMediumPreviewImageData;
 import com.myfridget.server.webapp.util.WebUtils;
 import java.io.IOException;
 import java.util.ArrayList;
@@ -37,7 +39,7 @@ public class ImageUploadBean {
     
     protected AdMedium currentMedium = null;
     
-    protected Map<Integer,byte[]> imageData = new HashMap<>();
+    protected Map<Integer,AdMediumPreviewImageData> imageData = new HashMap<>();
 
     public AdMedium getCurrentMedium() {
         return currentMedium;
@@ -53,7 +55,7 @@ public class ImageUploadBean {
         
         try {
             for (int type : EPDUtils.SPECTRA_DISPLAY_DEFAULT_TYPES) {
-                byte[] data = mediumEjb.getMediumPreview(currentMedium.getId(), type);
+                AdMediumPreviewImageData data = mediumEjb.getMediumPreview(currentMedium.getId(), type);
                 if (data != null) imageData.put(type, data);
             }
         } catch (IOException ex) {
@@ -65,19 +67,19 @@ public class ImageUploadBean {
         try {
             UploadedFile originalImage = event.getFile();
             byte[] data = Utils.readAll(originalImage.getInputstream());
-            setImageData(data);
+            setImageData(data, AdMediumItem.GENERATION_TYPE_MANUAL);
             WebUtils.addFacesMessage("File " + event.getFile().getFileName() + " uploaded successfully.");
         } catch (Exception ex) {
             WebUtils.addFacesMessage(ex);
         }
     }
     
-    protected void setImageData(byte[] data) throws IOException {
+    protected void setImageData(byte[] data, short gentype) throws IOException {
         if (selectedDisplayType < 0) {
             for (int type : EPDUtils.SPECTRA_DISPLAY_DEFAULT_TYPES)
-                imageData.put(type, mediumEjb.convertImage(data, type));
+                imageData.put(type, new AdMediumPreviewImageData(mediumEjb.convertImage(data, type), gentype));
         } else {
-            imageData.put(selectedDisplayType, mediumEjb.convertImage(data, selectedDisplayType));
+            imageData.put(selectedDisplayType, new AdMediumPreviewImageData(mediumEjb.convertImage(data, selectedDisplayType), gentype));
         }
     }
     

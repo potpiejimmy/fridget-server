@@ -11,7 +11,6 @@ import com.myfridget.server.util.WebRequester;
 import java.io.File;
 import java.io.IOException;
 import java.io.StringReader;
-import static java.lang.Math.log;
 import java.util.List;
 import java.util.Properties;
 import javax.annotation.Resource;

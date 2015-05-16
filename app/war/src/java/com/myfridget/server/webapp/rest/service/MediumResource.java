@@ -5,8 +5,10 @@
  */
 package com.myfridget.server.webapp.rest.service;
 
+import com.myfridget.server.db.entity.AdMediumItem;
 import com.myfridget.server.ejb.AdMediumEJBLocal;
 import com.myfridget.server.util.EPDUtils;
+import com.myfridget.server.vo.AdMediumPreviewImageData;
 import java.io.IOException;
 import java.util.Base64;
 import java.util.logging.Level;
@@ -48,7 +50,7 @@ public class MediumResource {
     protected void setMediumPreview(int adMediumId, int type, byte[] imgIn) throws IOException {
         byte[] image = mediumEjb.convertImage(imgIn, type);
         
-        mediumEjb.setMediumPreview(adMediumId, type, image);
+        mediumEjb.setMediumPreview(adMediumId, type, new AdMediumPreviewImageData(image, AdMediumItem.GENERATION_TYPE_MANUAL));
     }
 
     private AdMediumEJBLocal lookupAdMediumEJBLocal() {

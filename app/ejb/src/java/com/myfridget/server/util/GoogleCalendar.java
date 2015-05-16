@@ -6,6 +6,7 @@
 package com.myfridget.server.util;
 
 import com.google.api.client.auth.oauth2.Credential;
+import com.google.api.client.json.jackson2.JacksonFactory;
 import com.google.api.client.util.DateTime;
 import com.google.api.services.calendar.model.CalendarListEntry;
 import com.google.api.services.calendar.model.Event;
@@ -26,11 +27,11 @@ public class GoogleCalendar
     private List<CalendarItem> items;
     private com.google.api.services.calendar.Calendar calendarConnection;
 
-    public GoogleCalendar() throws IOException
+    public GoogleCalendar(String userId) throws IOException
     {
         items = new ArrayList<>();
 
-        connectCalendar();
+        connectCalendar(userId);
         List<CalendarListEntry> calendars = calendarConnection.calendarList().list().execute().getItems();
 	                       
         for (CalendarListEntry e : calendars)
@@ -50,6 +51,28 @@ public class GoogleCalendar
         Collections.sort(items);
     }
 	               
+    private boolean connectCalendar(String userId)
+    {
+        try
+        {
+            GoogleAuthorizationHelper helper = new GoogleAuthorizationHelper(userId);
+            Credential credential = (Credential)helper.getCredentials();
+            
+            calendarConnection = new com.google.api.services.calendar.Calendar.Builder(
+                GoogleAuthorizationHelper.HTTP_TRANSPORT,
+                JacksonFactory.getDefaultInstance(),
+                credential)
+                .setApplicationName("Fridget")
+                .build();
+        }
+        catch (Exception ex)
+        {
+            ex.printStackTrace();
+            return false;
+        }
+        return true;
+    }
+    
     private void addEventsToItems(Events es)
     {
         for (Event e : es.getItems()) addEventToItems(e);
@@ -90,35 +113,6 @@ public class GoogleCalendar
         return items;
     }
 	
-    private boolean connectCalendar()
-    {
-        try
-        {
-            
-//            TokenResponse tr = new TokenResponse();
-//            tr.set("access_token", "ya29.awGXJuacjC_fYaOhMuZv2gkj3k5WMSmQyC2CFKk5IfNzd4hLv88swYEnCQ5PeHPAf5Z7wUdSeOHZJQ");
-//            tr.set("token_type", "Bearer");
-//            tr.set("expires_in", 7200L);
-//            tr.set("refresh_token", "1/dfuQBsftFxGorbl2kSADiVWeHxVf-O8NnWZk94ot6Gs");
-//            tr.set("Issued", "2015-05-06T23:29:00.540+02:00");
-//            credential.setFromTokenResponse(tr);
-
-            GoogleAuthorizationHelper helper = new GoogleAuthorizationHelper("thorsten@potpiejimmy.de");
-            Credential credential = (Credential)helper.getCredentials();
-            
-            calendarConnection = new com.google.api.services.calendar.Calendar.Builder(
-                GoogleAuthorizationHelper.HTTP_TRANSPORT, GoogleAuthorizationHelper.JSON_FACTORY, credential)
-                .setApplicationName("MyProject")
-                .build();
-        }
-        catch (Exception ex)
-        {
-            ex.printStackTrace();
-            return false;
-        }
-        return true;
-    }
-    
     public static class CalendarItem implements Comparable<CalendarItem>
     {
         public boolean wholeDay;

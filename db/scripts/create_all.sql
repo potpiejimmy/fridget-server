@@ -169,6 +169,7 @@ CREATE TABLE IF NOT EXISTS `ad_medium_item` (
   `id` INT NOT NULL AUTO_INCREMENT,
   `ad_medium_id` INT NOT NULL,
   `type` SMALLINT NOT NULL DEFAULT 0,
+  `gentype` SMALLINT NOT NULL DEFAULT 0,
   PRIMARY KEY (`id`),
   INDEX `fk_ad_medium_item_ad_medium1_idx` (`ad_medium_id` ASC),
   CONSTRAINT `fk_ad_medium_item_ad_medium1`

@@ -46,9 +46,10 @@ public class GoogleCalendarRenderer {
     
     /**
      * Renders the Google Calendar as an image.
+     * @param userId a system user ID
      * @return an image
      */
-    public BufferedImage renderCalendar() throws IOException {
+    public BufferedImage renderCalendar(String userId) throws IOException {
 
         BufferedImage result = new BufferedImage(WIDTH, HEIGHT, BufferedImage.TYPE_INT_RGB);
         
@@ -57,7 +58,7 @@ public class GoogleCalendarRenderer {
         //m_Graphics.SmoothingMode = System.Drawing.Drawing2D.SmoothingMode.None;
         //m_Graphics.TextRenderingHint = System.Drawing.Text.TextRenderingHint.SingleBitPerPixelGridFit;
 
-        this.calendar = new GoogleCalendar();
+        this.calendar = new GoogleCalendar(userId);
 
         drawHeader();
         
@@ -197,6 +198,6 @@ public class GoogleCalendarRenderer {
     {
         GoogleCalendarRenderer renderer = new GoogleCalendarRenderer();
         FileOutputStream fos = new FileOutputStream("/Users/thorsten/calendar.png");
-        fos.write(Utils.encodeImage(renderer.renderCalendar(), "png"));
+        fos.write(Utils.encodeImage(renderer.renderCalendar("thorsten@potpiejimmy.de"), "png"));
     }
 }

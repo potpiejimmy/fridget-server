@@ -10,6 +10,7 @@ import com.myfridget.server.db.entity.AdMediumItem;
 import com.myfridget.server.util.EPDUtils;
 import com.myfridget.server.util.HuffmanCompression;
 import com.myfridget.server.util.Utils;
+import com.myfridget.server.vo.AdMediumPreviewImageData;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.FileInputStream;
@@ -72,8 +73,7 @@ public class AdMediumEJB implements AdMediumEJBLocal {
     }
     
     @Override
-    public void setMediumPreview(int adMediumId, int displayType, byte[] imgData) throws IOException {
-        
+    public void setMediumPreview(int adMediumId, int displayType, AdMediumPreviewImageData data) throws IOException {
         AdMediumItem item = findMediumItem(adMediumId, displayType);
         if (item == null) {
             // not found, create a new one
@@ -83,21 +83,22 @@ public class AdMediumEJB implements AdMediumEJBLocal {
             em.persist(item);
             em.flush(); // pre-fetch ID
         }
-        Utils.writeFile(cacheFileForImage(item, "png"), imgData);
+        item.setGentype(data.gentype);
+        Utils.writeFile(cacheFileForImage(item, "png"), data.data);
     }
     
     @Override
-    public byte[] getMediumPreview(int adMediumId, int displayType) throws IOException {
+    public AdMediumPreviewImageData getMediumPreview(int adMediumId, int displayType) throws IOException {
         AdMediumItem img = findMediumItem(adMediumId, displayType);
         if (img == null) return null; // not found
         File file = cacheFileForImage(img, "png");
         if (!file.exists()) return null;
-        return Utils.readAll(new FileInputStream(file));
+        return new AdMediumPreviewImageData(Utils.readAll(new FileInputStream(file)), img.getGentype());
     }    
     
     @Override
     public byte[] getMediumEPD(int adMediumId, int displayType) throws IOException {
-        byte[] preview = getMediumPreview(adMediumId, displayType); // encode from preview
+        byte[] preview = getMediumPreview(adMediumId, displayType).data; // encode from preview
         if (preview == null) return null; // not found
         return HuffmanCompression.compress(EPDUtils.compressRLE(EPDUtils.makeSpectra3Color(EPDUtils.getResizedImageForDisplay(preview, displayType))));
     }
@@ -110,6 +111,16 @@ public class AdMediumEJB implements AdMediumEJBLocal {
         }
     }
     
+    @Override
+    public List<AdMediumItem> getAllMediumItems() {
+        return em.createNamedQuery("AdMediumItem.findAll", AdMediumItem.class).getResultList();
+    }
+    
+    @Override
+    public AdMedium findAdMedium(int adMediumId) {
+        return em.find(AdMedium.class, adMediumId);
+    }
+
     protected static File cacheFileForImage(AdMediumItem item, String type) {
         return new File("fridget_item_"+item.getId()+"."+type);
     }

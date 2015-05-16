@@ -6,9 +6,11 @@
 package com.myfridget.server.webapp.mbean;
 
 import com.myfridget.server.db.entity.AdMedium;
+import com.myfridget.server.db.entity.AdMediumItem;
 import com.myfridget.server.util.EPDUtils;
 import com.myfridget.server.util.GoogleCalendarRenderer;
 import com.myfridget.server.util.Utils;
+import com.myfridget.server.vo.AdMediumPreviewImageData;
 import com.myfridget.server.webapp.util.GoogleAuthorizationServlet;
 import com.myfridget.server.webapp.util.WebUtils;
 import java.io.ByteArrayInputStream;
@@ -18,6 +20,7 @@ import javax.faces.bean.ManagedBean;
 import javax.faces.bean.SessionScoped;
 import javax.faces.context.FacesContext;
 import javax.faces.event.PhaseId;
+import javax.servlet.http.HttpServletRequest;
 import org.primefaces.model.DefaultStreamedContent;
 import org.primefaces.model.StreamedContent;
 
@@ -58,9 +61,9 @@ public class MediaBean extends ImageUploadBean {
     }
     
     public StreamedContent getCurrentMediumDisplay(int displayType) throws IOException {
-        byte[] image = imageData.get(displayType);
+        AdMediumPreviewImageData image = imageData.get(displayType);
         if (image == null) return null;
-        return new DefaultStreamedContent(new ByteArrayInputStream(image), "image/png");
+        return new DefaultStreamedContent(new ByteArrayInputStream(image.data), "image/png");
     }
     
     public StreamedContent getMediumPreview() throws IOException {
@@ -70,9 +73,9 @@ public class MediaBean extends ImageUploadBean {
             return new DefaultStreamedContent();
         } else {
             String id = FacesContext.getCurrentInstance().getExternalContext().getRequestParameterMap().get("adMediumId");
-            byte[] image = mediumEjb.getMediumPreview(Integer.parseInt(id), EPDUtils.SPECTRA_DISPLAY_TYPE_441);
+            AdMediumPreviewImageData image = mediumEjb.getMediumPreview(Integer.parseInt(id), EPDUtils.SPECTRA_DISPLAY_TYPE_441);
             if (image == null) image = mediumEjb.getMediumPreview(Integer.parseInt(id), EPDUtils.SPECTRA_DISPLAY_TYPE_74);
-            return new DefaultStreamedContent(new ByteArrayInputStream(image), "image/png");
+            return new DefaultStreamedContent(new ByteArrayInputStream(image.data), "image/png");
         }
     }
     
@@ -80,10 +83,11 @@ public class MediaBean extends ImageUploadBean {
     
     public void generateCalendar() {
         try {
-            if (GoogleAuthorizationServlet.startAuthorizationRequest(WebUtils.getHttpServletRequest(), WebUtils.getHttpServletResponse())) {
+            HttpServletRequest req = WebUtils.getHttpServletRequest();
+            if (GoogleAuthorizationServlet.authorize(req, WebUtils.getHttpServletResponse())) {
                 // okay, do it:
                 GoogleCalendarRenderer renderer = new GoogleCalendarRenderer();
-                setImageData((Utils.encodeImage(renderer.renderCalendar(), "png")));
+                setImageData(Utils.encodeImage(renderer.renderCalendar(WebUtils.getCurrentPerson(req)), "png"), AdMediumItem.GENERATION_TYPE_AUTO_GCAL);
             }
         } catch (Exception e) {
             WebUtils.addFacesMessage(e);
