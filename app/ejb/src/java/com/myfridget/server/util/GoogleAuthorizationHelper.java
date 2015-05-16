@@ -49,7 +49,7 @@ public class GoogleAuthorizationHelper {
     public GoogleAuthorizationHelper(String userId) {
         try {
             GoogleClientSecrets secrets = GoogleClientSecrets.load(JSON_FACTORY, new StringReader(
-                "{\"installed\":{\"auth_uri\":\"https://accounts.google.com/o/oauth2/auth\",\"client_secret\":\"i-zz2ycj20GIl19t7tkiT60e\",\"token_uri\":\"https://accounts.google.com/o/oauth2/token\",\"client_email\":\"\",\"redirect_uris\":[\"urn:ietf:wg:oauth:2.0:oob\",\"oob\"],\"client_x509_cert_url\":\"\",\"client_id\":\"742875388091-ibb4pcogvh1qgac7sglmv0kasq0f4qvb.apps.googleusercontent.com\",\"auth_provider_x509_cert_url\":\"https://www.googleapis.com/oauth2/v1/certs\"}}"));
+                "{\"web\":{\"auth_uri\":\"https://accounts.google.com/o/oauth2/auth\",\"client_secret\":\"YI5-RHyCR5g3ka8EONQosdqg\",\"token_uri\":\"https://accounts.google.com/o/oauth2/token\",\"client_email\":\"742875388091-gi4eube4sr25jd94doluln4jrd62i37t@developer.gserviceaccount.com\",\"redirect_uris\":[\"https://localhost:8181/fridget/gauth\",\"https://www.doogetha.com/fridget/gauth\"],\"client_x509_cert_url\":\"https://www.googleapis.com/robot/v1/metadata/x509/742875388091-gi4eube4sr25jd94doluln4jrd62i37t@developer.gserviceaccount.com\",\"client_id\":\"742875388091-gi4eube4sr25jd94doluln4jrd62i37t.apps.googleusercontent.com\",\"auth_provider_x509_cert_url\":\"https://www.googleapis.com/oauth2/v1/certs\",\"javascript_origins\":[\"https://localhost:8181\",\"https://www.doogetha.com\"]}}"));
             this.userId = userId;
             this.flow =
                     new GoogleAuthorizationCodeFlow.Builder(
