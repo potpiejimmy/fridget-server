@@ -11,12 +11,15 @@ import com.myfridget.server.db.entity.CampaignAction;
 import com.myfridget.server.db.entity.User;
 import com.myfridget.server.vo.ScheduledCampaignAction;
 import java.io.IOException;
+import java.io.StringReader;
 import java.io.StringWriter;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Collections;
 import java.util.List;
 import java.util.Properties;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javax.ejb.EJB;
 import javax.ejb.Stateless;
 import javax.persistence.EntityManager;
@@ -116,7 +119,14 @@ public class CampaignsEJB implements CampaignsEJBLocal {
         final String IMG_START_INDEX = "D";
         byte currentImageIndex = IMG_START_INDEX.getBytes()[0];
         // always start with showing pictue "D" which is the LAST picture of the previous program!
-        program.append(IMG_START_INDEX); 
+        Properties previousImageMap = new Properties();
+        try {previousImageMap.load(new StringReader(deviceEjb.getParameter(adDeviceId, "p").getValue()));} catch (IOException e) {}
+        if (previousImageMap.containsKey("NEXT")) {
+            imageMap.setProperty(IMG_START_INDEX, previousImageMap.getProperty("NEXT"));
+            program.append(IMG_START_INDEX); 
+        } else {
+            program.append("-");
+        }
         for (ScheduledCampaignAction scheduledAction : schedule) {
             CampaignAction action = scheduledAction.getAction();
             long offset = scheduledAction.getScheduledTime() - now;
@@ -127,8 +137,8 @@ public class CampaignsEJB implements CampaignsEJBLocal {
             if (cal.get(Calendar.DAY_OF_YEAR) != currentDay) {
                 // okay, this is the first event of next day, we have reached
                 // the end of this program.  we remember it's picture ID
-                // in index position "D":
-                imageMap.setProperty(IMG_START_INDEX, ""+action.getAdMediumId());
+                // in entry "NEXT":
+                imageMap.setProperty("NEXT", ""+action.getAdMediumId());
                 break;
             } else {
                 currentImageIndex++;
