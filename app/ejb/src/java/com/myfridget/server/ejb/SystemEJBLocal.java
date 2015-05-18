@@ -26,4 +26,6 @@ public interface SystemEJBLocal {
     public String flashFirmware(int adDeviceId) throws Exception;
     
     public boolean verifyDeviceParams(int adDeviceId, String deviceParamsString) throws IOException;
+    
+    public int getAttinyCycleLength();
 }

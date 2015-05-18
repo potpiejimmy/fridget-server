@@ -64,6 +64,12 @@ public class AdDeviceParameter implements Serializable {
         this.id = id;
     }
 
+    public AdDeviceParameter(Integer adDeviceId, String param, String value) {
+        this.adDeviceId = adDeviceId;
+        this.param = param;
+        this.value = value;
+    }
+
     public AdDeviceParameter(Integer id, Integer adDeviceId, String param, String value) {
         this.id = id;
         this.adDeviceId = adDeviceId;

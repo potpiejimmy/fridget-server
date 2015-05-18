@@ -111,4 +111,14 @@ public class SystemEJB implements SystemEJBLocal {
         AdDevice device = deviceEjb.getById((Integer)timer.getInfo());
         deviceEjb.addDebugMessage(device.getSerial(), flashFirmware(device.getId()));
     }
+    
+    @Override
+    public int getAttinyCycleLength() {
+        SystemParameter cycleLenParam = getSystemParameter("attiny.cycle.len");
+        try {
+            return Integer.parseInt(cycleLenParam.getValue());
+        } catch (Exception e) {
+            return 8870;  // use a default
+        }
+    }
 }

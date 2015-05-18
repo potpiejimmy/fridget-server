@@ -59,7 +59,8 @@ public class DeviceDebugResource {
         for (AdDeviceParameter param : deviceEjb.getParameters(deviceEjb.getBySerial(serial).getId())) {
             if ("exec".equals(param.getParam()))
                 appendParam(result, param.getParam(), getDemoProgram(device.getId(), param.getValue()));
-            else if (!"accesstoken".equals(param.getParam()))
+            else if (!"accesstoken".equals(param.getParam()) &&
+                     !"p".equals(param.getParam()))
                 appendParam(result, param.getParam(), param.getValue());
         }
         SystemParameter firmware = systemEjb.getSystemParameter(SystemEJB.PARAMETER_FIRMWARE_VERSION);

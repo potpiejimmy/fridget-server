@@ -8,13 +8,15 @@ package com.myfridget.server.ejb;
 import com.myfridget.server.db.entity.AdDeviceParameter;
 import com.myfridget.server.db.entity.Campaign;
 import com.myfridget.server.db.entity.CampaignAction;
-import com.myfridget.server.db.entity.SystemParameter;
 import com.myfridget.server.db.entity.User;
 import com.myfridget.server.vo.ScheduledCampaignAction;
+import java.io.IOException;
+import java.io.StringWriter;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Collections;
 import java.util.List;
+import java.util.Properties;
 import javax.ejb.EJB;
 import javax.ejb.Stateless;
 import javax.persistence.EntityManager;
@@ -77,13 +79,7 @@ public class CampaignsEJB implements CampaignsEJBLocal {
     
     @Override
     public String getProgramForDevice(int adDeviceId) {
-        SystemParameter cycleLenParam = systemEjb.getSystemParameter("attiny.cycle.len");
-        int cycleLen = 0;
-        try {
-            cycleLen = Integer.parseInt(cycleLenParam.getValue());
-        } catch (Exception e) {
-            cycleLen = 8870;  // use a default
-        }
+        // first, collect all campaign actions associated with this device:
         List<User> deviceUsers = deviceEjb.getAssignedUsers(adDeviceId);
         List<Campaign> deviceCampaigns = new ArrayList<>();
         deviceUsers.forEach(u -> deviceCampaigns.addAll(getCampaigns(u.getId())));
@@ -92,7 +88,8 @@ public class CampaignsEJB implements CampaignsEJBLocal {
         if (deviceActions.isEmpty()) return "A0070"; // XXX
         
         long now = System.currentTimeMillis();
-            
+        
+        // now, associate each campaign action with a concrete calendar date and time:
         List<ScheduledCampaignAction> schedule = new ArrayList<>();
         for (CampaignAction action : deviceActions) {
             Calendar cal = Calendar.getInstance();
@@ -104,15 +101,48 @@ public class CampaignsEJB implements CampaignsEJBLocal {
         }
         // now sort the schedule:
         Collections.sort(schedule);
-        
-        // XXX for now, just program the next action in time:
-        ScheduledCampaignAction nextScheduledAction = schedule.get(0); // first in the list
-        CampaignAction nextAction = nextScheduledAction.getAction();
-        long offset = nextScheduledAction.getScheduledTime() - now;
-        long cycles = Math.round(((double)offset)/cycleLen);
-        String delayString = Long.toHexString(0x10000+cycles).substring(1);
-        // XXX: remember used medium ID in parameter "p"
-        deviceEjb.setParameter(new AdDeviceParameter(null, adDeviceId, "p", ""+nextAction.getAdMediumId()));
-        return "-" + delayString + "P0001";
+
+        return buildProgramForSchedule(adDeviceId, schedule, now);
+    }
+    
+    protected String buildProgramForSchedule(int adDeviceId, List<ScheduledCampaignAction> schedule, long now) {
+        if (schedule.isEmpty()) return null;
+        int cycleLen = systemEjb.getAttinyCycleLength();
+        Calendar cal = Calendar.getInstance();
+        cal.setTimeInMillis(schedule.get(0).getScheduledTime());
+        int currentDay = cal.get(Calendar.DAY_OF_YEAR);
+        StringBuilder program = new StringBuilder();
+        Properties imageMap = new Properties();
+        final String IMG_START_INDEX = "D";
+        byte currentImageIndex = IMG_START_INDEX.getBytes()[0];
+        // always start with showing pictue "D" which is the LAST picture of the previous program!
+        program.append(IMG_START_INDEX); 
+        for (ScheduledCampaignAction scheduledAction : schedule) {
+            CampaignAction action = scheduledAction.getAction();
+            long offset = scheduledAction.getScheduledTime() - now;
+            long cycles = Math.round(((double)offset)/cycleLen);
+            String delayString = Long.toHexString(0x10000+cycles).substring(1);
+            program.append(delayString);
+            cal.setTimeInMillis(scheduledAction.getScheduledTime());
+            if (cal.get(Calendar.DAY_OF_YEAR) != currentDay) {
+                // okay, this is the first event of next day, we have reached
+                // the end of this program.  we remember it's picture ID
+                // in index position "D":
+                imageMap.setProperty(IMG_START_INDEX, ""+action.getAdMediumId());
+                break;
+            } else {
+                currentImageIndex++;
+                String currentImage = new String(new byte[] {currentImageIndex});
+                imageMap.setProperty(currentImage, ""+action.getAdMediumId());
+                program.append(currentImage);
+                now = scheduledAction.getScheduledTime() + 15000; // XXX 15 sec. img update
+            }
+        }
+        // remember used images map in parameter "p"
+        StringWriter imageMapString = new StringWriter();
+        try {imageMap.store(imageMapString, null);}
+        catch (IOException ioe) {}
+        deviceEjb.setParameter(new AdDeviceParameter(adDeviceId, "p", imageMapString.toString()));
+        return program.toString();
     }
 }
