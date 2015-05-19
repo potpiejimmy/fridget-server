@@ -10,26 +10,22 @@ import com.myfridget.server.db.entity.AdDeviceParameter;
 import com.myfridget.server.db.entity.AdDeviceTestImage;
 import com.myfridget.server.ejb.AdDeviceEJBLocal;
 import com.myfridget.server.ejb.AdMediumEJBLocal;
-import com.myfridget.server.util.EPDUtils;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
-import java.util.Base64;
+import java.io.StringReader;
 import java.util.List;
+import java.util.Properties;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.faces.bean.RequestScoped;
 import javax.naming.Context;
 import javax.naming.InitialContext;
 import javax.naming.NamingException;
-import javax.ws.rs.Consumes;
 import javax.ws.rs.GET;
-import javax.ws.rs.POST;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
 import javax.ws.rs.QueryParam;
-import javax.ws.rs.core.MediaType;
-import javax.ws.rs.core.Response;
 
 /**
  *
@@ -43,15 +39,20 @@ public class DeviceTestImageResource {
     private String serial;
     
     protected AdDeviceEJBLocal deviceEjb = lookupEjb("java:app/Fridget_EJBs/AdDeviceEJB!com.myfridget.server.ejb.AdDeviceEJBLocal");
-    protected AdMediumEJBLocal mediumEjb = lookupEjb("java:global/Fridget_EA/Fridget_EJBs/AdMediumEJB!com.myfridget.server.ejb.AdMediumEJBLocal");
+    protected AdMediumEJBLocal mediumEjb = lookupEjb("java:app/Fridget_EJBs/AdMediumEJB!com.myfridget.server.ejb.AdMediumEJBLocal");
     
     @GET
     @Produces({"application/binary"})
     public byte[] getData(@QueryParam("index") Integer index) throws IOException {
         AdDevice device = deviceEjb.getBySerial(serial);
         if (device == null) return null; // unknown device
+        
+        AdDeviceParameter exec = deviceEjb.getParameter(device.getId(), "exec");
+        boolean testData = exec != null && exec.getValue() != null && exec.getValue().length() > 0;
+        
         List<AdDeviceTestImage> images = deviceEjb.getDeviceTestImages(device.getId());
         if (index !=null) {
+            // note: index support only for test images
             if (images == null || index < 0 || index >= images.size()) return null; // no image at that index
             return deviceEjb.getTestImage(images.get(index).getId());
         } else {
@@ -59,15 +60,19 @@ public class DeviceTestImageResource {
             AdDeviceParameter imgList = deviceEjb.getParameter(device.getId(), "flashimages");
             if (imgList == null) return null;
             ByteArrayOutputStream baos = new ByteArrayOutputStream();
-            for (byte b : imgList.getValue().getBytes()) {
-                int imgIndex = b - 65; //'A'
+            for (char c : imgList.getValue().toCharArray()) {
+                String image = Character.valueOf(c).toString();
+                int imgIndex = image.getBytes()[0] - 65; //'A'
                 byte[] imgData;
-                AdDeviceParameter pImg = deviceEjb.getParameter(device.getId(), "p");
-                if (imgIndex == 15 /*'P'*/ && pImg != null) {
-                    imgData = mediumEjb.getMediumEPD(Integer.parseInt(pImg.getValue()), device.getType());
-                } else {
+                if (testData) {
                     if (images == null || imgIndex < 0 || imgIndex >= images.size()) continue; // no such image
                     imgData = deviceEjb.getTestImage(images.get(imgIndex).getId());
+                } else {
+                    AdDeviceParameter pImg = deviceEjb.getParameter(device.getId(), "p");
+                    Properties imageMap = new Properties();
+                    try {imageMap.load(new StringReader(pImg.getValue()));} catch (Exception e) {}
+                    if (!imageMap.containsKey(image)) continue; // unknown image
+                    imgData = mediumEjb.getMediumEPD(Integer.parseInt(imageMap.getProperty(image)), device.getType());
                 }
                 int size = imgData.length;
                 // write one byte image index
@@ -81,20 +86,6 @@ public class DeviceTestImageResource {
             baos.close();
             return baos.toByteArray();
         }
-    }
-    
-    @POST
-    @Consumes({MediaType.TEXT_PLAIN})
-    public Response uploadFile(String file) throws IOException
-    {
-        // quick and dirty hack for wolfram to upload 7.4" test images
-        byte[] imgIn = Base64.getDecoder().decode(file);
-        AdDevice device = deviceEjb.getBySerial(serial);
-        if (device == null) return null; // unknown device
-        List<AdDeviceTestImage> images = deviceEjb.getDeviceTestImages(device.getId());
-        if (images.size()>0) deviceEjb.removeTestImage(images.get(images.size()-1).getId());
-        deviceEjb.uploadTestImage(device.getId(), EPDUtils.SPECTRA_DISPLAY_TYPE_74, imgIn);
-        return Response.ok("File uploaded successfully.\n").build();
     }
     
     private static <T> T lookupEjb(String name) {

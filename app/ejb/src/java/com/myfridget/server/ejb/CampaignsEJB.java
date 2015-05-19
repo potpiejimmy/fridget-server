@@ -18,8 +18,6 @@ import java.util.Calendar;
 import java.util.Collections;
 import java.util.List;
 import java.util.Properties;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import javax.ejb.EJB;
 import javax.ejb.Stateless;
 import javax.persistence.EntityManager;
@@ -116,21 +114,23 @@ public class CampaignsEJB implements CampaignsEJBLocal {
         int currentDay = cal.get(Calendar.DAY_OF_YEAR);
         StringBuilder program = new StringBuilder();
         Properties imageMap = new Properties();
-        final String IMG_START_INDEX = "D";
+        StringBuilder flashImages = new StringBuilder();
+        final String IMG_START_INDEX = "D"; // start campaign images at index D (A,B,C reserved for welcome, setup and connection error screens)
         byte currentImageIndex = IMG_START_INDEX.getBytes()[0];
         // always start with showing pictue "D" which is the LAST picture of the previous program!
         Properties previousImageMap = new Properties();
-        try {previousImageMap.load(new StringReader(deviceEjb.getParameter(adDeviceId, "p").getValue()));} catch (IOException e) {}
+        try {previousImageMap.load(new StringReader(deviceEjb.getParameter(adDeviceId, "p").getValue()));} catch (Exception e) {}
         if (previousImageMap.containsKey("NEXT")) {
             imageMap.setProperty(IMG_START_INDEX, previousImageMap.getProperty("NEXT"));
-            program.append(IMG_START_INDEX); 
+            program.append(IMG_START_INDEX);
+            flashImages.append(IMG_START_INDEX);
         } else {
             program.append("-");
         }
         for (ScheduledCampaignAction scheduledAction : schedule) {
             CampaignAction action = scheduledAction.getAction();
             long offset = scheduledAction.getScheduledTime() - now;
-            long cycles = Math.round(((double)offset)/cycleLen);
+            long cycles = Math.max(Math.round(((double)offset)/cycleLen), 2);
             String delayString = Long.toHexString(0x10000+cycles).substring(1);
             program.append(delayString);
             cal.setTimeInMillis(scheduledAction.getScheduledTime());
@@ -145,6 +145,7 @@ public class CampaignsEJB implements CampaignsEJBLocal {
                 String currentImage = new String(new byte[] {currentImageIndex});
                 imageMap.setProperty(currentImage, ""+action.getAdMediumId());
                 program.append(currentImage);
+                flashImages.append(currentImage);
                 now = scheduledAction.getScheduledTime() + 15000; // XXX 15 sec. img update
             }
         }
@@ -153,6 +154,8 @@ public class CampaignsEJB implements CampaignsEJBLocal {
         try {imageMap.store(imageMapString, null);}
         catch (IOException ioe) {}
         deviceEjb.setParameter(new AdDeviceParameter(adDeviceId, "p", imageMapString.toString()));
+        // and set the flashimages parameter:
+        deviceEjb.setParameter(new AdDeviceParameter(adDeviceId, "flashimages", flashImages.toString()));
         return program.toString();
     }
 }

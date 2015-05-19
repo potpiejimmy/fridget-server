@@ -11,6 +11,7 @@ import com.myfridget.server.db.entity.CampaignAction;
 import com.myfridget.server.ejb.AdMediumEJBLocal;
 import com.myfridget.server.ejb.CampaignsEJBLocal;
 import com.myfridget.server.util.EPDUtils;
+import com.myfridget.server.vo.AdMediumPreviewImageData;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.util.ArrayList;
@@ -116,8 +117,9 @@ public class CampaignsBean {
             String campaignId = FacesContext.getCurrentInstance().getExternalContext().getRequestParameterMap().get("campaignId");
             List<CampaignAction> actions = campaignsEjb.getCampaignActionsForCampaign(Integer.parseInt(campaignId));
             if (actions.isEmpty()) return null;
-            byte[] image = mediumEjb.getMediumPreview(actions.get(0).getAdMediumId(), EPDUtils.SPECTRA_DISPLAY_TYPE_441).data;
-            return new DefaultStreamedContent(new ByteArrayInputStream(image), "image/png");
+            AdMediumPreviewImageData image = mediumEjb.getMediumPreview(actions.get(0).getAdMediumId(), EPDUtils.SPECTRA_DISPLAY_TYPE_441);
+            if (image == null) image = mediumEjb.getMediumPreview(actions.get(0).getAdMediumId(), EPDUtils.SPECTRA_DISPLAY_TYPE_74);
+            return new DefaultStreamedContent(new ByteArrayInputStream(image.data), "image/png");
         }
     }
     // ------------

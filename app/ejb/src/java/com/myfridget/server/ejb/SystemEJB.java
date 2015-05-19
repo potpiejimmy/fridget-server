@@ -14,6 +14,7 @@ import java.io.StringReader;
 import java.util.List;
 import java.util.Properties;
 import javax.annotation.Resource;
+import javax.annotation.security.PermitAll;
 import javax.ejb.EJB;
 import javax.ejb.Stateless;
 import javax.ejb.Timeout;
@@ -113,6 +114,7 @@ public class SystemEJB implements SystemEJBLocal {
     }
     
     @Override
+    @PermitAll
     public int getAttinyCycleLength() {
         SystemParameter cycleLenParam = getSystemParameter("attiny.cycle.len");
         try {

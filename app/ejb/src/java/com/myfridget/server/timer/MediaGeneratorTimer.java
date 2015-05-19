@@ -43,7 +43,7 @@ public class MediaGeneratorTimer {
     @PostConstruct
     public void initialize(){
         ScheduleExpression expression = new ScheduleExpression();
-        expression.hour("*/1");
+        expression.hour("1,7,13,19");
         timerService.createCalendarTimer(expression);
     }
     

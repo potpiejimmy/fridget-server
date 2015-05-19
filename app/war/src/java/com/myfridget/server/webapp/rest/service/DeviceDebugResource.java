@@ -56,13 +56,12 @@ public class DeviceDebugResource {
         
         // send server params:
         StringBuilder result = new StringBuilder();
-        for (AdDeviceParameter param : deviceEjb.getParameters(deviceEjb.getBySerial(serial).getId())) {
-            if ("exec".equals(param.getParam()))
-                appendParam(result, param.getParam(), getDemoProgram(device.getId(), param.getValue()));
-            else if (!"accesstoken".equals(param.getParam()) &&
-                     !"p".equals(param.getParam()))
-                appendParam(result, param.getParam(), param.getValue());
-        }
+        AdDeviceParameter param = deviceEjb.getParameter(device.getId(), "exec");
+        appendParam(result, param.getParam(), getDemoProgram(device.getId(), param.getValue()));
+        param = deviceEjb.getParameter(device.getId(), "flashimages");
+        appendParam(result, param.getParam(), param.getValue());
+        param = deviceEjb.getParameter(device.getId(), "connectmode");
+        appendParam(result, param.getParam(), param.getValue());
         SystemParameter firmware = systemEjb.getSystemParameter(SystemEJB.PARAMETER_FIRMWARE_VERSION);
         result.append("firmware").append('=').append(firmware.getValue()).append(';');
         
