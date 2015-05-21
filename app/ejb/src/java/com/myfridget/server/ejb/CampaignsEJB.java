@@ -65,6 +65,9 @@ public class CampaignsEJB implements CampaignsEJBLocal {
             em.flush(); //pre-fetch ID
         } else {
             em.merge(campaign);
+            getCampaignActionsForCampaign(campaign.getId()).forEach(a -> {
+                if (!actions.contains(a)) em.remove(a);
+            });
         }
         for (CampaignAction a : actions) {
             a.setCampaignId(campaign.getId());
@@ -102,6 +105,13 @@ public class CampaignsEJB implements CampaignsEJBLocal {
         }
         // now sort the schedule:
         Collections.sort(schedule);
+        
+        // add the first one for next day again:
+        ScheduledCampaignAction first = schedule.get(0);
+        Calendar cal = Calendar.getInstance();
+        cal.setTimeInMillis(first.getScheduledTime());
+        cal.add(Calendar.DAY_OF_YEAR, 1);
+        schedule.add(new ScheduledCampaignAction(first.getAction(), cal.getTimeInMillis()));
 
         return buildProgramForSchedule(adDeviceId, schedule, now);
     }
@@ -148,6 +158,7 @@ public class CampaignsEJB implements CampaignsEJBLocal {
                 flashImages.append(currentImage);
                 now = scheduledAction.getScheduledTime() + 15000; // XXX 15 sec. img update
             }
+            // Note: XXX loop must not end here but only on break above
         }
         // remember used images map in parameter "p"
         StringWriter imageMapString = new StringWriter();
