@@ -49,6 +49,12 @@ public class DeviceDebugResource {
         msg = WebUtils.removeQuotes(msg);
         deviceEjb.addDebugMessage(serial, ">>>" + msg);
         
+        // XXX voltage reporting for debugging, ignore
+        if (msg.contains("voltage=")) {
+            deviceEjb.addDebugMessage(serial, "<<< ok");
+            return "ok";
+        }
+        
         AdDevice device = deviceEjb.getBySerial(serial);
 
         // verify client params string, flash firmware if necessary:
