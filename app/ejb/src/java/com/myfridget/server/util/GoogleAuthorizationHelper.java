@@ -16,10 +16,12 @@ import com.google.api.client.http.HttpTransport;
 import com.google.api.client.json.jackson2.JacksonFactory;
 import com.google.api.client.util.store.FileDataStoreFactory;
 import com.google.api.services.calendar.CalendarScopes;
+import com.google.api.services.tasks.TasksScopes;
 import java.io.File;
 import java.io.IOException;
 import java.io.StringReader;
 import java.util.Arrays;
+import java.util.Collection;
 
 /**
  *
@@ -29,6 +31,12 @@ public class GoogleAuthorizationHelper {
     
     /** OAuth client ID JSON */
     public final static String CLIENT_ID = "{\"web\":{\"auth_uri\":\"https://accounts.google.com/o/oauth2/auth\",\"client_secret\":\"YI5-RHyCR5g3ka8EONQosdqg\",\"token_uri\":\"https://accounts.google.com/o/oauth2/token\",\"client_email\":\"742875388091-gi4eube4sr25jd94doluln4jrd62i37t@developer.gserviceaccount.com\",\"redirect_uris\":[\"https://localhost:8181/fridget/gauth\",\"https://www.doogetha.com/fridget/gauth\"],\"client_x509_cert_url\":\"https://www.googleapis.com/robot/v1/metadata/x509/742875388091-gi4eube4sr25jd94doluln4jrd62i37t@developer.gserviceaccount.com\",\"client_id\":\"742875388091-gi4eube4sr25jd94doluln4jrd62i37t.apps.googleusercontent.com\",\"auth_provider_x509_cert_url\":\"https://www.googleapis.com/oauth2/v1/certs\",\"javascript_origins\":[\"https://localhost:8181\",\"https://www.doogetha.com\"]}}";
+    
+    /* Scopes */
+    public final static Collection<String> SCOPES = Arrays.asList(
+            CalendarScopes.CALENDAR_READONLY,
+            TasksScopes.TASKS_READONLY
+    );
     
     /** Global instance of the HTTP transport. */
     public static HttpTransport HTTP_TRANSPORT;
@@ -55,7 +63,7 @@ public class GoogleAuthorizationHelper {
                             HTTP_TRANSPORT,
                             JacksonFactory.getDefaultInstance(),
                             secrets,
-                            Arrays.asList(CalendarScopes.CALENDAR_READONLY))
+                            SCOPES)
                            .setDataStoreFactory(new FileDataStoreFactory(new File("google-calendar-credentials/"+userId)))
                            .setAccessType("offline")
                            .build();
@@ -67,6 +75,11 @@ public class GoogleAuthorizationHelper {
     public boolean hasCredentials() {
         Credential credential = getCredentials();
         return (credential != null && credential.getAccessToken() != null); 
+    }
+    
+    public String getRefreshToken() {
+        if (!hasCredentials()) return null;
+        return getCredentials().getRefreshToken();
     }
     
     public Credential getCredentials() {

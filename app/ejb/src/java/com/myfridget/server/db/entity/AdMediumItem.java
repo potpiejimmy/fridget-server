@@ -16,6 +16,7 @@ import javax.persistence.NamedQueries;
 import javax.persistence.NamedQuery;
 import javax.persistence.Table;
 import javax.validation.constraints.NotNull;
+import javax.validation.constraints.Size;
 import javax.xml.bind.annotation.XmlRootElement;
 
 /**
@@ -54,6 +55,11 @@ public class AdMediumItem implements Serializable {
     @NotNull
     @Column(name = "gentype")
     private short gentype;
+    
+    @Basic(optional = true)
+    @Size(min = 1, max = 255)
+    @Column(name = "geninfo")
+    private String geninfo;
 
     public AdMediumItem() {
     }
@@ -97,6 +103,14 @@ public class AdMediumItem implements Serializable {
 
     public void setGentype(short gentype) {
         this.gentype = gentype;
+    }
+
+    public String getGeninfo() {
+        return geninfo;
+    }
+
+    public void setGeninfo(String geninfo) {
+        this.geninfo = geninfo;
     }
 
     @Override

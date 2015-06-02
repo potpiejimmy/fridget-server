@@ -14,9 +14,7 @@
                 <h:outputLabel for="mediumName" value="Medium Description:"/>
                 <p:inputText id="mediumName" value="#{mediaBean.currentMedium.name}" size="60"/>
                 <p:message for="mediumName"/>
-            </h:panelGrid>
-
-            <h:panelGrid columns="3">
+                
                 <h:outputLabel for="selectDisplayType" value="Generate for Display Type:"/>
                 <p:selectOneMenu id="selectDisplayType" value="#{mediaBean.selectedDisplayType}">
                     <f:selectItems value="#{mediaBean.displayTypesSelectItems}"/>
@@ -24,11 +22,29 @@
                 </p:selectOneMenu>
                 <p:message for="selectDisplayType"/>
             </h:panelGrid>
-            <p:fileUpload id="imgUpload" label="Upload file..." fileUploadListener="#{mediaBean.handleFileUpload}" mode="advanced"
-                         update="messages,medium4,medium7" auto="true" sizeLimit="5000000" allowTypes="/(\.|\/)(gif|jpe?g|png)$/"/>
-            <p:growl id="messages" showDetail="true"/>  
+            
+            <p:accordionPanel>
+                <p:tab title="Upload Image">
+                    <p:fileUpload id="imgUpload" label="Choose file..." fileUploadListener="#{mediaBean.handleFileUpload}" mode="advanced"
+                                 update="messages,:editform:medium4,:editform:medium7" auto="true" sizeLimit="5000000" allowTypes="/(\.|\/)(gif|jpe?g|png)$/"/>
+                    <p:growl id="messages" showDetail="true"/>
+                </p:tab>
 
-            <p:commandButton value="Generate Google Calendar" action="#{mediaBean.generateCalendar}" ajax="false"/>
+                <p:tab title="Google Calendar">
+                    <p:commandButton value="Generate calendar image" action="#{mediaBean.generateCalendar}" ajax="false"/>
+                </p:tab>
+                
+                <p:tab title="Google Tasks">
+                    <h:panelGrid columns="2">
+                        <h:outputText value="Select Task List:"/>
+                        <h:selectOneMenu>
+                            <f:selectItem itemValue="ToDo"/>
+                            <f:selectItem itemValue="Wochenaufgaben"/>
+                        </h:selectOneMenu>
+                    </h:panelGrid>
+                    <p:commandButton value="Generate tasks image" action="#{mediaBean.generateTasks}" ajax="false"/>
+                </p:tab>
+            </p:accordionPanel>
             
             <h:panelGrid columns="3">
                 <h:outputLabel for="medium4" value="Display 4.41&quot;:"/>

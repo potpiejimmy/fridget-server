@@ -103,4 +103,8 @@ public class MediaBean extends ImageUploadBean {
         byte[] data = Utils.encodeImage(renderer.renderCalendar(userId), "png");
         imageData.put(displayType, new AdMediumPreviewImageData(mediumEjb.convertImage(data, displayType), AdMediumItem.GENERATION_TYPE_AUTO_GCAL));
     }
+    
+    public void generateTasks() {
+        // TODO
+    }
 }
