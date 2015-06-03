@@ -3,9 +3,10 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package com.myfridget.server.util;
+package com.myfridget.server.util.google;
 
-import com.myfridget.server.util.GoogleCalendar.CalendarItem;
+import com.myfridget.server.util.google.GoogleCalendar.CalendarItem;
+import com.myfridget.server.util.Utils;
 import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.Font;

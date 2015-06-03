@@ -5,7 +5,7 @@
  */
 package com.myfridget.server.webapp.util;
 
-import com.myfridget.server.util.GoogleAuthorizationHelper;
+import com.myfridget.server.util.google.GoogleAuthorizationHelper;
 import java.io.IOException;
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;

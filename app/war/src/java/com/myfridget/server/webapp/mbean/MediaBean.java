@@ -8,18 +8,22 @@ package com.myfridget.server.webapp.mbean;
 import com.myfridget.server.db.entity.AdMedium;
 import com.myfridget.server.db.entity.AdMediumItem;
 import com.myfridget.server.util.EPDUtils;
-import com.myfridget.server.util.GoogleCalendarRenderer;
+import com.myfridget.server.util.google.GoogleCalendarRenderer;
 import com.myfridget.server.util.Utils;
+import com.myfridget.server.util.google.GoogleTasks;
 import com.myfridget.server.vo.AdMediumPreviewImageData;
 import com.myfridget.server.webapp.util.GoogleAuthorizationServlet;
 import com.myfridget.server.webapp.util.WebUtils;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import javax.faces.bean.ManagedBean;
 import javax.faces.bean.SessionScoped;
 import javax.faces.context.FacesContext;
 import javax.faces.event.PhaseId;
+import javax.faces.model.SelectItem;
 import javax.servlet.http.HttpServletRequest;
 import org.primefaces.model.DefaultStreamedContent;
 import org.primefaces.model.StreamedContent;
@@ -102,6 +106,16 @@ public class MediaBean extends ImageUploadBean {
         GoogleCalendarRenderer renderer = new GoogleCalendarRenderer(EPDUtils.dimensionForDisplayType(displayType));
         byte[] data = Utils.encodeImage(renderer.renderCalendar(userId), "png");
         imageData.put(displayType, new AdMediumPreviewImageData(mediumEjb.convertImage(data, displayType), AdMediumItem.GENERATION_TYPE_AUTO_GCAL));
+    }
+    
+    public List<SelectItem> getTaskLists() {
+        GoogleTasks tasks = new GoogleTasks(WebUtils.getCurrentPerson(WebUtils.getHttpServletRequest()));
+        List<GoogleTasks.GoogleTaskList> taskLists = tasks.getTaskLists();
+        if (taskLists == null) return Arrays.asList(new SelectItem("<Could not load task lists>"));
+        List<SelectItem> result = new ArrayList<>(taskLists.size());
+        for (GoogleTasks.GoogleTaskList list : taskLists)
+            result.add(new SelectItem(list.id, list.title));
+        return result;
     }
     
     public void generateTasks() {

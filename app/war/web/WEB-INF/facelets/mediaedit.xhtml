@@ -38,8 +38,7 @@
                     <h:panelGrid columns="2">
                         <h:outputText value="Select Task List:"/>
                         <h:selectOneMenu>
-                            <f:selectItem itemValue="ToDo"/>
-                            <f:selectItem itemValue="Wochenaufgaben"/>
+                            <f:selectItems value="#{mediaBean.taskLists}"/>
                         </h:selectOneMenu>
                     </h:panelGrid>
                     <p:commandButton value="Generate tasks image" action="#{mediaBean.generateTasks}" ajax="false"/>

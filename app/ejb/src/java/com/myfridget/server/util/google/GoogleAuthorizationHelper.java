@@ -3,7 +3,7 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package com.myfridget.server.util;
+package com.myfridget.server.util.google;
 
 import com.google.api.client.auth.oauth2.AuthorizationCodeFlow;
 import com.google.api.client.auth.oauth2.AuthorizationCodeResponseUrl;
@@ -37,6 +37,8 @@ public class GoogleAuthorizationHelper {
             CalendarScopes.CALENDAR_READONLY,
             TasksScopes.TASKS_READONLY
     );
+    
+    public final static String APPLICATION_NAME = "Fridget";
     
     /** Global instance of the HTTP transport. */
     public static HttpTransport HTTP_TRANSPORT;

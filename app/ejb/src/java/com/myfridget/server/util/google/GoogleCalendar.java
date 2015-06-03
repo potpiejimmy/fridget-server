@@ -3,7 +3,7 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package com.myfridget.server.util;
+package com.myfridget.server.util.google;
 
 import com.google.api.client.auth.oauth2.Credential;
 import com.google.api.client.json.jackson2.JacksonFactory;
@@ -62,7 +62,7 @@ public class GoogleCalendar
                 GoogleAuthorizationHelper.HTTP_TRANSPORT,
                 JacksonFactory.getDefaultInstance(),
                 credential)
-                .setApplicationName("Fridget")
+                .setApplicationName(GoogleAuthorizationHelper.APPLICATION_NAME)
                 .build();
         }
         catch (Exception ex)
