@@ -12,7 +12,7 @@
 
             <ui:repeat value="#{mediaBean.media}" var="m">
                 <p:commandLink action="#{mediaBean.edit(m)}" ajax="false">
-                    <p:graphicImage styleClass="mediaSelectHover" value="#{mediaBean.mediumPreview}" width="200px;" alt="#{m.name}" title="#{m.name}">
+                    <p:graphicImage styleClass="mediaSelectHover" value="#{mediaBean.mediumPreview}" height="150px;" alt="#{m.name}" title="#{m.name}">
                         <f:param name="adMediumId" value="#{m.id}"/>
                     </p:graphicImage>
                 </p:commandLink>

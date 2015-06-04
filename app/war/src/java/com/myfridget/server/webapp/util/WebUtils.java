@@ -17,6 +17,11 @@ import javax.servlet.http.HttpServletResponse;
  */
 public class WebUtils
 {
+    public static String getCurrentPerson()
+    {
+        return getCurrentPerson(getHttpServletRequest());
+    }
+
     public static String getCurrentPerson(HttpServletRequest hsr)
     {
         Principal p = hsr.getUserPrincipal();

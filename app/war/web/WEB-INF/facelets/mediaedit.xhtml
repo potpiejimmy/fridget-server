@@ -21,12 +21,20 @@
                     <p:ajax event="change"/>
                 </p:selectOneMenu>
                 <p:message for="selectDisplayType"/>
+                
+                <h:outputLabel for="googleToken" value="Google Token (Refresh Token):"/>
+                <h:panelGroup>
+                    <h:outputText id="googleToken" value="#{mediaBean.googleRefreshToken} ("/>
+                    <h:outputLink value="https://accounts.google.com/o/oauth2/revoke?token=#{mediaBean.googleRefreshToken}" target="_blank">Revoke</h:outputLink>
+                    <h:outputText value=")"/>
+                </h:panelGroup>
+                <p:message for="googleToken"/>
             </h:panelGrid>
             
             <p:accordionPanel>
                 <p:tab title="Upload Image">
                     <p:fileUpload id="imgUpload" label="Choose file..." fileUploadListener="#{mediaBean.handleFileUpload}" mode="advanced"
-                                 update="messages,:editform:medium4,:editform:medium7" auto="true" sizeLimit="5000000" allowTypes="/(\.|\/)(gif|jpe?g|png)$/"/>
+                                 update="messages,:editform:mediumoutputtable" auto="true" sizeLimit="5000000" allowTypes="/(\.|\/)(gif|jpe?g|png)$/"/>
                     <p:growl id="messages" showDetail="true"/>
                 </p:tab>
 
@@ -45,15 +53,15 @@
                 </p:tab>
             </p:accordionPanel>
             
-            <h:panelGrid columns="3">
-                <h:outputLabel for="medium4" value="Display 4.41&quot;:"/>
-                <p:graphicImage id="medium4" value="#{mediaBean.getCurrentMediumDisplay(0)}" cache="false" styleClass="mediaSelectHover"/>
-                <p:message for="medium4"/>
+            <p:dataTable id="mediumoutputtable" value="1">
+                <p:column headerText="Display 4.41&quot;:" style="vertical-align: top">
+                    <p:graphicImage id="medium4" value="#{mediaBean.getCurrentMediumDisplay(0)}" cache="false" styleClass="mediaSelectHover"/>
+                </p:column>
 
-                <h:outputLabel for="medium7" value="Display 7.4&quot;:"/>
-                <p:graphicImage id="medium7" value="#{mediaBean.getCurrentMediumDisplay(1)}" cache="false" styleClass="mediaSelectHover"/>
-                <p:message for="medium7"/>
-            </h:panelGrid>
+                <p:column headerText="Display 7.4&quot;:" style="vertical-align: top">
+                    <p:graphicImage id="medium7" value="#{mediaBean.getCurrentMediumDisplay(1)}" cache="false" styleClass="mediaSelectHover"/>
+                </p:column>
+            </p:dataTable>
 
             <p:commandButton value="Save" action="#{mediaBean.save}" ajax="false"/>
             <p:commandButton value="Cancel" action="#{mediaBean.cancel}" immediate="true" ajax="false"/>
