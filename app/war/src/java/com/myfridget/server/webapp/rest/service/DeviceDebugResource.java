@@ -8,10 +8,9 @@ package com.myfridget.server.webapp.rest.service;
 import com.myfridget.server.db.entity.AdDevice;
 import com.myfridget.server.db.entity.AdDeviceParameter;
 import com.myfridget.server.db.entity.SystemParameter;
-import com.myfridget.server.ejb.AdDeviceEJBLocal;
-import com.myfridget.server.ejb.CampaignsEJBLocal;
+import com.myfridget.server.ejb.AdDeviceEJB;
+import com.myfridget.server.ejb.CampaignsEJB;
 import com.myfridget.server.ejb.SystemEJB;
-import com.myfridget.server.ejb.SystemEJBLocal;
 import com.myfridget.server.webapp.util.WebUtils;
 import java.io.IOException;
 import java.util.logging.Level;
@@ -38,9 +37,9 @@ public class DeviceDebugResource {
     @PathParam("serial")
     private String serial;
     
-    protected AdDeviceEJBLocal deviceEjb = lookupEjb("java:app/Fridget_EJBs/AdDeviceEJB!com.myfridget.server.ejb.AdDeviceEJBLocal");
-    protected SystemEJBLocal systemEjb = lookupEjb("java:app/Fridget_EJBs/SystemEJB!com.myfridget.server.ejb.SystemEJBLocal");
-    protected CampaignsEJBLocal campaignsEjb = lookupEjb("java:app/Fridget_EJBs/CampaignsEJB!com.myfridget.server.ejb.CampaignsEJBLocal");
+    protected AdDeviceEJB deviceEjb = lookupEjb("java:app/Fridget_EJBs/AdDeviceEJB!com.myfridget.server.ejb.AdDeviceEJB");
+    protected SystemEJB systemEjb = lookupEjb("java:app/Fridget_EJBs/SystemEJB!com.myfridget.server.ejb.SystemEJB");
+    protected CampaignsEJB campaignsEjb = lookupEjb("java:app/Fridget_EJBs/CampaignsEJB!com.myfridget.server.ejb.CampaignsEJB");
     
     @POST
     @Consumes({"application/json"})

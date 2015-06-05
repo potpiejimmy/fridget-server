@@ -7,7 +7,7 @@ package com.myfridget.server.webapp.mbean;
 
 import com.myfridget.server.db.entity.AdMedium;
 import com.myfridget.server.db.entity.AdMediumItem;
-import com.myfridget.server.ejb.AdMediumEJBLocal;
+import com.myfridget.server.ejb.AdMediumEJB;
 import com.myfridget.server.util.EPDUtils;
 import com.myfridget.server.util.Utils;
 import com.myfridget.server.vo.AdMediumPreviewImageData;
@@ -33,7 +33,7 @@ import org.primefaces.model.UploadedFile;
 public class ImageUploadBean {
     
     @EJB
-    protected AdMediumEJBLocal mediumEjb;
+    protected AdMediumEJB mediumEjb;
     
     protected int selectedDisplayType = -1;
     

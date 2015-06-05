@@ -9,8 +9,8 @@ import com.myfridget.server.db.entity.AdDevice;
 import com.myfridget.server.db.entity.AdDeviceDebugMsg;
 import com.myfridget.server.db.entity.AdDeviceParameter;
 import com.myfridget.server.db.entity.AdDeviceTestImage;
-import com.myfridget.server.ejb.AdDeviceEJBLocal;
-import com.myfridget.server.ejb.UsersEJBLocal;
+import com.myfridget.server.ejb.AdDeviceEJB;
+import com.myfridget.server.ejb.UsersEJB;
 import com.myfridget.server.util.Utils;
 import com.myfridget.server.webapp.util.WebUtils;
 import java.io.ByteArrayInputStream;
@@ -39,9 +39,9 @@ public class DeviceDebugBean extends ImageUploadBean {
     protected final static DateFormat DATE_FORMAT = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss.SSS");
     
     @EJB
-    private AdDeviceEJBLocal deviceEjb;
+    private AdDeviceEJB deviceEjb;
     @EJB
-    private UsersEJBLocal usersEjb;
+    private UsersEJB usersEjb;
     
     private Integer selectedDevice = null;
     

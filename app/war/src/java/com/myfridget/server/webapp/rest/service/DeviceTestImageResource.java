@@ -8,8 +8,8 @@ package com.myfridget.server.webapp.rest.service;
 import com.myfridget.server.db.entity.AdDevice;
 import com.myfridget.server.db.entity.AdDeviceParameter;
 import com.myfridget.server.db.entity.AdDeviceTestImage;
-import com.myfridget.server.ejb.AdDeviceEJBLocal;
-import com.myfridget.server.ejb.AdMediumEJBLocal;
+import com.myfridget.server.ejb.AdDeviceEJB;
+import com.myfridget.server.ejb.AdMediumEJB;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.StringReader;
@@ -38,8 +38,8 @@ public class DeviceTestImageResource {
     @PathParam("serial")
     private String serial;
     
-    protected AdDeviceEJBLocal deviceEjb = lookupEjb("java:app/Fridget_EJBs/AdDeviceEJB!com.myfridget.server.ejb.AdDeviceEJBLocal");
-    protected AdMediumEJBLocal mediumEjb = lookupEjb("java:app/Fridget_EJBs/AdMediumEJB!com.myfridget.server.ejb.AdMediumEJBLocal");
+    protected AdDeviceEJB deviceEjb = lookupEjb("java:app/Fridget_EJBs/AdDeviceEJB!com.myfridget.server.ejb.AdDeviceEJB");
+    protected AdMediumEJB mediumEjb = lookupEjb("java:app/Fridget_EJBs/AdMediumEJB!com.myfridget.server.ejb.AdMediumEJB");
     
     @GET
     @Produces({"application/binary"})

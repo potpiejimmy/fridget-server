@@ -2,8 +2,8 @@ package com.myfridget.server.webapp.mbean;
 
 import com.myfridget.server.db.entity.AdDevice;
 import com.myfridget.server.db.entity.User;
-import com.myfridget.server.ejb.AdDeviceEJBLocal;
-import com.myfridget.server.ejb.UsersEJBLocal;
+import com.myfridget.server.ejb.AdDeviceEJB;
+import com.myfridget.server.ejb.UsersEJB;
 import com.myfridget.server.util.EPDUtils;
 import com.myfridget.server.webapp.util.WebUtils;
 import java.io.Serializable;
@@ -27,9 +27,9 @@ public class AdminDevicesBean implements Serializable, Converter {
 	private static final long serialVersionUID = 1L;
 
         @EJB
-        private AdDeviceEJBLocal deviceEjb;
+        private AdDeviceEJB deviceEjb;
         @EJB
-        private UsersEJBLocal usersEjb;
+        private UsersEJB usersEjb;
 	
 	private AdDevice currentDevice = null;
 

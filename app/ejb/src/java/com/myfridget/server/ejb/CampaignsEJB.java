@@ -28,36 +28,32 @@ import javax.persistence.PersistenceContext;
  * @author thorsten
  */
 @Stateless
-public class CampaignsEJB implements CampaignsEJBLocal {
+public class CampaignsEJB {
     
     @PersistenceContext(unitName = "Fridget_EJBsPU")
     private EntityManager em;
     
     @EJB
-    private UsersEJBLocal usersEjb;
+    private UsersEJB usersEjb;
 
     @EJB
-    private AdDeviceEJBLocal deviceEjb;
+    private AdDeviceEJB deviceEjb;
     
     @EJB
-    private SystemEJBLocal systemEjb;
+    private SystemEJB systemEjb;
     
-    @Override
     public List<Campaign> getCampaigns() {
         return getCampaigns(usersEjb.getCurrentUser().getId());
     }
 
-    @Override
     public List<Campaign> getCampaigns(int userId) {
         return em.createNamedQuery("Campaign.findByUserId", Campaign.class).setParameter("userId", userId).getResultList();
     }
 
-    @Override
     public List<CampaignAction> getCampaignActionsForCampaign(int campaignId) {
         return em.createNamedQuery("CampaignAction.findByCampaignId", CampaignAction.class).setParameter("campaignId", campaignId).getResultList();
     }
 
-    @Override
     public void saveCampaign(Campaign campaign, List<CampaignAction> actions) {
         if (campaign.getId() == null) {
             campaign.setUserId(usersEjb.getCurrentUser().getId());
@@ -75,13 +71,11 @@ public class CampaignsEJB implements CampaignsEJBLocal {
         }
     }
 
-    @Override
     public void deleteCampaign(int id) {
         getCampaignActionsForCampaign(id).forEach(a->em.remove(a));
         em.remove(em.find(Campaign.class, id));
     }
     
-    @Override
     public String getProgramForDevice(int adDeviceId) {
         // first, collect all campaign actions associated with this device:
         List<User> deviceUsers = deviceEjb.getAssignedUsers(adDeviceId);

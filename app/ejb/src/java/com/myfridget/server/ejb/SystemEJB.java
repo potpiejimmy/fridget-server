@@ -32,7 +32,7 @@ import org.apache.http.entity.mime.MultipartEntityBuilder;
  * @author thorsten
  */
 @Stateless
-public class SystemEJB implements SystemEJBLocal {
+public class SystemEJB {
 
     public final static String PARAMETER_FIRMWARE_VERSION = "firmware.version";
     public final static String PARAMETER_FIRMWARE_PATH = "firmware.path";
@@ -45,14 +45,12 @@ public class SystemEJB implements SystemEJBLocal {
     protected TimerService timerService;
     
     @EJB
-    protected AdDeviceEJBLocal deviceEjb;
+    protected AdDeviceEJB deviceEjb;
     
-    @Override
     public List<SystemParameter> getSystemParameters() {
         return em.createNamedQuery("SystemParameter.findAll", SystemParameter.class).getResultList();
     }
     
-    @Override
     public SystemParameter getSystemParameter(String param) {
         try {
             return em.createNamedQuery("SystemParameter.findByParam", SystemParameter.class).setParameter("param", param).getSingleResult();
@@ -61,12 +59,10 @@ public class SystemEJB implements SystemEJBLocal {
         }
     }
 
-    @Override
     public void setSystemParameter(SystemParameter param) {
         em.merge(param);
     }
     
-    @Override
     public String flashFirmware(int adDeviceId) throws Exception {
         
         AdDevice device = deviceEjb.getById(adDeviceId);
@@ -94,7 +90,6 @@ public class SystemEJB implements SystemEJBLocal {
         }
     }
     
-    @Override
     public boolean verifyDeviceParams(int adDeviceId, String deviceParamsString) throws IOException {
         Properties deviceParams = new Properties();
         deviceParams.load(new StringReader(deviceParamsString.replace(',', '\n')));
@@ -113,7 +108,6 @@ public class SystemEJB implements SystemEJBLocal {
         deviceEjb.addDebugMessage(device.getSerial(), flashFirmware(device.getId()));
     }
     
-    @Override
     @PermitAll
     public int getAttinyCycleLength() {
         SystemParameter cycleLenParam = getSystemParameter("attiny.cycle.len");

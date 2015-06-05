@@ -26,20 +26,18 @@ import javax.persistence.PersistenceContext;
  * @author thorsten
  */
 @Stateless
-public class AdMediumEJB implements AdMediumEJBLocal {
+public class AdMediumEJB {
 
     @PersistenceContext(unitName = "Fridget_EJBsPU")
     protected EntityManager em;
     
     @EJB
-    private UsersEJBLocal usersEjb;
+    private UsersEJB usersEjb;
     
-    @Override
     public List<AdMedium> getMediaForCurrentUser() {
         return em.createNamedQuery("AdMedium.findByUserId", AdMedium.class).setParameter("userId", usersEjb.getCurrentUser().getId()).getResultList();
     }
     
-    @Override
     public AdMedium saveMedium(AdMedium medium) {
         if (medium.getId() == null) {
             medium.setUserId(usersEjb.getCurrentUser().getId());
@@ -57,14 +55,12 @@ public class AdMediumEJB implements AdMediumEJBLocal {
         }
     }
     
-    @Override
     public void deleteMedium(int mediumId) {
         AdMedium medium = em.find(AdMedium.class, mediumId);
         removeMediumItemsForMedium(medium);
         em.remove(medium);
     }
 
-    @Override
     public byte[] convertImage(byte[] imgData, int displayType) throws IOException {
         BufferedImage img = EPDUtils.getResizedImageForDisplay(imgData, displayType);
         EPDUtils.makeSpectra3Color(img); // Note: converts "img" to 3 colors
@@ -72,7 +68,6 @@ public class AdMediumEJB implements AdMediumEJBLocal {
         return Utils.encodeImage(img, "png"); // encode PNG
     }
     
-    @Override
     public void setMediumPreview(int adMediumId, int displayType, AdMediumPreviewImageData data) throws IOException {
         AdMediumItem item = findMediumItem(adMediumId, displayType);
         if (item == null) {
@@ -87,7 +82,6 @@ public class AdMediumEJB implements AdMediumEJBLocal {
         Utils.writeFile(cacheFileForImage(item, "png"), data.data);
     }
     
-    @Override
     public AdMediumPreviewImageData getMediumPreview(int adMediumId, int displayType) throws IOException {
         AdMediumItem img = findMediumItem(adMediumId, displayType);
         if (img == null) return null; // not found
@@ -96,7 +90,6 @@ public class AdMediumEJB implements AdMediumEJBLocal {
         return new AdMediumPreviewImageData(Utils.readAll(new FileInputStream(file)), img.getGentype());
     }    
     
-    @Override
     public byte[] getMediumEPD(int adMediumId, int displayType) throws IOException {
         byte[] preview = getMediumPreview(adMediumId, displayType).data; // encode from preview
         if (preview == null) return null; // not found
@@ -111,12 +104,10 @@ public class AdMediumEJB implements AdMediumEJBLocal {
         }
     }
     
-    @Override
     public List<AdMediumItem> getAllMediumItems() {
         return em.createNamedQuery("AdMediumItem.findAll", AdMediumItem.class).getResultList();
     }
     
-    @Override
     public AdMedium findAdMedium(int adMediumId) {
         return em.find(AdMedium.class, adMediumId);
     }

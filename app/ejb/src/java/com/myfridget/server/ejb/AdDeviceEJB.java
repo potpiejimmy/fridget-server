@@ -30,12 +30,11 @@ import javax.persistence.PersistenceContext;
  * @author thorsten
  */
 @Stateless
-public class AdDeviceEJB implements AdDeviceEJBLocal {
+public class AdDeviceEJB {
 
     @PersistenceContext(unitName = "Fridget_EJBsPU")
     protected EntityManager em;
     
-    @Override
     public AdDeviceDebugMsg addDebugMessage(String deviceSerial, String message) {
         AdDevice adDevice = findAdDeviceBySerial(deviceSerial);
         if (adDevice == null) {
@@ -51,7 +50,6 @@ public class AdDeviceEJB implements AdDeviceEJBLocal {
         return msg;
     }
     
-    @Override
     public AdDevice getBySerial(String deviceSerial) {
         try {
             return em.createNamedQuery("AdDevice.findBySerial", AdDevice.class).setParameter("serial", deviceSerial).getSingleResult();
@@ -60,42 +58,34 @@ public class AdDeviceEJB implements AdDeviceEJBLocal {
         }
     }
     
-    @Override
     public AdDevice getById(int deviceId) {
         return em.find(AdDevice.class, deviceId);
     }
 
-    @Override
     public List<AdDeviceDebugMsg> getDebugMessages(int deviceId) {
         return em.createNamedQuery("AdDeviceDebugMsg.findByAdDeviceId", AdDeviceDebugMsg.class).setParameter("adDeviceId", deviceId).getResultList();
     }
     
-    @Override
     public List<AdDevice> getAllDevices() {
         return em.createNamedQuery("AdDevice.findAll", AdDevice.class).getResultList();
     }
 
-    @Override
     public List<AdDevice> getDevicesForUser(int userId) {
         return em.createNamedQuery("AdDevice.findByUserId", AdDevice.class).setParameter("userId", userId).getResultList();
     }
     
-    @Override
     public List<User> getAssignedUsers(int deviceId) {
         return em.createNamedQuery("User.findByDeviceId", User.class).setParameter("adDeviceId", deviceId).getResultList();
     }
 
-    @Override
     public void clearDebugMessages(int deviceId) {
         getDebugMessages(deviceId).forEach(i->em.remove(i));
     }
     
-    @Override
     public List<AdDeviceParameter> getParameters(int deviceId) {
         return em.createNamedQuery("AdDeviceParameter.findByAdDeviceId", AdDeviceParameter.class).setParameter("adDeviceId", deviceId).getResultList();
     }
 
-    @Override
     public AdDeviceParameter getParameter(int deviceId, String param) {
         try {
             return em.createNamedQuery("AdDeviceParameter.findByAdDeviceIdAndParam", AdDeviceParameter.class).setParameter("adDeviceId", deviceId).setParameter("param", param).getSingleResult();
@@ -104,7 +94,6 @@ public class AdDeviceEJB implements AdDeviceEJBLocal {
         }
     }
 
-    @Override
     public void setParameter(AdDeviceParameter param) {
         AdDeviceParameter storedParam = getParameter(param.getAdDeviceId(), param.getParam());
         if (storedParam != null) {
@@ -135,7 +124,6 @@ public class AdDeviceEJB implements AdDeviceEJBLocal {
         return adDevice;
     }
     
-    @Override
     public void saveDevice(AdDevice device, List<User> assignedUsers) {
         // update entity
         em.merge(device);
@@ -150,7 +138,6 @@ public class AdDeviceEJB implements AdDeviceEJBLocal {
         }
     }
     
-    @Override
     public void uploadTestImage(int deviceId, int displayType, byte[] imgData) throws IOException {
         if (displayType < 0) throw new RuntimeException("Sorry, invalid display size for test upload: "+displayType);
 
@@ -179,7 +166,6 @@ public class AdDeviceEJB implements AdDeviceEJBLocal {
         em.remove(img);
     }
     
-    @Override
     public byte[] getTestImage(int deviceTestImageId) throws IOException {
         byte[] imgData = getTestImageData(deviceTestImageId, "epd");
         // XXX REMOVE THE FOLLOWING. RECREATE ON THE FLY (allow change of encoding by removing EPD files from cache)
@@ -192,7 +178,6 @@ public class AdDeviceEJB implements AdDeviceEJBLocal {
         return imgData;
     }
 
-    @Override
     public byte[] getTestImagePreview(int deviceTestImageId) throws IOException {
         return getTestImageData(deviceTestImageId, "png");
     }
@@ -205,7 +190,6 @@ public class AdDeviceEJB implements AdDeviceEJBLocal {
         return Utils.readAll(new FileInputStream(file));
     }
 
-    @Override
     public List<AdDeviceTestImage> getDeviceTestImages(int deviceId) {
         try {
             return em.createNamedQuery("AdDeviceTestImage.findByAdDeviceId", AdDeviceTestImage.class).setParameter("adDeviceId", deviceId).getResultList();
@@ -214,7 +198,6 @@ public class AdDeviceEJB implements AdDeviceEJBLocal {
         }
     }
     
-    @Override
     public void removeTestImage(int deviceTestImageId) throws IOException {
         em.remove(em.find(AdDeviceTestImage.class, deviceTestImageId));
     }

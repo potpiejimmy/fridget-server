@@ -73,34 +73,4 @@
     <security-role>
         <role-name>user</role-name>
     </security-role>
-    <ejb-local-ref>
-        <ejb-ref-name>AdDeviceEJB</ejb-ref-name>
-        <ejb-ref-type>Session</ejb-ref-type>
-        <local>com.myfridget.server.ejb.AdDeviceEJBLocal</local>
-        <ejb-link>Fridget_EJBs.jar#AdDeviceEJB</ejb-link>
-    </ejb-local-ref>
-    <ejb-local-ref>
-        <ejb-ref-name>AdMediumEJB</ejb-ref-name>
-        <ejb-ref-type>Session</ejb-ref-type>
-        <local>com.myfridget.server.ejb.AdMediumEJBLocal</local>
-        <ejb-link>Fridget_EJBs.jar#AdMediumEJB</ejb-link>
-    </ejb-local-ref>
-    <ejb-local-ref>
-        <ejb-ref-name>SystemEJB</ejb-ref-name>
-        <ejb-ref-type>Session</ejb-ref-type>
-        <local>com.myfridget.server.ejb.SystemEJBLocal</local>
-        <ejb-link>Fridget_EJBs.jar#SystemEJB</ejb-link>
-    </ejb-local-ref>
-    <ejb-local-ref>
-        <ejb-ref-name>CampaignsEJB</ejb-ref-name>
-        <ejb-ref-type>Session</ejb-ref-type>
-        <local>com.myfridget.server.ejb.CampaignsEJBLocal</local>
-        <ejb-link>Fridget_EJBs.jar#CampaignsEJB</ejb-link>
-    </ejb-local-ref>
-    <ejb-local-ref>
-        <ejb-ref-name>AdMediumEJB1</ejb-ref-name>
-        <ejb-ref-type>Session</ejb-ref-type>
-        <local>com.myfridget.server.ejb.AdMediumEJBLocal</local>
-        <ejb-link>Fridget_EJBs.jar#AdMediumEJB</ejb-link>
-    </ejb-local-ref>
 </web-app>

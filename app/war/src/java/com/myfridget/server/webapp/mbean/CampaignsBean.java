@@ -8,8 +8,8 @@ package com.myfridget.server.webapp.mbean;
 import com.myfridget.server.db.entity.AdMedium;
 import com.myfridget.server.db.entity.Campaign;
 import com.myfridget.server.db.entity.CampaignAction;
-import com.myfridget.server.ejb.AdMediumEJBLocal;
-import com.myfridget.server.ejb.CampaignsEJBLocal;
+import com.myfridget.server.ejb.AdMediumEJB;
+import com.myfridget.server.ejb.CampaignsEJB;
 import com.myfridget.server.util.EPDUtils;
 import com.myfridget.server.vo.AdMediumPreviewImageData;
 import java.io.ByteArrayInputStream;
@@ -34,10 +34,10 @@ import org.primefaces.model.StreamedContent;
 public class CampaignsBean {
     
     @EJB
-    private CampaignsEJBLocal campaignsEjb;
+    private CampaignsEJB campaignsEjb;
     
     @EJB
-    protected AdMediumEJBLocal mediumEjb;
+    protected AdMediumEJB mediumEjb;
     
     private Campaign currentCampaign = null;
     private CampaignAction currentAction = null;

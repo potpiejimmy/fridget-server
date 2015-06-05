@@ -1,6 +1,6 @@
 package com.myfridget.server.webapp.mbean;
 
-import com.myfridget.server.ejb.UsersEJBLocal;
+import com.myfridget.server.ejb.UsersEJB;
 import com.myfridget.server.webapp.util.WebUtils;
 import javax.ejb.EJB;
 import javax.servlet.http.HttpServletRequest;
@@ -14,7 +14,7 @@ public class ChangePasswordBean {
 
 
     @EJB
-    private UsersEJBLocal ejb;
+    private UsersEJB ejb;
 
     private String oldPassword;
     private String newPassword;

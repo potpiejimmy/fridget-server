@@ -6,7 +6,7 @@
 package com.myfridget.server.webapp.rest.service;
 
 import com.myfridget.server.db.entity.AdMediumItem;
-import com.myfridget.server.ejb.AdMediumEJBLocal;
+import com.myfridget.server.ejb.AdMediumEJB;
 import com.myfridget.server.util.EPDUtils;
 import com.myfridget.server.vo.AdMediumPreviewImageData;
 import java.io.IOException;
@@ -32,7 +32,7 @@ import javax.ws.rs.core.Response;
 @RequestScoped
 public class MediumResource {
     
-    protected AdMediumEJBLocal mediumEjb = lookupAdMediumEJBLocal();
+    protected AdMediumEJB mediumEjb = lookupAdMediumEJBLocal();
  
     @POST
     @Consumes({MediaType.TEXT_PLAIN})
@@ -53,10 +53,10 @@ public class MediumResource {
         mediumEjb.setMediumPreview(adMediumId, type, new AdMediumPreviewImageData(image, AdMediumItem.GENERATION_TYPE_MANUAL));
     }
 
-    private AdMediumEJBLocal lookupAdMediumEJBLocal() {
+    private AdMediumEJB lookupAdMediumEJBLocal() {
         try {
             Context c = new InitialContext();
-            return (AdMediumEJBLocal) c.lookup("java:app/Fridget_EJBs/AdMediumEJB!com.myfridget.server.ejb.AdMediumEJBLocal");
+            return (AdMediumEJB) c.lookup("java:app/Fridget_EJBs/AdMediumEJB!com.myfridget.server.ejb.AdMediumEJB");
         } catch (NamingException ne) {
             Logger.getLogger(getClass().getName()).log(Level.SEVERE, "exception caught", ne);
             throw new RuntimeException(ne);

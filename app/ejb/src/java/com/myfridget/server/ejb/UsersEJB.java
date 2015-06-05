@@ -21,7 +21,7 @@ import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
 
 @Stateless
-public class UsersEJB implements UsersEJBLocal {
+public class UsersEJB {
 
     @PersistenceContext(unitName = "Fridget_EJBsPU")
     private EntityManager em;
@@ -29,19 +29,16 @@ public class UsersEJB implements UsersEJBLocal {
     @Resource
     private SessionContext ctx;
 	
-    @Override
     @RolesAllowed({"superuser"})
     public List<User> getUsers() {
         return em.createNamedQuery("User.findAll", User.class).getResultList();
     }
     
-    @Override
     @PermitAll
     public User getUser(int userId) {
         return em.find(User.class, userId);
     }
     
-    @Override
     @RolesAllowed({"superuser"})
     public void saveUser(User user) {
         if (user.getId() == null) {
@@ -54,25 +51,21 @@ public class UsersEJB implements UsersEJBLocal {
         }
     }
 
-    @Override
     @RolesAllowed({"superuser"})
     public void deleteUser(int userId) {
         em.remove(em.find(User.class, userId));
     }
 
-    @Override
     @RolesAllowed({"superuser"})
     public void resetPassword(int userId) {
         setDefaultPassword(em.find(User.class, userId));
     }
 
-    @Override
     @RolesAllowed({"user","admin","superuser"})
     public User getCurrentUser() {
         return em.createNamedQuery("User.findByEmail", User.class).setParameter("email", ctx.getCallerPrincipal().getName()).getSingleResult();
     }
 
-    @Override
     @RolesAllowed({"user","admin","superuser"})
     public void changePassword(String oldPassword, String newPassword) {
         User user = getCurrentUser();

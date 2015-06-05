@@ -6,7 +6,7 @@
 package com.myfridget.server.webapp.mbean;
 
 import com.myfridget.server.db.entity.SystemParameter;
-import com.myfridget.server.ejb.SystemEJBLocal;
+import com.myfridget.server.ejb.SystemEJB;
 import java.util.List;
 import javax.ejb.EJB;
 import javax.faces.bean.ManagedBean;
@@ -21,7 +21,7 @@ import javax.faces.bean.SessionScoped;
 public class SystemBean {
     
     @EJB
-    private SystemEJBLocal systemEjb;
+    private SystemEJB systemEjb;
     
     private SystemParameter currentParameter = new SystemParameter();
     

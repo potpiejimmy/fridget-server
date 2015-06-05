@@ -7,8 +7,8 @@ package com.myfridget.server.timer;
 
 import com.myfridget.server.db.entity.AdMedium;
 import com.myfridget.server.db.entity.AdMediumItem;
-import com.myfridget.server.ejb.AdMediumEJBLocal;
-import com.myfridget.server.ejb.UsersEJBLocal;
+import com.myfridget.server.ejb.AdMediumEJB;
+import com.myfridget.server.ejb.UsersEJB;
 import com.myfridget.server.util.EPDUtils;
 import com.myfridget.server.util.google.GoogleCalendarRenderer;
 import com.myfridget.server.util.Utils;
@@ -35,10 +35,10 @@ public class MediaGeneratorTimer {
     protected TimerService timerService;
     
     @EJB
-    protected AdMediumEJBLocal mediumEjb;
+    protected AdMediumEJB mediumEjb;
     
     @EJB
-    protected UsersEJBLocal userEjb;
+    protected UsersEJB userEjb;
     
     @PostConstruct
     public void initialize(){
