@@ -12,6 +12,7 @@ import com.myfridget.server.ejb.UsersEJB;
 import com.myfridget.server.util.EPDUtils;
 import com.myfridget.server.util.google.GoogleCalendarRenderer;
 import com.myfridget.server.util.Utils;
+import com.myfridget.server.util.google.GoogleTasksRenderer;
 import com.myfridget.server.vo.AdMediumPreviewImageData;
 import java.io.IOException;
 import javax.annotation.PostConstruct;
@@ -53,16 +54,23 @@ public class MediaGeneratorTimer {
         
         for (AdMediumItem item : mediumEjb.getAllMediumItems()) {
             
-            if (item.getGentype() == AdMediumItem.GENERATION_TYPE_AUTO_GCAL) {
+            if (item.getGentype() == AdMediumItem.GENERATION_TYPE_AUTO_GCAL ||
+                item.getGentype() == AdMediumItem.GENERATION_TYPE_AUTO_GTASKS) {
             
                 AdMedium medium = mediumEjb.findAdMedium(item.getAdMediumId());
                 String userId = userEjb.getUser(medium.getUserId()).getEmail();
                 System.out.println("--------MediaGeneratorTimer: Generating item " + item.getId() + " for " + userId);
 
                 try {
-                    GoogleCalendarRenderer renderer = new GoogleCalendarRenderer(EPDUtils.dimensionForDisplayType(item.getType()));
-                    byte[] img = mediumEjb.convertImage(Utils.encodeImage(renderer.renderCalendar(userId), "png"), item.getType());
-                    mediumEjb.setMediumPreview(medium.getId(), item.getType(), new AdMediumPreviewImageData(img, item.getGentype()));
+                    if (item.getGentype() == AdMediumItem.GENERATION_TYPE_AUTO_GCAL) {
+                        GoogleCalendarRenderer renderer = new GoogleCalendarRenderer(EPDUtils.dimensionForDisplayType(item.getType()));
+                        byte[] img = mediumEjb.convertImage(Utils.encodeImage(renderer.renderCalendar(userId), "png"), item.getType());
+                        mediumEjb.setMediumPreview(medium.getId(), item.getType(), new AdMediumPreviewImageData(img, item.getGentype()));
+                    } else if (item.getGentype() == AdMediumItem.GENERATION_TYPE_AUTO_GTASKS) {
+                        GoogleTasksRenderer renderer = new GoogleTasksRenderer(EPDUtils.dimensionForDisplayType(item.getType()));
+                        byte[] img = mediumEjb.convertImage(Utils.encodeImage(renderer.renderTasks(userId, item.getGeninfo()), "png"), item.getType());
+                        mediumEjb.setMediumPreview(medium.getId(), item.getType(), new AdMediumPreviewImageData(img, item.getGentype(), item.getGeninfo()));
+                    }
                 } catch (IOException e) {
                     e.printStackTrace();
                 }

@@ -8,6 +8,7 @@ package com.myfridget.server.util.google;
 import com.google.api.client.auth.oauth2.Credential;
 import com.google.api.client.json.jackson2.JacksonFactory;
 import com.google.api.services.tasks.Tasks;
+import com.google.api.services.tasks.model.Task;
 import com.google.api.services.tasks.model.TaskList;
 import java.io.IOException;
 import java.util.ArrayList;
@@ -51,6 +52,22 @@ public class GoogleTasks {
             return result;
         } catch (IOException ioe) {
             ioe.printStackTrace();
+            return null;
+        }
+    }
+    
+    public TaskList getTaskListById(String taskListId) {
+        try {
+            return taskService.tasklists().get(taskListId).execute();
+        } catch (IOException ioe) {
+            return null;
+        }
+    }
+    
+    public List<Task> getTasks(String taskListId) {
+        try {
+            return taskService.tasks().list(taskListId).execute().getItems();
+        } catch (IOException ioe) {
             return null;
         }
     }

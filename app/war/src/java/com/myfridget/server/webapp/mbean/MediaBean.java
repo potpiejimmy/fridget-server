@@ -12,6 +12,7 @@ import com.myfridget.server.util.google.GoogleCalendarRenderer;
 import com.myfridget.server.util.Utils;
 import com.myfridget.server.util.google.GoogleAuthorizationHelper;
 import com.myfridget.server.util.google.GoogleTasks;
+import com.myfridget.server.util.google.GoogleTasksRenderer;
 import com.myfridget.server.vo.AdMediumPreviewImageData;
 import com.myfridget.server.webapp.util.GoogleAuthorizationServlet;
 import com.myfridget.server.webapp.util.WebUtils;
@@ -122,7 +123,9 @@ public class MediaBean extends ImageUploadBean {
     
     protected void doGenerateTasks(int displayType) {
         try {
-            
+            GoogleTasksRenderer renderer = new GoogleTasksRenderer(EPDUtils.dimensionForDisplayType(displayType));
+            byte[] data = Utils.encodeImage(renderer.renderTasks(WebUtils.getCurrentPerson(), this.selectedTaskList), "png");
+            imageData.put(displayType, new AdMediumPreviewImageData(mediumEjb.convertImage(data, displayType), AdMediumItem.GENERATION_TYPE_AUTO_GTASKS, this.selectedTaskList));
         } catch (Exception e) {
             WebUtils.addFacesMessage(e);
         }
@@ -136,5 +139,15 @@ public class MediaBean extends ImageUploadBean {
         for (GoogleTasks.GoogleTaskList list : taskLists)
             result.add(new SelectItem(list.id, list.title));
         return result;
+    }
+    
+    private String selectedTaskList = null;
+
+    public String getSelectedTaskList() {
+        return selectedTaskList;
+    }
+
+    public void setSelectedTaskList(String selectedTaskList) {
+        this.selectedTaskList = selectedTaskList;
     }
 }

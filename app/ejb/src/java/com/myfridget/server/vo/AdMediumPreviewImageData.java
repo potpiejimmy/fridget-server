@@ -13,9 +13,15 @@ public class AdMediumPreviewImageData {
     
     public byte[] data;
     public short gentype;
+    public String geninfo;
     
     public AdMediumPreviewImageData(byte[] data, short gentype) {
+        this(data, gentype, null);
+    }
+    
+    public AdMediumPreviewImageData(byte[] data, short gentype, String geninfo) {
         this.data = data;
         this.gentype = gentype;
+        this.geninfo = geninfo;
     }
 }

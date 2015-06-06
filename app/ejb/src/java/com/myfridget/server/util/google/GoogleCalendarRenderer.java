@@ -139,11 +139,6 @@ public class GoogleCalendarRenderer extends BaseRenderer {
         return formatterTime.format(i.start) + "-" + formatterTime.format(i.end);
     }
 
-    private void fillUpWithWhite()
-    {
-        while (this.lineNumber<dimension.height) drawColoredLines(1, Color.WHITE);
-    }
-    
     public static void main(String[] args) throws Exception 
     {
         GoogleCalendarRenderer renderer = new GoogleCalendarRenderer(new Dimension(480, 800));

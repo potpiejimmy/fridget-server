@@ -47,13 +47,16 @@ public class BaseRenderer {
     
     protected void drawHeader()
     {
+        drawHeader(null);
+    }
+    
+    protected void drawHeader(String headLine)
+    {
         Calendar now = Calendar.getInstance();
         int currentLine = this.lineNumber;
         drawColoredLines(56, Color.RED);
-        drawColoredLines(1, Color.WHITE);			// needed when no item at current date
-//			drawColoredLines(2, Color.Red);
-//			drawColoredLines(2, Color.White);
-//			drawColoredLines(4, Color.Black);
+        drawColoredLines(1, Color.WHITE);
+        
         graphics.setColor(Color.WHITE);
         Font font = graphics.getFont();
         font = font.deriveFont(Font.BOLD);
@@ -62,10 +65,13 @@ public class BaseRenderer {
         graphics.drawString(formatterDayOfWeek.format(now.getTime()), 10, currentLine + 16);
 
         graphics.setFont(font.deriveFont(28f));
-        graphics.drawString(formatterDate.format(now.getTime()), 10, currentLine + 44);
+        graphics.drawString(headLine!=null ? headLine : formatterDate.format(now.getTime()), 10, currentLine + 44);
 
-        graphics.setFont(font.deriveFont(14f));
-        graphics.drawString("Kalenderwoche " + now.get(Calendar.WEEK_OF_YEAR), dimension.width - 150, currentLine + 16);
+            graphics.setFont(font.deriveFont(14f));
+        if (headLine == null)
+            graphics.drawString("Kalenderwoche " + now.get(Calendar.WEEK_OF_YEAR), dimension.width - 150, currentLine + 16);
+        else
+            graphics.drawString("Tasks", dimension.width - 64, currentLine + 16);
     }
 
     protected void drawColoredLines(int n, Color c)
@@ -78,5 +84,10 @@ public class BaseRenderer {
             this.lineNumber++;
             if (this.lineNumber == dimension.height) return;
         }
+    }
+
+    protected void fillUpWithWhite()
+    {
+        while (this.lineNumber<dimension.height) drawColoredLines(1, Color.WHITE);
     }
 }

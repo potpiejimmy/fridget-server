@@ -79,6 +79,7 @@ public class AdMediumEJB {
             em.flush(); // pre-fetch ID
         }
         item.setGentype(data.gentype);
+        item.setGeninfo(data.geninfo);
         Utils.writeFile(cacheFileForImage(item, "png"), data.data);
     }
     

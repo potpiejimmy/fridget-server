@@ -35,6 +35,7 @@ public class AdMediumItem implements Serializable {
     
     public final static short GENERATION_TYPE_MANUAL = (short)0;
     public final static short GENERATION_TYPE_AUTO_GCAL = (short)1;
+    public final static short GENERATION_TYPE_AUTO_GTASKS = (short)2;
     
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

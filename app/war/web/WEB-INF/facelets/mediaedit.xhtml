@@ -45,7 +45,7 @@
                 <p:tab title="Google Tasks">
                     <h:panelGrid columns="2">
                         <h:outputText value="Select Task List:"/>
-                        <h:selectOneMenu>
+                        <h:selectOneMenu value="#{mediaBean.selectedTaskList}">
                             <f:selectItems value="#{mediaBean.taskLists}"/>
                         </h:selectOneMenu>
                     </h:panelGrid>
