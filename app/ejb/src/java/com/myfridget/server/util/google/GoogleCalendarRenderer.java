@@ -9,8 +9,6 @@ import com.myfridget.server.util.google.GoogleCalendar.CalendarItem;
 import com.myfridget.server.util.Utils;
 import java.awt.Color;
 import java.awt.Dimension;
-import java.awt.Font;
-import java.awt.Graphics2D;
 import java.awt.image.BufferedImage;
 import java.io.FileOutputStream;
 import java.io.IOException;
@@ -22,26 +20,16 @@ import java.util.Calendar;
  *
  * @author thorsten
  */
-public class GoogleCalendarRenderer {
-    
-    public Dimension dimension = null;
+public class GoogleCalendarRenderer extends BaseRenderer {
     
     private GoogleCalendar calendar = null;
-    private Graphics2D graphics = null;
-    private int lineNumber = 0;
     
-    private DateFormat formatterDate = null;
-    private DateFormat formatterDayOfWeek = null;
     private DateFormat formatterDateline = null;
     private DateFormat formatterTime = null;
     
     public GoogleCalendarRenderer(Dimension dimension) {
-        this.dimension = dimension;
-        this.calendar = null;
-        this.lineNumber = 0;
+        super(dimension);
         
-        this.formatterDate = new SimpleDateFormat("MMMM dd");
-        this.formatterDayOfWeek = new SimpleDateFormat("EEEE");
         this.formatterDateline = new SimpleDateFormat("EEEE, MMMM dd");
         this.formatterTime = new SimpleDateFormat("HH:mm");
     }
@@ -53,17 +41,12 @@ public class GoogleCalendarRenderer {
      */
     public BufferedImage renderCalendar(String userId) throws IOException {
 
-        BufferedImage result = new BufferedImage(dimension.width, dimension.height, BufferedImage.TYPE_INT_RGB);
-        
-        this.graphics = (Graphics2D)result.getGraphics();
-
-        //m_Graphics.SmoothingMode = System.Drawing.Drawing2D.SmoothingMode.None;
-        //m_Graphics.TextRenderingHint = System.Drawing.Text.TextRenderingHint.SingleBitPerPixelGridFit;
-
-        this.calendar = new GoogleCalendar(userId);
+        BufferedImage result = createImage();
 
         drawHeader();
         
+        this.calendar = new GoogleCalendar(userId);
+
         Calendar today = Calendar.getInstance();
         today.set(Calendar.HOUR_OF_DAY, 0);
         today.set(Calendar.MINUTE, 0);
@@ -88,41 +71,6 @@ public class GoogleCalendarRenderer {
         fillUpWithWhite();
         
         return result;
-    }
-    
-    private void drawHeader()
-    {
-        Calendar now = Calendar.getInstance();
-        int currentLine = this.lineNumber;
-        drawColoredLines(56, Color.RED);
-        drawColoredLines(1, Color.WHITE);			// needed when no item at current date
-//			drawColoredLines(2, Color.Red);
-//			drawColoredLines(2, Color.White);
-//			drawColoredLines(4, Color.Black);
-        graphics.setColor(Color.WHITE);
-        Font font = graphics.getFont();
-        font = font.deriveFont(Font.BOLD);
-        
-        graphics.setFont(font.deriveFont(14f));
-        graphics.drawString(formatterDayOfWeek.format(now.getTime()), 10, currentLine + 16);
-
-        graphics.setFont(font.deriveFont(28f));
-        graphics.drawString(formatterDate.format(now.getTime()), 10, currentLine + 44);
-
-        graphics.setFont(font.deriveFont(14f));
-        graphics.drawString("Kalenderwoche " + now.get(Calendar.WEEK_OF_YEAR), dimension.width - 150, currentLine + 16);
-    }
-
-    private void drawColoredLines(int n, Color c)
-    {
-        if (this.lineNumber == dimension.height) return;
-        this.graphics.setColor(c);
-        for (int i=0; i<n; i++)
-        {
-            this.graphics.drawLine(0, this.lineNumber, dimension.width-1, this.lineNumber);
-            this.lineNumber++;
-            if (this.lineNumber == dimension.height) return;
-        }
     }
     
     private void drawDateLine(Calendar d)
