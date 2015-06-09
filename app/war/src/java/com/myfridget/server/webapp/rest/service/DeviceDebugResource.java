@@ -13,12 +13,8 @@ import com.myfridget.server.ejb.CampaignsEJB;
 import com.myfridget.server.ejb.SystemEJB;
 import com.myfridget.server.webapp.util.WebUtils;
 import java.io.IOException;
-import java.util.logging.Level;
-import java.util.logging.Logger;
-import javax.faces.bean.RequestScoped;
-import javax.naming.Context;
-import javax.naming.InitialContext;
-import javax.naming.NamingException;
+import javax.ejb.EJB;
+import javax.enterprise.context.RequestScoped;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.GET;
 import javax.ws.rs.POST;
@@ -37,9 +33,14 @@ public class DeviceDebugResource {
     @PathParam("serial")
     private String serial;
     
-    protected AdDeviceEJB deviceEjb = lookupEjb("java:app/Fridget_EJBs/AdDeviceEJB!com.myfridget.server.ejb.AdDeviceEJB");
-    protected SystemEJB systemEjb = lookupEjb("java:app/Fridget_EJBs/SystemEJB!com.myfridget.server.ejb.SystemEJB");
-    protected CampaignsEJB campaignsEjb = lookupEjb("java:app/Fridget_EJBs/CampaignsEJB!com.myfridget.server.ejb.CampaignsEJB");
+    @EJB
+    protected AdDeviceEJB deviceEjb;
+    
+    @EJB
+    protected SystemEJB systemEjb;
+    
+    @EJB
+    protected CampaignsEJB campaignsEjb;
     
     @POST
     @Consumes({"application/json"})
@@ -93,15 +94,5 @@ public class DeviceDebugResource {
         if (program!=null && program.length()>0) return program;
         // otherwise calculate a real campaign program
         return campaignsEjb.getProgramForDevice(adDeviceId);
-    }
-    
-    private static <T> T lookupEjb(String name) {
-        try {
-            Context c = new InitialContext();
-            return (T) c.lookup(name);
-        } catch (NamingException ne) {
-            Logger.getLogger(DeviceDebugResource.class.getName()).log(Level.SEVERE, "exception caught", ne);
-            throw new RuntimeException(ne);
-        }
     }
 }

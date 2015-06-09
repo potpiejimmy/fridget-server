@@ -11,12 +11,8 @@ import com.myfridget.server.util.EPDUtils;
 import com.myfridget.server.vo.AdMediumPreviewImageData;
 import java.io.IOException;
 import java.util.Base64;
-import java.util.logging.Level;
-import java.util.logging.Logger;
-import javax.faces.bean.RequestScoped;
-import javax.naming.Context;
-import javax.naming.InitialContext;
-import javax.naming.NamingException;
+import javax.ejb.EJB;
+import javax.enterprise.context.RequestScoped;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.POST;
 import javax.ws.rs.Path;
@@ -32,7 +28,8 @@ import javax.ws.rs.core.Response;
 @RequestScoped
 public class MediumResource {
     
-    protected AdMediumEJB mediumEjb = lookupAdMediumEJBLocal();
+    @EJB
+    protected AdMediumEJB mediumEjb;
  
     @POST
     @Consumes({MediaType.TEXT_PLAIN})
@@ -52,15 +49,4 @@ public class MediumResource {
         
         mediumEjb.setMediumPreview(adMediumId, type, new AdMediumPreviewImageData(image, AdMediumItem.GENERATION_TYPE_MANUAL));
     }
-
-    private AdMediumEJB lookupAdMediumEJBLocal() {
-        try {
-            Context c = new InitialContext();
-            return (AdMediumEJB) c.lookup("java:app/Fridget_EJBs/AdMediumEJB!com.myfridget.server.ejb.AdMediumEJB");
-        } catch (NamingException ne) {
-            Logger.getLogger(getClass().getName()).log(Level.SEVERE, "exception caught", ne);
-            throw new RuntimeException(ne);
-        }
-    }
-
 }

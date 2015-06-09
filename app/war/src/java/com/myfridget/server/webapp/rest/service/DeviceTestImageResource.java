@@ -15,12 +15,8 @@ import java.io.IOException;
 import java.io.StringReader;
 import java.util.List;
 import java.util.Properties;
-import java.util.logging.Level;
-import java.util.logging.Logger;
-import javax.faces.bean.RequestScoped;
-import javax.naming.Context;
-import javax.naming.InitialContext;
-import javax.naming.NamingException;
+import javax.ejb.EJB;
+import javax.enterprise.context.RequestScoped;
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
@@ -38,8 +34,11 @@ public class DeviceTestImageResource {
     @PathParam("serial")
     private String serial;
     
-    protected AdDeviceEJB deviceEjb = lookupEjb("java:app/Fridget_EJBs/AdDeviceEJB!com.myfridget.server.ejb.AdDeviceEJB");
-    protected AdMediumEJB mediumEjb = lookupEjb("java:app/Fridget_EJBs/AdMediumEJB!com.myfridget.server.ejb.AdMediumEJB");
+    @EJB
+    protected AdDeviceEJB deviceEjb;
+    
+    @EJB
+    protected AdMediumEJB mediumEjb;
     
     @GET
     @Produces({"application/binary"})
@@ -85,16 +84,6 @@ public class DeviceTestImageResource {
             }
             baos.close();
             return baos.toByteArray();
-        }
-    }
-    
-    private static <T> T lookupEjb(String name) {
-        try {
-            Context c = new InitialContext();
-            return (T) c.lookup(name);
-        } catch (NamingException ne) {
-            Logger.getLogger(DeviceTestImageResource.class.getName()).log(Level.SEVERE, "exception caught", ne);
-            throw new RuntimeException(ne);
         }
     }
 }
