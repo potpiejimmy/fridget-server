@@ -11,6 +11,9 @@ import java.net.HttpURLConnection;
 import java.net.URL;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
+import java.util.Calendar;
 import javax.json.Json;
 import javax.json.JsonArray;
 import javax.json.JsonObject;
@@ -21,6 +24,8 @@ import javax.json.JsonReader;
  * @author thorsten
  */
 public class WetterDotCom {
+    
+    protected final static DateFormat WEATHER_DATE_FORMATTER = new SimpleDateFormat("yyyy-MM-dd");
     
     public static enum WeatherState {
             sonnig,
@@ -36,8 +41,8 @@ public class WetterDotCom {
 	
     public static class DayWeather
     {
-        public int tempMin;
-        public int tempMax;
+        public String tempMin;
+        public String tempMax;
 
         public WeatherState morning;
         public WeatherState noon;
@@ -46,14 +51,13 @@ public class WetterDotCom {
 
         public DayWeather(JsonObject node)
         {
-            tempMin = node.getInt("tn");
-            tempMax = node.getInt("tx");
+            tempMin = node.getString("tn");
+            tempMax = node.getString("tx");
 
-            JsonArray today = node.getJsonArray("time");
-            morning = getWeatherStateFromNumber(today.getJsonObject(0).getInt("w"));
-            noon    = getWeatherStateFromNumber(today.getJsonObject(1).getInt("w"));
-            evening = getWeatherStateFromNumber(today.getJsonObject(2).getInt("w"));
-            night   = getWeatherStateFromNumber(today.getJsonObject(3).getInt("w"));		
+            morning = getWeatherStateFromNumber(Integer.parseInt(node.getJsonObject("06:00").getString("w")));
+            noon    = getWeatherStateFromNumber(Integer.parseInt(node.getJsonObject("11:00").getString("w")));
+            evening = getWeatherStateFromNumber(Integer.parseInt(node.getJsonObject("17:00").getString("w")));
+            night   = getWeatherStateFromNumber(Integer.parseInt(node.getJsonObject("23:00").getString("w")));		
         }
 
         private WeatherState getWeatherStateFromNumber(int n)
@@ -85,15 +89,18 @@ public class WetterDotCom {
     {
         // first get city code
         JsonObject locationResult = getAnswerFromWeatherCom("http://api.wetter.com/location/index/search/", plz);
-        JsonArray locations = locationResult.getJsonObject("search").getJsonObject("result").getJsonArray("item");
+        JsonArray locations = locationResult.getJsonObject("search").getJsonArray("result");
         String citycode = locations.getJsonObject(0).getString("city_code");
 
         JsonObject weatherResult = getAnswerFromWeatherCom("http://api.wetter.com/forecast/weather/city/", citycode);
 
-        JsonArray xnList = weatherResult.getJsonObject("city").getJsonObject("forecast").getJsonArray("date");
+        Calendar day = Calendar.getInstance();
+        
+        JsonObject xnList = weatherResult.getJsonObject("city").getJsonObject("forecast");
 
-        today = new DayWeather(xnList.getJsonObject(0));
-        tomorrow = new DayWeather(xnList.getJsonObject(1));
+        today = new DayWeather(xnList.getJsonObject(WEATHER_DATE_FORMATTER.format(day.getTime())));
+        day.add(Calendar.DAY_OF_YEAR, 1);
+        tomorrow = new DayWeather(xnList.getJsonObject(WEATHER_DATE_FORMATTER.format(day.getTime())));
 
         creditString = weatherResult.getJsonObject("city").getJsonObject("credit").getString("text");
         creditLink = weatherResult.getJsonObject("city").getJsonObject("credit").getString("link");
@@ -108,7 +115,7 @@ public class WetterDotCom {
         //API key is fedf9983e0f8481924e2ef0ea17d11c7 provided by wetter.com
 
         String autKey = md5Hex("fridget"+"fedf9983e0f8481924e2ef0ea17d11c7"+searchString);
-        URL url = new URL(baseUrl+searchString+"/project/fridget/cs/"+autKey);
+        URL url = new URL(baseUrl+searchString+"/project/fridget/cs/"+autKey+"?output=json");
 
         HttpURLConnection request = (HttpURLConnection)url.openConnection();
         request.addRequestProperty("Accept", "application/json");
@@ -136,5 +143,10 @@ public class WetterDotCom {
         } catch (NoSuchAlgorithmException ex) {
             throw new RuntimeException(ex);
         }
+    }
+    
+    public static void main(String[] args) throws Exception {
+        WetterDotCom wetter = new WetterDotCom();
+        wetter.updateData("60598");
     }
 }
