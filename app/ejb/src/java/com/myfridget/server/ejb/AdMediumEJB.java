@@ -88,7 +88,7 @@ public class AdMediumEJB {
         if (img == null) return null; // not found
         File file = cacheFileForImage(img, "png");
         if (!file.exists()) return null;
-        return new AdMediumPreviewImageData(Utils.readAll(new FileInputStream(file)), img.getGentype());
+        return new AdMediumPreviewImageData(Utils.readAll(new FileInputStream(file)), img.getGentype(), img.getGeninfo());
     }    
     
     public byte[] getMediumEPD(int adMediumId, int displayType) throws IOException {

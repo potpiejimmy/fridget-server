@@ -53,6 +53,10 @@
                 </p:tab>
             </p:accordionPanel>
             
+            <p>
+                <ui:include src="/WEB-INF/facelets/addweather.xhtml"/>
+            </p>
+                    
             <p:dataTable id="mediumoutputtable" value="1">
                 <p:column headerText="Display 4.41&quot;:" style="vertical-align: top">
                     <p:graphicImage id="medium4" value="#{mediaBean.getCurrentMediumDisplay(0)}" cache="false" styleClass="mediaSelectHover"/>

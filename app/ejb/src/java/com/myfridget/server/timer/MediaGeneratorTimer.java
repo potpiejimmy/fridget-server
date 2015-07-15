@@ -13,8 +13,11 @@ import com.myfridget.server.util.EPDUtils;
 import com.myfridget.server.util.google.GoogleCalendarRenderer;
 import com.myfridget.server.util.Utils;
 import com.myfridget.server.util.google.GoogleTasksRenderer;
+import com.myfridget.server.util.wettercom.WetterDotComRenderer;
 import com.myfridget.server.vo.AdMediumPreviewImageData;
+import java.awt.image.BufferedImage;
 import java.io.IOException;
+import java.io.StringReader;
 import javax.annotation.PostConstruct;
 import javax.annotation.Resource;
 import javax.ejb.EJB;
@@ -23,6 +26,8 @@ import javax.ejb.Singleton;
 import javax.ejb.Startup;
 import javax.ejb.Timeout;
 import javax.ejb.TimerService;
+import javax.json.Json;
+import javax.json.JsonObject;
 
 /**
  *
@@ -62,19 +67,33 @@ public class MediaGeneratorTimer {
                 System.out.println("--------MediaGeneratorTimer: Generating item " + item.getId() + " for " + userId);
 
                 try {
-                    if (item.getGentype() == AdMediumItem.GENERATION_TYPE_AUTO_GCAL) {
-                        GoogleCalendarRenderer renderer = new GoogleCalendarRenderer(EPDUtils.dimensionForDisplayType(item.getType()));
-                        byte[] img = mediumEjb.convertImage(Utils.encodeImage(renderer.renderCalendar(userId), "png"), item.getType());
-                        mediumEjb.setMediumPreview(medium.getId(), item.getType(), new AdMediumPreviewImageData(img, item.getGentype()));
-                    } else if (item.getGentype() == AdMediumItem.GENERATION_TYPE_AUTO_GTASKS) {
-                        GoogleTasksRenderer renderer = new GoogleTasksRenderer(EPDUtils.dimensionForDisplayType(item.getType()));
-                        byte[] img = mediumEjb.convertImage(Utils.encodeImage(renderer.renderTasks(userId, item.getGeninfo()), "png"), item.getType());
+                    if (item.getGentype() == AdMediumItem.GENERATION_TYPE_AUTO_GCAL ||
+                        item.getGentype() == AdMediumItem.GENERATION_TYPE_AUTO_GTASKS) {
+                        BufferedImage image = null;
+                        JsonObject genInfo = Json.createReader(new StringReader(item.getGeninfo())).readObject();
+                        if (item.getGentype() == AdMediumItem.GENERATION_TYPE_AUTO_GCAL) {
+                            GoogleCalendarRenderer renderer = new GoogleCalendarRenderer(EPDUtils.dimensionForDisplayType(item.getType()));
+                            image = renderer.renderCalendar(userId);
+                        } else if (item.getGentype() == AdMediumItem.GENERATION_TYPE_AUTO_GTASKS) {
+                            GoogleTasksRenderer renderer = new GoogleTasksRenderer(EPDUtils.dimensionForDisplayType(item.getType()));
+                            image = renderer.renderTasks(userId, genInfo.getString("taskList"));
+                        }
+                        renderWeatherPanel(image, genInfo);
+                        byte[] img = mediumEjb.convertImage(Utils.encodeImage(image, "png"), item.getType());
                         mediumEjb.setMediumPreview(medium.getId(), item.getType(), new AdMediumPreviewImageData(img, item.getGentype(), item.getGeninfo()));
                     }
                 } catch (IOException e) {
                     e.printStackTrace();
                 }
             }
+        }
+    }
+    
+    protected void renderWeatherPanel(BufferedImage img, JsonObject genInfo) throws IOException {
+        String location = genInfo.getString("addWeatherForLocation", null);
+        if (location != null && location.length()>0) {
+            WetterDotComRenderer renderer = new WetterDotComRenderer();
+            renderer.renderWeather(img, location);
         }
     }
 }

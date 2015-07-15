@@ -13,11 +13,14 @@ import com.myfridget.server.util.Utils;
 import com.myfridget.server.util.google.GoogleAuthorizationHelper;
 import com.myfridget.server.util.google.GoogleTasks;
 import com.myfridget.server.util.google.GoogleTasksRenderer;
+import com.myfridget.server.util.wettercom.WetterDotComRenderer;
 import com.myfridget.server.vo.AdMediumPreviewImageData;
 import com.myfridget.server.webapp.util.GoogleAuthorizationServlet;
 import com.myfridget.server.webapp.util.WebUtils;
+import java.awt.image.BufferedImage;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
+import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -27,6 +30,9 @@ import javax.faces.bean.SessionScoped;
 import javax.faces.context.FacesContext;
 import javax.faces.event.PhaseId;
 import javax.faces.model.SelectItem;
+import javax.json.Json;
+import javax.json.JsonObject;
+import javax.json.JsonObjectBuilder;
 import org.primefaces.model.DefaultStreamedContent;
 import org.primefaces.model.StreamedContent;
 
@@ -114,8 +120,9 @@ public class MediaBean extends ImageUploadBean {
     protected void doGenerateCalendar(int displayType) {
         try {
             GoogleCalendarRenderer renderer = new GoogleCalendarRenderer(EPDUtils.dimensionForDisplayType(displayType));
-            byte[] data = Utils.encodeImage(renderer.renderCalendar(WebUtils.getCurrentPerson()), "png");
-            imageData.put(displayType, new AdMediumPreviewImageData(mediumEjb.convertImage(data, displayType), AdMediumItem.GENERATION_TYPE_AUTO_GCAL));
+            BufferedImage img = renderer.renderCalendar(WebUtils.getCurrentPerson());
+            JsonObjectBuilder genInfo = Json.createObjectBuilder();
+            addGeneratedImage(displayType, img, AdMediumItem.GENERATION_TYPE_AUTO_GCAL, genInfo);
         } catch (Exception e) {
             WebUtils.addFacesMessage(e);
         }
@@ -124,10 +131,25 @@ public class MediaBean extends ImageUploadBean {
     protected void doGenerateTasks(int displayType) {
         try {
             GoogleTasksRenderer renderer = new GoogleTasksRenderer(EPDUtils.dimensionForDisplayType(displayType));
-            byte[] data = Utils.encodeImage(renderer.renderTasks(WebUtils.getCurrentPerson(), this.selectedTaskList), "png");
-            imageData.put(displayType, new AdMediumPreviewImageData(mediumEjb.convertImage(data, displayType), AdMediumItem.GENERATION_TYPE_AUTO_GTASKS, this.selectedTaskList));
+            BufferedImage img = renderer.renderTasks(WebUtils.getCurrentPerson(), this.selectedTaskList);
+            JsonObjectBuilder genInfo = Json.createObjectBuilder();
+            genInfo.add("taskList", this.selectedTaskList);
+            addGeneratedImage(displayType, img, AdMediumItem.GENERATION_TYPE_AUTO_GTASKS, genInfo);
         } catch (Exception e) {
             WebUtils.addFacesMessage(e);
+        }
+    }
+    
+    protected void addGeneratedImage(int displayType, BufferedImage img, short genType, JsonObjectBuilder genInfo) throws IOException {
+        addWeatherPanel(img, genInfo);
+        imageData.put(displayType, new AdMediumPreviewImageData(mediumEjb.convertImage(Utils.encodeImage(img, "png"), displayType), genType, genInfo.build().toString()));
+    }
+    
+    protected void addWeatherPanel(BufferedImage img, JsonObjectBuilder genInfo) throws IOException {
+        if (addWeather) {
+            WetterDotComRenderer renderer = new WetterDotComRenderer();
+            renderer.renderWeather(img, weatherLocation);
+            genInfo.add("addWeatherForLocation", weatherLocation);
         }
     }
     
@@ -150,4 +172,24 @@ public class MediaBean extends ImageUploadBean {
     public void setSelectedTaskList(String selectedTaskList) {
         this.selectedTaskList = selectedTaskList;
     }
+    
+    private boolean addWeather = false;
+    private String weatherLocation = null;
+
+    public boolean isAddWeather() {
+        return addWeather;
+    }
+
+    public void setAddWeather(boolean addWeather) {
+        this.addWeather = addWeather;
+    }
+
+    public String getWeatherLocation() {
+        return weatherLocation;
+    }
+
+    public void setWeatherLocation(String weatherLocation) {
+        this.weatherLocation = weatherLocation;
+    }
+    
 }

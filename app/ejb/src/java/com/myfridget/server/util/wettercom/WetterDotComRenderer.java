@@ -6,14 +6,10 @@
 package com.myfridget.server.util.wettercom;
 
 import com.myfridget.server.util.Utils;
-import com.myfridget.server.util.google.GoogleCalendarRenderer;
 import java.awt.Color;
-import java.awt.Dimension;
 import java.awt.Font;
 import java.awt.Graphics2D;
 import java.awt.Image;
-import java.awt.Rectangle;
-import java.awt.geom.AffineTransform;
 import java.awt.image.BufferedImage;
 import java.io.FileOutputStream;
 import java.io.IOException;
@@ -40,11 +36,12 @@ public class WetterDotComRenderer {
     /**
      * Renders the weather on top of the given image.
      * @param image an image buffer
+     * @param location a location search string
      * @return update image buffer
      */
-    public BufferedImage renderWeather(BufferedImage image) throws IOException {
-        //Image symbolsPic = new ImageIcon("/com/myfridget/server/util/wettercom/Wetter1.png").getImage();
-        Image symbolsPic = new ImageIcon("/Users/thorsten/Downloads/Wetter1.png").getImage();
+    public BufferedImage renderWeather(BufferedImage image, String location) throws IOException {
+        byte[] symbolsPicData = Utils.readAll(getClass().getResourceAsStream("/com/myfridget/server/util/wettercom/Wetter1.png"));
+        Image symbolsPic = new ImageIcon(symbolsPicData).getImage();
         this.weatherSymbols = new BufferedImage(symbolsPic.getWidth(null), symbolsPic.getHeight(null), BufferedImage.TYPE_INT_RGB);
         this.weatherSymbols.getGraphics().setColor(Color.WHITE);
         this.weatherSymbols.getGraphics().fillRect(0, 0, weatherSymbols.getWidth(), weatherSymbols.getHeight());
@@ -54,7 +51,7 @@ public class WetterDotComRenderer {
         graphics.setColor(Color.WHITE);
         graphics.fillRect(0, image.getHeight() - TOTAL_HEIGHT, image.getWidth(), TOTAL_HEIGHT);
         
-        w.updateData("71638");
+        w.updateData(location);
         
         renderImage(image, graphics);
         
@@ -67,8 +64,6 @@ public class WetterDotComRenderer {
         final int VERTICAL_START = image.getHeight() - TOTAL_HEIGHT;
         
         Font boldFont = graphics.getFont().deriveFont(Font.BOLD);
-//        AffineTransform rotation = new AffineTransform();
-//        rotation.rotate(java.lang.Math.PI/2);
         graphics.rotate(-java.lang.Math.PI/2);
         graphics.setFont(boldFont.deriveFont(10.0f));
         graphics.setColor(Color.BLACK);
@@ -130,7 +125,7 @@ public class WetterDotComRenderer {
         WetterDotComRenderer renderer = new WetterDotComRenderer();
         BufferedImage output = new BufferedImage(400, 300, BufferedImage.TYPE_INT_RGB);
         FileOutputStream fos = new FileOutputStream("/Users/thorsten/weatheroutput.png");
-        fos.write(Utils.encodeImage(renderer.renderWeather(output), "png"));
+        fos.write(Utils.encodeImage(renderer.renderWeather(output, "60598"), "png"));
         fos.close();
     }
 }
