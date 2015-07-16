@@ -69,8 +69,12 @@ public class MediaGeneratorTimer {
                 try {
                     if (item.getGentype() == AdMediumItem.GENERATION_TYPE_AUTO_GCAL ||
                         item.getGentype() == AdMediumItem.GENERATION_TYPE_AUTO_GTASKS) {
+                        
                         BufferedImage image = null;
-                        JsonObject genInfo = Json.createReader(new StringReader(item.getGeninfo())).readObject();
+                        JsonObject genInfo = null;
+                        if (item.getGeninfo()!=null) 
+                            genInfo = Json.createReader(new StringReader(item.getGeninfo())).readObject();
+                        
                         if (item.getGentype() == AdMediumItem.GENERATION_TYPE_AUTO_GCAL) {
                             GoogleCalendarRenderer renderer = new GoogleCalendarRenderer(EPDUtils.dimensionForDisplayType(item.getType()));
                             image = renderer.renderCalendar(userId);
@@ -82,7 +86,7 @@ public class MediaGeneratorTimer {
                         byte[] img = mediumEjb.convertImage(Utils.encodeImage(image, "png"), item.getType());
                         mediumEjb.setMediumPreview(medium.getId(), item.getType(), new AdMediumPreviewImageData(img, item.getGentype(), item.getGeninfo()));
                     }
-                } catch (IOException e) {
+                } catch (Exception e) {
                     e.printStackTrace();
                 }
             }

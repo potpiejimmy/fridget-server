@@ -57,7 +57,7 @@ public class WetterDotCom {
             morning = getWeatherStateFromNumber(Integer.parseInt(node.getJsonObject("06:00").getString("w")));
             noon    = getWeatherStateFromNumber(Integer.parseInt(node.getJsonObject("11:00").getString("w")));
             evening = getWeatherStateFromNumber(Integer.parseInt(node.getJsonObject("17:00").getString("w")));
-            night   = getWeatherStateFromNumber(Integer.parseInt(node.getJsonObject("23:00").getString("w")));		
+            night   = getWeatherStateFromNumber(Integer.parseInt(node.getJsonObject("23:00").getString("w")), true);		
         }
 
         private WeatherState getWeatherStateFromNumber(int n)
