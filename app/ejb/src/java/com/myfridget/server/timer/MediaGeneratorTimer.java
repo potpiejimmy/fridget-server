@@ -94,7 +94,8 @@ public class MediaGeneratorTimer {
     }
     
     protected void renderWeatherPanel(BufferedImage img, JsonObject genInfo) throws IOException {
-        String location = genInfo.getString("addWeatherForLocation", null);
+        String location = null;
+        if (genInfo != null) location = genInfo.getString("addWeatherForLocation", null);
         if (location != null && location.length()>0) {
             WetterDotComRenderer renderer = new WetterDotComRenderer();
             renderer.renderWeather(img, location);
