@@ -7,7 +7,6 @@ package com.myfridget.server.util;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
-import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -124,13 +123,13 @@ public class HuffmanCompression
     }
     
     public static void printDictionary(List<DictionaryEntry> dictionary) {
-        System.out.println("SYMBOL\tHUFFMAN CODE");
+        //System.out.println("SYMBOL\tHUFFMAN CODE");
         // print out character, frequency, and code for this leaf (which is just the prefix)
         dictionary.forEach(i->System.out.println(i.symbol + "\t" + i.code));
     }
     
     public static byte[] compress(byte[] data) throws IOException {
-        System.out.println("ORIG SIZE: " + data.length);
+        //System.out.println("ORIG SIZE: " + data.length);
 
         int[] counter = new int[256];
         for (byte b : data) counter[b&0xff]++;
@@ -150,8 +149,8 @@ public class HuffmanCompression
             for (char bit : map.get((short)(b&0xff)).toCharArray()) compressOut.write(bit=='1');
         }
         compressOut.close();
-        System.out.println("DICTIONARY SIZE: " + encodedDictionary.length);
-        System.out.println("RESULTING SIZE: " + baos.size());
+        //System.out.println("DICTIONARY SIZE: " + encodedDictionary.length);
+        //System.out.println("RESULTING SIZE: " + baos.size());
         return baos.toByteArray();
     }
 }

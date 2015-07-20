@@ -114,7 +114,7 @@ public class CampaignsEJB {
         if (schedule.isEmpty()) return null;
         int cycleLen = systemEjb.getAttinyCycleLength();
         Calendar cal = Calendar.getInstance();
-        cal.setTimeInMillis(schedule.get(0).getScheduledTime());
+        //cal.setTimeInMillis(schedule.get(0).getScheduledTime());
         int currentDay = cal.get(Calendar.DAY_OF_YEAR);
         StringBuilder program = new StringBuilder();
         Properties imageMap = new Properties();
@@ -158,9 +158,15 @@ public class CampaignsEJB {
         StringWriter imageMapString = new StringWriter();
         try {imageMap.store(imageMapString, null);}
         catch (IOException ioe) {}
-        deviceEjb.setParameter(new AdDeviceParameter(adDeviceId, "p", imageMapString.toString()));
-        // and set the flashimages parameter:
-        deviceEjb.setParameter(new AdDeviceParameter(adDeviceId, "flashimages", flashImages.toString()));
+        try {
+            deviceEjb.setParameter(new AdDeviceParameter(adDeviceId, "p", imageMapString.toString()));
+            // and set the flashimages parameter:
+            deviceEjb.setParameter(new AdDeviceParameter(adDeviceId, "flashimages", flashImages.toString()));
+        } catch (Exception e) {
+            e.printStackTrace();
+            System.err.println("Could not store p and flashimages parameters: " + imageMapString.toString() + ", " + flashImages.toString());
+            return "A0070"; //XXX 
+        }
         return program.toString();
     }
 }
