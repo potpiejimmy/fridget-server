@@ -63,30 +63,34 @@ public class SystemEJB {
         em.merge(param);
     }
     
-    public String flashFirmware(int adDeviceId) throws Exception {
+    public String flashFirmware(int adDeviceId) {
         
         AdDevice device = deviceEjb.getById(adDeviceId);
         
-        // URL
-        String url = getSystemParameter(PARAMETER_FIRMWARE_FLASHURL).getValue();
-        url += device.getSerial();
-        
-        // Firmware file:
-        String firmwareVersion = getSystemParameter(PARAMETER_FIRMWARE_VERSION).getValue();
-        String fileName = "core-firmware-"+device.getType()+"-"+firmwareVersion+".bin";
-        File fwFile = new File(getSystemParameter(PARAMETER_FIRMWARE_PATH).getValue(), fileName);
+        try {
+            // URL
+            String url = getSystemParameter(PARAMETER_FIRMWARE_FLASHURL).getValue();
+            url += device.getSerial();
 
-        // Upload data:
-        MultipartEntityBuilder builder = MultipartEntityBuilder.create();
-        builder.addTextBody("file_type", "binary", ContentType.TEXT_PLAIN);
-        builder.addBinaryBody("file", fwFile);
-        
-        try (WebRequester curl = new WebRequester()) {
-            curl.setParam("access_token", deviceEjb.getParameter(adDeviceId, "accesstoken").getValue());
+            // Firmware file:
+            String firmwareVersion = getSystemParameter(PARAMETER_FIRMWARE_VERSION).getValue();
+            String fileName = "core-firmware-"+device.getType()+"-"+firmwareVersion+".bin";
+            File fwFile = new File(getSystemParameter(PARAMETER_FIRMWARE_PATH).getValue(), fileName);
 
-            String result = curl.put(url, builder.build());
+            // Upload data:
+            MultipartEntityBuilder builder = MultipartEntityBuilder.create();
+            builder.addTextBody("file_type", "binary", ContentType.TEXT_PLAIN);
+            builder.addBinaryBody("file", fwFile);
 
-            return "Flashing " + fileName + ", result: " + result;
+            try (WebRequester curl = new WebRequester()) {
+                curl.setParam("access_token", deviceEjb.getParameter(adDeviceId, "accesstoken").getValue());
+
+                String result = curl.put(url, builder.build());
+
+                return "Flashing " + fileName + ", result: " + result;
+            }
+        } catch (Exception e) {
+            return "Flashing firmware failed: " + e;
         }
     }
     
