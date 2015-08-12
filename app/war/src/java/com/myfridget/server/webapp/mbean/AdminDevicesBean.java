@@ -26,8 +26,8 @@ public class AdminDevicesBean implements Serializable, Converter {
 
 	private static final long serialVersionUID = 1L;
         
-        protected final static int DEVICE_TYPE_CORE   = 0x10; // use lower nibble for image type
-        protected final static int DEVICE_TYPE_PHOTON = 0x20; // use lower nibble for image type
+        protected final static int DEVICE_TYPE_CORE   = 0x00; // use lower nibble for image type
+        protected final static int DEVICE_TYPE_PHOTON = 0x10; // use lower nibble for image type
 
         @EJB
         private AdDeviceEJB deviceEjb;
