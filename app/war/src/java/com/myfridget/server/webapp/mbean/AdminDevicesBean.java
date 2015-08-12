@@ -25,6 +25,9 @@ import org.primefaces.model.DualListModel;
 public class AdminDevicesBean implements Serializable, Converter {
 
 	private static final long serialVersionUID = 1L;
+        
+        protected final static int DEVICE_TYPE_CORE   = 0x10; // use lower nibble for image type
+        protected final static int DEVICE_TYPE_PHOTON = 0x20; // use lower nibble for image type
 
         @EJB
         private AdDeviceEJB deviceEjb;
@@ -37,8 +40,10 @@ public class AdminDevicesBean implements Serializable, Converter {
     
         public List<SelectItem> getDeviceTypesSelectItems() {
             List<SelectItem> result = new ArrayList<>();
-            result.add(new SelectItem(EPDUtils.SPECTRA_DISPLAY_TYPE_441, "Spark Core with Spectra 4.41\" (400x300)"));
-            result.add(new SelectItem(EPDUtils.SPECTRA_DISPLAY_TYPE_74, "Spark Core with Spectra 7.4\" (480x800)"));
+            result.add(new SelectItem(DEVICE_TYPE_CORE   + EPDUtils.SPECTRA_DISPLAY_TYPE_441, "Spark Core with Spectra 4.41\" (400x300)"));
+            result.add(new SelectItem(DEVICE_TYPE_CORE   + EPDUtils.SPECTRA_DISPLAY_TYPE_74, "Spark Core with Spectra 7.4\" (480x800)"));
+            result.add(new SelectItem(DEVICE_TYPE_PHOTON + EPDUtils.SPECTRA_DISPLAY_TYPE_441, "Particle Photon with Spectra 4.41\" (400x300)"));
+            result.add(new SelectItem(DEVICE_TYPE_PHOTON + EPDUtils.SPECTRA_DISPLAY_TYPE_74, "Particle Photon with Spectra 7.4\" (480x800)"));
             return result;
         }
     

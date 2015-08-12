@@ -71,7 +71,7 @@ public class DeviceTestImageResource {
                     Properties imageMap = new Properties();
                     try {imageMap.load(new StringReader(pImg.getValue()));} catch (Exception e) {}
                     if (!imageMap.containsKey(image)) continue; // unknown image
-                    imgData = mediumEjb.getMediumEPD(Integer.parseInt(imageMap.getProperty(image)), device.getType());
+                    imgData = mediumEjb.getMediumEPD(Integer.parseInt(imageMap.getProperty(image)), device.getType() & 0x0f);
                 }
                 int size = imgData.length;
                 // write one byte image index
