@@ -96,7 +96,7 @@ public abstract class WetterDotComRenderer {
 
     public static void main(String[] args) throws Exception 
     {
-        BufferedImage output = new BufferedImage(400, 600, BufferedImage.TYPE_INT_RGB);
+        BufferedImage output = new BufferedImage(800, 480, BufferedImage.TYPE_INT_RGB);
         WetterDotComRenderer renderer = WetterDotComRenderer.createInstanceForImage(output);
         FileOutputStream fos = new FileOutputStream("/Users/thorsten/weatheroutput.png");
         fos.write(Utils.encodeImage(renderer.renderWeather("60598"), "png"));

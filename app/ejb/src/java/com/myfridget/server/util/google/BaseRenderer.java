@@ -33,7 +33,15 @@ public class BaseRenderer {
         
         this.formatterDate = new SimpleDateFormat("MMMM dd");
         this.formatterDayOfWeek = new SimpleDateFormat("EEEE");
-     }
+    }
+    
+    protected void forceOrientation(boolean landscape) {
+        if (landscape != (dimension.width>dimension.height)) {
+            int width = dimension.width;
+            dimension.width = dimension.height;
+            dimension.height = width;
+        }
+    }
     
     protected BufferedImage createImage() {
         BufferedImage result = new BufferedImage(dimension.width, dimension.height, BufferedImage.TYPE_INT_RGB);

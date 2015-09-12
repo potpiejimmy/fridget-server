@@ -22,7 +22,7 @@ public class WetterDotComRenderer_Large extends WetterDotComRenderer {
     private final static int CREDIT_SPACE = 10;  // height of the space at the buttom used for displaying the wetter.com credit stuff
 
     // calculated values
-    private final static int TOTAL_HEIGHT = 4*LINE_HEIGHT+3*LINE_GAP+CREDIT_SPACE+HEADER_HEIGHT;;
+    private final static int TOTAL_WIDTH = 300;
     private final static int VERTICAL_OFFSET = LINE_HEIGHT+LINE_GAP;
     
     public WetterDotComRenderer_Large(BufferedImage image) {
@@ -34,12 +34,12 @@ public class WetterDotComRenderer_Large extends WetterDotComRenderer {
     {
         Graphics2D graphics = (Graphics2D)image.getGraphics();
         graphics.setColor(Color.WHITE);
-        graphics.fillRect(0, image.getHeight() - TOTAL_HEIGHT, image.getWidth(), TOTAL_HEIGHT);
+        graphics.fillRect(image.getWidth() - TOTAL_WIDTH, 0, TOTAL_WIDTH, image.getHeight());
         graphics.setColor(Color.BLACK);
-        graphics.fillRect(0, image.getHeight() - TOTAL_HEIGHT - 2, image.getWidth(), 2);
+        graphics.fillRect(image.getWidth() - TOTAL_WIDTH, 0, 2, image.getHeight());
         
         final int HORIZONTAL_OFFSET = image.getWidth() / 5;
-        final int HORIZONTAL_START = 500;
+        final int HORIZONTAL_START = image.getWidth() - TOTAL_WIDTH;
         
         Font boldFont = graphics.getFont().deriveFont(Font.BOLD);
         graphics.setFont(boldFont.deriveFont(15.0f));

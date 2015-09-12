@@ -30,6 +30,8 @@ public class GoogleCalendarRenderer extends BaseRenderer {
     public GoogleCalendarRenderer(Dimension dimension) {
         super(dimension);
         
+        forceOrientation(true); // force landscape rendering
+        
         this.formatterDateline = new SimpleDateFormat("EEEE, MMMM dd");
         this.formatterTime = new SimpleDateFormat("HH:mm");
     }

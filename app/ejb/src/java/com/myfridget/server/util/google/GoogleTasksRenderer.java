@@ -21,6 +21,8 @@ public class GoogleTasksRenderer extends BaseRenderer {
     
     public GoogleTasksRenderer(Dimension dimension) {
         super(dimension);
+
+        forceOrientation(true); // force landscape rendering
     }
     
     public BufferedImage renderTasks(String userId, String taskListId) {
