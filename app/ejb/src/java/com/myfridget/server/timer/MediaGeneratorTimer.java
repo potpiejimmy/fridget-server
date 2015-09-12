@@ -97,8 +97,8 @@ public class MediaGeneratorTimer {
         String location = null;
         if (genInfo != null) location = genInfo.getString("addWeatherForLocation", null);
         if (location != null && location.length()>0) {
-            WetterDotComRenderer renderer = new WetterDotComRenderer();
-            renderer.renderWeather(img, location);
+            WetterDotComRenderer renderer = WetterDotComRenderer.createInstanceForImage(img);
+            renderer.renderWeather(location);
         }
     }
 }

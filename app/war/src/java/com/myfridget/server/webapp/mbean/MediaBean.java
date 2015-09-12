@@ -147,8 +147,8 @@ public class MediaBean extends ImageUploadBean {
     
     protected void addWeatherPanel(BufferedImage img, JsonObjectBuilder genInfo) throws IOException {
         if (addWeather) {
-            WetterDotComRenderer renderer = new WetterDotComRenderer();
-            renderer.renderWeather(img, weatherLocation);
+            WetterDotComRenderer renderer = WetterDotComRenderer.createInstanceForImage(img);
+            renderer.renderWeather(weatherLocation);
             genInfo.add("addWeatherForLocation", weatherLocation);
         }
     }
