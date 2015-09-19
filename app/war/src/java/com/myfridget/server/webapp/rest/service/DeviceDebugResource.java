@@ -68,7 +68,7 @@ public class DeviceDebugResource {
         appendParam(result, param.getParam(), param.getValue());
         param = deviceEjb.getParameter(device.getId(), "connectmode");
         appendParam(result, param.getParam(), param.getValue());
-        SystemParameter firmware = systemEjb.getSystemParameter(SystemEJB.PARAMETER_FIRMWARE_VERSION);
+        SystemParameter firmware = systemEjb.getSystemParameter(SystemEJB.PARAMETER_FIRMWARE_VERSION+device.getType());
         result.append("firmware").append('=').append(firmware.getValue()).append(';');
         
         deviceEjb.addDebugMessage(serial, "<<< " + result);

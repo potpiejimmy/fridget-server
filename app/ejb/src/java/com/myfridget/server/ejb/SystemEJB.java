@@ -34,7 +34,7 @@ import org.apache.http.entity.mime.MultipartEntityBuilder;
 @Stateless
 public class SystemEJB {
 
-    public final static String PARAMETER_FIRMWARE_VERSION = "firmware.version";
+    public final static String PARAMETER_FIRMWARE_VERSION = "firmware.version.";
     public final static String PARAMETER_FIRMWARE_PATH = "firmware.path";
     public final static String PARAMETER_FIRMWARE_FLASHURL = "firmware.flashurl";
     
@@ -73,7 +73,7 @@ public class SystemEJB {
             url += device.getSerial();
 
             // Firmware file:
-            String firmwareVersion = getSystemParameter(PARAMETER_FIRMWARE_VERSION).getValue();
+            String firmwareVersion = getSystemParameter(PARAMETER_FIRMWARE_VERSION+device.getType()).getValue();
             String fileName = "core-firmware-"+device.getType()+"-"+firmwareVersion+".bin";
             File fwFile = new File(getSystemParameter(PARAMETER_FIRMWARE_PATH).getValue(), fileName);
 
@@ -98,7 +98,8 @@ public class SystemEJB {
         Properties deviceParams = new Properties();
         deviceParams.load(new StringReader(deviceParamsString.replace(',', '\n')));
         
-        String serverFirmware = getSystemParameter(PARAMETER_FIRMWARE_VERSION).getValue();
+        AdDevice device = deviceEjb.getById(adDeviceId);
+        String serverFirmware = getSystemParameter(PARAMETER_FIRMWARE_VERSION+device.getType()).getValue();
         String deviceFirmware = deviceParams.getProperty("firmware");
         if (deviceFirmware!=null && !deviceFirmware.equals(serverFirmware))
             timerService.createSingleActionTimer(10000, new TimerConfig(adDeviceId, true));
