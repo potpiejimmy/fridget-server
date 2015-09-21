@@ -10,6 +10,7 @@ import com.myfridget.server.db.entity.AdDeviceDebugMsg;
 import com.myfridget.server.db.entity.AdDeviceParameter;
 import com.myfridget.server.db.entity.AdDeviceTestImage;
 import com.myfridget.server.ejb.AdDeviceEJB;
+import com.myfridget.server.ejb.SystemEJB;
 import com.myfridget.server.ejb.UsersEJB;
 import com.myfridget.server.util.Utils;
 import com.myfridget.server.webapp.util.WebUtils;
@@ -42,6 +43,8 @@ public class DeviceDebugBean extends ImageUploadBean {
     private AdDeviceEJB deviceEjb;
     @EJB
     private UsersEJB usersEjb;
+    @EJB
+    private SystemEJB systemEjb;
     
     private Integer selectedDevice = null;
     
@@ -216,5 +219,14 @@ public class DeviceDebugBean extends ImageUploadBean {
 
     public void setCurrentImageIndex(int currentImageIndex) {
         this.currentImageIndex = currentImageIndex;
+    }
+    
+    public void factoryReset() {
+        try {
+            WebUtils.addFacesMessage(systemEjb.factoryReset(selectedDevice), "configForm:factoryReset");
+        } catch (Exception e) {
+            WebUtils.addFacesMessage(e);
+            e.printStackTrace();
+        }
     }
 }

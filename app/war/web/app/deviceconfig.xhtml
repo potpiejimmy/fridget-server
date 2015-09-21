@@ -43,6 +43,10 @@
                         </p:inputText>
                         <p:message for="flashImages"/>
 
+                        <h:outputLabel for="factoryReset" value="Factory reset (must be cloud-online):"/>
+                        <p:commandLink id="factoryReset" value="Reset device now" ajax="false" action="#{deviceDebugBean.factoryReset}" disabled="#{deviceDebugBean.selectedDevice eq null}"/>
+                        <p:message for="factoryReset"/>
+
                     </h:panelGrid>
 
                     <p:commandButton action="#{deviceDebugBean.save}" update=":outputPanel" value="Save" disabled="#{deviceDebugBean.selectedDevice eq null}"/>

@@ -37,7 +37,12 @@ public class WebUtils
     
     public static void addFacesMessage(String msg)
     {
-        FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(msg));
+        addFacesMessage(msg, null);
+    }
+
+    public static void addFacesMessage(String msg, String clientId)
+    {
+        FacesContext.getCurrentInstance().addMessage(clientId, new FacesMessage(msg));
     }
 
     public static void addFacesMessage(Throwable ex)

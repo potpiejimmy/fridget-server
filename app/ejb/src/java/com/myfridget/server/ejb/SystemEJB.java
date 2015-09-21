@@ -25,6 +25,7 @@ import javax.persistence.EntityManager;
 import javax.persistence.NoResultException;
 import javax.persistence.PersistenceContext;
 import org.apache.http.entity.ContentType;
+import org.apache.http.entity.mime.FormBodyPartBuilder;
 import org.apache.http.entity.mime.MultipartEntityBuilder;
 
 /**
@@ -91,6 +92,31 @@ public class SystemEJB {
             }
         } catch (Exception e) {
             return "Flashing firmware failed: " + e;
+        }
+    }
+    
+    public String factoryReset(int adDeviceId) {
+        
+        AdDevice device = deviceEjb.getById(adDeviceId);
+        
+        try {
+            // URL
+            StringBuilder url = new StringBuilder(getSystemParameter(PARAMETER_FIRMWARE_FLASHURL).getValue());
+            url.append(device.getSerial());
+            url.append("/clearCredentials");
+            
+            // Post data:
+            MultipartEntityBuilder builder = MultipartEntityBuilder.create();
+            builder.addTextBody("access_token", deviceEjb.getParameter(adDeviceId, "accesstoken").getValue(), ContentType.TEXT_PLAIN);
+
+            try (WebRequester curl = new WebRequester()) {
+                String result = curl.post(url.toString(), builder.build());
+
+                return "Reset device " + adDeviceId + ", result: " + result;
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+            return "Factory reset failed: " + e;
         }
     }
     

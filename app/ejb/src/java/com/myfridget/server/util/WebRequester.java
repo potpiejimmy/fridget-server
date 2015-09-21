@@ -117,7 +117,6 @@ public class WebRequester implements ResponseHandler<String>, AutoCloseable
     
     public String get(String url) throws Exception
     {
- 
        HttpGet request = new HttpGet(appendRequestParameters(url));
  
        setRequestHeaders(request);
