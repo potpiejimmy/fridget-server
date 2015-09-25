@@ -108,6 +108,7 @@ public class SystemEJB {
             // Post data:
             MultipartEntityBuilder builder = MultipartEntityBuilder.create();
             builder.addTextBody("access_token", deviceEjb.getParameter(adDeviceId, "accesstoken").getValue(), ContentType.TEXT_PLAIN);
+            builder.addTextBody("arg", "n/a", ContentType.TEXT_PLAIN);
 
             try (WebRequester curl = new WebRequester()) {
                 String result = curl.post(url.toString(), builder.build());
