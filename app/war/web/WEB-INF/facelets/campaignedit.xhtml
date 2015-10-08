@@ -26,8 +26,11 @@
                 <hr/>
                 
                 <p:dataTable id="actionTable" value="#{campaignsBean.campaignActions}" var="action">
-                    <p:column headerText="Time">
-                        <h:outputText value="#{campaignsBean.getFormattedActionTime(action)}"/>
+                    <p:column headerText="From">
+                        <h:outputText value="#{campaignsBean.getFormattedActionTime(action.minuteOfDayFrom)}"/>
+                    </p:column>
+                    <p:column headerText="To">
+                        <h:outputText value="#{campaignsBean.getFormattedActionTime(action.minuteOfDayTo)}"/>
                     </p:column>
                     <p:column headerText="Display">
                         <p:graphicImage value="#{mediaBean.mediumPreview}" width="200px;">
@@ -46,14 +49,8 @@
                     
                 <p:outputPanel id="editActionPanel">
                     <p:outputPanel rendered="#{campaignsBean.currentAction ne null}">
-                        <h:panelGrid columns="6">
-                            <h:outputLabel for="actionTime" value="Time (HH:MM):"/>
-                            <p:inputMask id="actionTime" value="#{campaignsBean.currentActionTime}" mask="99:99" size="5">
-                                <f:validateRegex pattern="^[0-2][0-9]:[0-5][0-9]$"/>
-                            </p:inputMask>
-                            <p:message for="actionTime"/>
-                            
-                            <h:outputLabel for="medium" value="Medium / Display:"/>
+                        <h:panelGrid columns="3">
+                            <h:outputLabel for="medium" value="Show Medium / Display:"/>
                             <p:selectOneMenu id="medium" value="#{campaignsBean.currentAction.adMediumId}" var="m">
                                 <f:selectItems value="#{campaignsBean.mediaItems}"/>
                                 <p:column>
@@ -64,7 +61,18 @@
                             </p:selectOneMenu>
                             <p:message for="medium"/>
                         </h:panelGrid>
+                            
+                        <h:panelGrid columns="1">
+                            <h:outputText id="displayRange" value="Between #{campaignsBean.getFormattedActionTime(campaignsBean.currentAction.minuteOfDayFrom)}h and #{campaignsBean.getFormattedActionTime(campaignsBean.currentAction.minuteOfDayTo)}h" />
+                            <p:slider for="timeFrom,timeTo" style="width: 400px" range="true" maxValue="1440" step="15">
+                                <p:ajax event="slideEnd" update="displayRange" process="timeFrom,timeTo"/>
+                            </p:slider>
+                        </h:panelGrid>
+                        <h:inputHidden id="timeFrom" value="#{campaignsBean.currentAction.minuteOfDayFrom}" />
+                        <h:inputHidden id="timeTo" value="#{campaignsBean.currentAction.minuteOfDayTo}" />
                                                 
+                        <br/>
+
                         <p:commandButton value="Save Action" action="#{campaignsBean.saveAction}" update="actionTable,actionbuttonpanel,editActionPanel"/>
                         <p:commandButton value="Cancel" immediate="true" action="#{campaignsBean.cancelAction}" update="actionTable,actionbuttonpanel,editActionPanel"/>
                     </p:outputPanel>

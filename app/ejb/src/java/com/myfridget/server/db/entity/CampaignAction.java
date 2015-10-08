@@ -27,8 +27,7 @@ import javax.xml.bind.annotation.XmlRootElement;
 @XmlRootElement
 @NamedQueries({
     @NamedQuery(name = "CampaignAction.findAll", query = "SELECT c FROM CampaignAction c"),
-    @NamedQuery(name = "CampaignAction.findByCampaignId", query = "SELECT c FROM CampaignAction c WHERE c.campaignId = :campaignId ORDER BY c.timeOfDay"),
-    @NamedQuery(name = "CampaignAction.findByTimeOfDay", query = "SELECT c FROM CampaignAction c WHERE c.timeOfDay = :timeOfDay")})
+    @NamedQuery(name = "CampaignAction.findByCampaignId", query = "SELECT c FROM CampaignAction c WHERE c.campaignId = :campaignId ORDER BY c.minuteOfDayFrom")})
 public class CampaignAction implements Serializable {
     private static final long serialVersionUID = 1L;
     
@@ -48,8 +47,13 @@ public class CampaignAction implements Serializable {
 
     @Basic(optional = false)
     @NotNull
-    @Column(name = "time_of_day")
-    private short timeOfDay;
+    @Column(name = "minute_of_day_from")
+    private short minuteOfDayFrom;
+    
+    @Basic(optional = false)
+    @NotNull
+    @Column(name = "minute_of_day_to")
+    private short minuteOfDayTo;
     
     public CampaignAction() {
     }
@@ -58,9 +62,10 @@ public class CampaignAction implements Serializable {
         this.id = id;
     }
 
-    public CampaignAction(Integer id, short timeOfDay) {
+    public CampaignAction(Integer id, short minuteOfDayFrom, short minuteOfDayTo) {
         this.id = id;
-        this.timeOfDay = timeOfDay;
+        this.minuteOfDayFrom = minuteOfDayFrom;
+        this.minuteOfDayTo = minuteOfDayTo;
     }
 
     public Integer getId() {
@@ -69,14 +74,6 @@ public class CampaignAction implements Serializable {
 
     public void setId(Integer id) {
         this.id = id;
-    }
-
-    public short getTimeOfDay() {
-        return timeOfDay;
-    }
-
-    public void setTimeOfDay(short timeOfDay) {
-        this.timeOfDay = timeOfDay;
     }
 
     public Integer getCampaignId() {
@@ -93,6 +90,22 @@ public class CampaignAction implements Serializable {
 
     public void setAdMediumId(Integer adMediumId) {
         this.adMediumId = adMediumId;
+    }
+
+    public short getMinuteOfDayFrom() {
+        return minuteOfDayFrom;
+    }
+
+    public void setMinuteOfDayFrom(short minuteOfDayFrom) {
+        this.minuteOfDayFrom = minuteOfDayFrom;
+    }
+
+    public short getMinuteOfDayTo() {
+        return minuteOfDayTo;
+    }
+
+    public void setMinuteOfDayTo(short minuteOfDayTo) {
+        this.minuteOfDayTo = minuteOfDayTo;
     }
 
     @Override

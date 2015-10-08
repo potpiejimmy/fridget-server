@@ -41,7 +41,6 @@ public class CampaignsBean {
     
     private Campaign currentCampaign = null;
     private CampaignAction currentAction = null;
-    private String currentActionTime = null;
     private List<CampaignAction> currentActions = null;
             
     public Campaign getCurrentCampaign() {
@@ -60,14 +59,6 @@ public class CampaignsBean {
         this.currentAction = currentAction;
     }
 
-    public String getCurrentActionTime() {
-        return currentActionTime;
-    }
-
-    public void setCurrentActionTime(String currentActionTime) {
-        this.currentActionTime = currentActionTime;
-    }
-    
     public List<SelectItem> getMediaItems() {
         List<SelectItem> result = new ArrayList<>();
         for (AdMedium m : mediumEjb.getMediaForCurrentUser()) {
@@ -130,6 +121,7 @@ public class CampaignsBean {
     
     public void newAction() {
         currentAction = new CampaignAction();
+        currentAction.setMinuteOfDayTo((short)1440);
     }
 
     public void deleteAction(CampaignAction action) {
@@ -138,32 +130,24 @@ public class CampaignsBean {
 
     public void editAction(CampaignAction action) {
         currentAction = action;
-        currentActionTime = getFormattedActionTime(action);
         editingAction = true;
     }
 
     public void saveAction() {
-        currentAction.setTimeOfDay(parseActionTime(currentActionTime));
         if (!editingAction) currentActions.add(currentAction);
         cancelAction();
     }
 
     public void cancelAction() {
         currentAction = null;
-        currentActionTime = null;
         editingAction = false;
     }
     
-    public String getFormattedActionTime(CampaignAction action) {
-        return formatActionTime(action.getTimeOfDay());
+    public String getFormattedActionTime(short minuteOfDay) {
+        return twoDigitNumber(minuteOfDay / 60) + ":" + twoDigitNumber(minuteOfDay % 60);
     }
     
-    protected static String formatActionTime(short actionTime) {
-        return String.valueOf(100+actionTime/100).substring(1) + ":" +
-               String.valueOf(100+actionTime%100).substring(1);
-    }
-    
-    protected static short parseActionTime(String actionTime) {
-        return Short.parseShort(actionTime.replace(":", ""));
+    protected static String twoDigitNumber(int number) {
+        return ("" + (100+number)).substring(1);
     }
 }

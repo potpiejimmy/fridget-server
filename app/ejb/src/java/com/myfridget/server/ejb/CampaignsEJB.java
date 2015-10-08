@@ -91,8 +91,8 @@ public class CampaignsEJB {
         List<ScheduledCampaignAction> schedule = new ArrayList<>();
         for (CampaignAction action : deviceActions) {
             Calendar cal = Calendar.getInstance();
-            cal.set(Calendar.HOUR_OF_DAY, action.getTimeOfDay()/100);
-            cal.set(Calendar.MINUTE, action.getTimeOfDay()%100);
+            cal.set(Calendar.HOUR_OF_DAY, action.getMinuteOfDayFrom()/60);
+            cal.set(Calendar.MINUTE, action.getMinuteOfDayFrom()%60);
             cal.set(Calendar.SECOND, 0);
             if (cal.getTimeInMillis() < now) cal.add(Calendar.DAY_OF_YEAR, 1);
             schedule.add(new ScheduledCampaignAction(action, cal.getTimeInMillis()));
