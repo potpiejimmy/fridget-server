@@ -51,10 +51,10 @@
                     <p:outputPanel rendered="#{campaignsBean.currentAction ne null}">
                         <h:panelGrid columns="3">
                             <h:outputLabel for="medium" value="Show Medium / Display:"/>
-                            <p:selectOneMenu id="medium" value="#{campaignsBean.currentAction.adMediumId}" var="m">
+                            <p:selectOneMenu id="medium" value="#{campaignsBean.currentAction.adMediumId}" var="m" style="width: 210px;">
                                 <f:selectItems value="#{campaignsBean.mediaItems}"/>
                                 <p:column>
-                                    <p:graphicImage value="#{mediaBean.mediumPreview}" width="100px;">
+                                    <p:graphicImage value="#{mediaBean.mediumPreview}" width="200px;">
                                         <f:param name="adMediumId" value="#{m}"/>
                                     </p:graphicImage>
                                 </p:column>
