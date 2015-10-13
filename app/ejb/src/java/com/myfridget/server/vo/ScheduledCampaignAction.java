@@ -16,10 +16,12 @@ public class ScheduledCampaignAction implements Comparable<ScheduledCampaignActi
 
     private CampaignAction action = null;
     private long scheduledTime = 0;
+    private boolean off = false;
     
-    public ScheduledCampaignAction(CampaignAction action, long scheduledTime) {
+    public ScheduledCampaignAction(CampaignAction action, long scheduledTime, boolean off) {
         this.action = action;
         this.scheduledTime = scheduledTime;
+        this.off = off;
     }
 
     public CampaignAction getAction() {
@@ -36,6 +38,14 @@ public class ScheduledCampaignAction implements Comparable<ScheduledCampaignActi
 
     public void setScheduledTime(long scheduledTime) {
         this.scheduledTime = scheduledTime;
+    }
+
+    public boolean isOff() {
+        return off;
+    }
+
+    public void setOff(boolean off) {
+        this.off = off;
     }
     
     @Override

@@ -10,14 +10,18 @@ import com.myfridget.server.db.entity.Campaign;
 import com.myfridget.server.db.entity.CampaignAction;
 import com.myfridget.server.db.entity.User;
 import com.myfridget.server.vo.ScheduledCampaignAction;
+import com.myfridget.server.vo.ScheduledProgramAction;
 import java.io.IOException;
 import java.io.StringReader;
 import java.io.StringWriter;
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
+import java.util.Map;
 import java.util.Properties;
+import java.util.TreeMap;
 import javax.ejb.EJB;
 import javax.ejb.Stateless;
 import javax.persistence.EntityManager;
@@ -76,6 +80,17 @@ public class CampaignsEJB {
         em.remove(em.find(Campaign.class, id));
     }
     
+    protected static ScheduledCampaignAction scheduleAction(CampaignAction action, boolean off, long now) {
+        short scheduleTime = off ? action.getMinuteOfDayTo() : action.getMinuteOfDayFrom();
+        Calendar cal = Calendar.getInstance();
+        cal.set(Calendar.HOUR_OF_DAY, (scheduleTime/60) % 24);
+        cal.set(Calendar.MINUTE, scheduleTime%60);
+        cal.set(Calendar.SECOND, 0);
+        cal.set(Calendar.MILLISECOND, 0);
+        if (cal.getTimeInMillis() < now) cal.add(Calendar.DAY_OF_YEAR, 1);
+        return new ScheduledCampaignAction(action, cal.getTimeInMillis(), off);
+    }
+    
     public String getProgramForDevice(int adDeviceId) {
         // first, collect all campaign actions associated with this device:
         List<User> deviceUsers = deviceEjb.getAssignedUsers(adDeviceId);
@@ -83,34 +98,51 @@ public class CampaignsEJB {
         deviceUsers.forEach(u -> deviceCampaigns.addAll(getCampaigns(u.getId())));
         List<CampaignAction> deviceActions = new ArrayList<>();
         deviceCampaigns.forEach(c -> deviceActions.addAll(getCampaignActionsForCampaign(c.getId())));
-        if (deviceActions.isEmpty()) return "A0070"; // XXX
+        if (deviceActions.isEmpty()) return "1A0070"; // XXX
         
         long now = System.currentTimeMillis();
         
         // now, associate each campaign action with a concrete calendar date and time:
         List<ScheduledCampaignAction> schedule = new ArrayList<>();
         for (CampaignAction action : deviceActions) {
-            Calendar cal = Calendar.getInstance();
-            cal.set(Calendar.HOUR_OF_DAY, action.getMinuteOfDayFrom()/60);
-            cal.set(Calendar.MINUTE, action.getMinuteOfDayFrom()%60);
-            cal.set(Calendar.SECOND, 0);
-            if (cal.getTimeInMillis() < now) cal.add(Calendar.DAY_OF_YEAR, 1);
-            schedule.add(new ScheduledCampaignAction(action, cal.getTimeInMillis()));
+            schedule.add(scheduleAction(action, false, now)); // schedule "on" action
+            schedule.add(scheduleAction(action, true, now)); // schedule "off" action
         }
         // now sort the schedule:
         Collections.sort(schedule);
         
-        // add the first one for next day again:
-        ScheduledCampaignAction first = schedule.get(0);
-        Calendar cal = Calendar.getInstance();
-        cal.setTimeInMillis(first.getScheduledTime());
-        cal.add(Calendar.DAY_OF_YEAR, 1);
-        schedule.add(new ScheduledCampaignAction(first.getAction(), cal.getTimeInMillis()));
-
-        return buildProgramForSchedule(adDeviceId, schedule, now);
+        // collect all actions that are already active on program start
+        ScheduledProgramAction initialAction = new ScheduledProgramAction(0L);
+        List<CampaignAction> gotOn = new ArrayList<>();
+        for (ScheduledCampaignAction action : schedule) {
+            CampaignAction a = action.getAction();
+            if (action.isOff()) {if (!gotOn.contains(a)) initialAction.getActions().add(a);}
+            else gotOn.add(a);
+        }
+        
+        // build the program action schedule:
+        Map<Long,ScheduledProgramAction> programSchedule = new TreeMap<>();
+        programSchedule.put(0L, initialAction);
+        ScheduledProgramAction lastAction = initialAction;
+        for (ScheduledCampaignAction action : schedule) {
+            ScheduledProgramAction currentAction = programSchedule.get(action.getScheduledTime());
+            if (currentAction == null) {
+                currentAction = new ScheduledProgramAction(action.getScheduledTime());
+                currentAction.getActions().addAll(lastAction.getActions());
+                programSchedule.put(action.getScheduledTime(), currentAction);
+                lastAction = currentAction;
+            }
+            if (action.isOff()) {
+                currentAction.getActions().remove(action.getAction());
+            } else {
+                currentAction.getActions().add(action.getAction());
+            }
+        }
+        
+        return buildProgramForSchedule(adDeviceId, programSchedule.values(), now);
     }
     
-    protected String buildProgramForSchedule(int adDeviceId, List<ScheduledCampaignAction> schedule, long now) {
+    protected String buildProgramForSchedule(int adDeviceId, Collection<ScheduledProgramAction> schedule, long now) {
         if (schedule.isEmpty()) return null;
         int cycleLen = systemEjb.getAttinyCycleLength();
         Calendar cal = Calendar.getInstance();
@@ -131,8 +163,8 @@ public class CampaignsEJB {
         } else {
             program.append("-");
         }
-        for (ScheduledCampaignAction scheduledAction : schedule) {
-            CampaignAction action = scheduledAction.getAction();
+        for (ScheduledProgramAction scheduledAction : schedule) {
+            List<CampaignAction> actions = scheduledAction.getActions();
             long offset = scheduledAction.getScheduledTime() - now;
             long cycles = Math.max(Math.round(((double)offset)/cycleLen), 2);
             String delayString = Long.toHexString(0x10000+cycles).substring(1);
@@ -142,12 +174,12 @@ public class CampaignsEJB {
                 // okay, this is the first event of next day, we have reached
                 // the end of this program.  we remember it's picture ID
                 // in entry "NEXT":
-                imageMap.setProperty("NEXT", ""+action.getAdMediumId());
+                imageMap.setProperty("NEXT", ""+actions.get(0).getAdMediumId());
                 break;
             } else {
                 currentImageIndex++;
                 String currentImage = new String(new byte[] {currentImageIndex});
-                imageMap.setProperty(currentImage, ""+action.getAdMediumId());
+                imageMap.setProperty(currentImage, ""+actions.get(0).getAdMediumId());
                 program.append(currentImage);
                 flashImages.append(currentImage);
                 now = scheduledAction.getScheduledTime() + 15000; // XXX 15 sec. img update
@@ -165,7 +197,7 @@ public class CampaignsEJB {
         } catch (Exception e) {
             e.printStackTrace();
             System.err.println("Could not store p and flashimages parameters: " + imageMapString.toString() + ", " + flashImages.toString());
-            return "A0070"; //XXX 
+            return "1A0070"; //XXX 
         }
         return program.toString();
     }
