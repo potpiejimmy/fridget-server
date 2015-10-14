@@ -14,10 +14,13 @@ import com.myfridget.server.vo.ScheduledProgramAction;
 import java.io.IOException;
 import java.io.StringReader;
 import java.io.StringWriter;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.Date;
 import java.util.List;
 import java.util.Map;
 import java.util.Properties;
@@ -83,6 +86,7 @@ public class CampaignsEJB {
     protected static ScheduledCampaignAction scheduleAction(CampaignAction action, boolean off, long now) {
         short scheduleTime = off ? action.getMinuteOfDayTo() : action.getMinuteOfDayFrom();
         Calendar cal = Calendar.getInstance();
+        cal.setTimeInMillis(now);
         cal.set(Calendar.HOUR_OF_DAY, (scheduleTime/60) % 24);
         cal.set(Calendar.MINUTE, scheduleTime%60);
         cal.set(Calendar.SECOND, 0);
@@ -102,17 +106,28 @@ public class CampaignsEJB {
         
         long now = System.currentTimeMillis();
         
+        Collection<ScheduledProgramAction> programSchedule = getScheduleForActions(deviceActions, now);
+        return buildProgramForSchedule(adDeviceId, programSchedule, now);
+    }
+        
+    public static Collection<ScheduledProgramAction> getScheduleForActions(List<CampaignAction> deviceActions, long now) {
+        
+        ScheduledProgramAction initialAction = new ScheduledProgramAction(now);
+        
         // now, associate each campaign action with a concrete calendar date and time:
         List<ScheduledCampaignAction> schedule = new ArrayList<>();
         for (CampaignAction action : deviceActions) {
-            schedule.add(scheduleAction(action, false, now)); // schedule "on" action
-            schedule.add(scheduleAction(action, true, now)); // schedule "off" action
+            if (action.getMinuteOfDayFrom()%1440 == action.getMinuteOfDayTo()%1440) {
+                initialAction.getActions().add(action); // always on!
+            } else {
+                schedule.add(scheduleAction(action, false, now)); // schedule "on" action
+                schedule.add(scheduleAction(action, true, now)); // schedule "off" action
+            }
         }
         // now sort the schedule:
         Collections.sort(schedule);
         
         // collect all actions that are already active on program start
-        ScheduledProgramAction initialAction = new ScheduledProgramAction(0L);
         List<CampaignAction> gotOn = new ArrayList<>();
         for (ScheduledCampaignAction action : schedule) {
             CampaignAction a = action.getAction();
@@ -139,15 +154,16 @@ public class CampaignsEJB {
             }
         }
         
-        return buildProgramForSchedule(adDeviceId, programSchedule.values(), now);
+        return programSchedule.values();
     }
     
     protected String buildProgramForSchedule(int adDeviceId, Collection<ScheduledProgramAction> schedule, long now) {
         if (schedule.isEmpty()) return null;
+        dumpProgramSchedule(schedule); // XXX for testing
+        
         int cycleLen = systemEjb.getAttinyCycleLength();
         Calendar cal = Calendar.getInstance();
         //cal.setTimeInMillis(schedule.get(0).getScheduledTime());
-        int currentDay = cal.get(Calendar.DAY_OF_YEAR);
         StringBuilder program = new StringBuilder();
         Properties imageMap = new Properties();
         StringBuilder flashImages = new StringBuilder();
@@ -170,20 +186,12 @@ public class CampaignsEJB {
             String delayString = Long.toHexString(0x10000+cycles).substring(1);
             program.append(delayString);
             cal.setTimeInMillis(scheduledAction.getScheduledTime());
-            if (cal.get(Calendar.DAY_OF_YEAR) != currentDay) {
-                // okay, this is the first event of next day, we have reached
-                // the end of this program.  we remember it's picture ID
-                // in entry "NEXT":
-                imageMap.setProperty("NEXT", ""+actions.get(0).getAdMediumId());
-                break;
-            } else {
-                currentImageIndex++;
-                String currentImage = new String(new byte[] {currentImageIndex});
-                imageMap.setProperty(currentImage, ""+actions.get(0).getAdMediumId());
-                program.append(currentImage);
-                flashImages.append(currentImage);
-                now = scheduledAction.getScheduledTime() + 15000; // XXX 15 sec. img update
-            }
+            currentImageIndex++;
+            String currentImage = new String(new byte[] {currentImageIndex});
+            imageMap.setProperty(currentImage, ""+actions.get(0).getAdMediumId());
+            program.append(currentImage);
+            flashImages.append(currentImage);
+            now = scheduledAction.getScheduledTime() + 15000; // XXX 15 sec. img update
             // Note: XXX loop must not end here but only on break above
         }
         // remember used images map in parameter "p"
@@ -200,5 +208,29 @@ public class CampaignsEJB {
             return "1A0070"; //XXX 
         }
         return program.toString();
+    }
+    
+    /**
+     * For testing only.
+     * @param schedule a schedule
+     */
+    protected static void dumpProgramSchedule(Collection<ScheduledProgramAction> schedule) {
+        final DateFormat DF = new SimpleDateFormat("yyyy-MM-dd HH:mm");
+        int i=0;
+        for (ScheduledProgramAction action : schedule) {
+            System.out.print((++i) + " " + DF.format(new Date(action.getScheduledTime())) + " ");
+            for (CampaignAction a : action.getActions()) System.out.print(a.getId()+" ");
+            System.out.println();
+        }
+    }
+    
+    public static void main(String[] args) {
+        List<CampaignAction> actions = new ArrayList<>();
+        actions.add(new CampaignAction(1, (short)0, (short)(24*60-1)));
+        actions.add(new CampaignAction(2, (short)60, (short)120));
+        actions.add(new CampaignAction(3, (short)120, (short)180));
+        actions.add(new CampaignAction(4, (short)150, (short)210));
+        
+        dumpProgramSchedule(getScheduleForActions(actions, System.currentTimeMillis()-180000000));
     }
 }
