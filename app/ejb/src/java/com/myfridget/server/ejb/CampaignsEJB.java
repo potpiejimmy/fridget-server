@@ -12,7 +12,6 @@ import com.myfridget.server.db.entity.User;
 import com.myfridget.server.vo.ScheduledCampaignAction;
 import com.myfridget.server.vo.ScheduledProgramAction;
 import java.io.IOException;
-import java.io.StringReader;
 import java.io.StringWriter;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
@@ -21,6 +20,7 @@ import java.util.Calendar;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Properties;
@@ -159,42 +159,44 @@ public class CampaignsEJB {
     
     protected String buildProgramForSchedule(int adDeviceId, Collection<ScheduledProgramAction> schedule, long now) {
         if (schedule.isEmpty()) return null;
-        dumpProgramSchedule(schedule); // XXX for testing
+        dumpProgramSchedule(schedule); // XXX for debugging
         
         int cycleLen = systemEjb.getAttinyCycleLength();
-        Calendar cal = Calendar.getInstance();
+        
         //cal.setTimeInMillis(schedule.get(0).getScheduledTime());
         StringBuilder program = new StringBuilder();
         Properties imageMap = new Properties();
+        Map<Integer,String> usedMediumIds = new HashMap<>();
         StringBuilder flashImages = new StringBuilder();
+        
         final String IMG_START_INDEX = "D"; // start campaign images at index D (A,B,C reserved for welcome, setup and connection error screens)
         byte currentImageIndex = IMG_START_INDEX.getBytes()[0];
-        // always start with showing pictue "D" which is the LAST picture of the previous program!
-        Properties previousImageMap = new Properties();
-        try {previousImageMap.load(new StringReader(deviceEjb.getParameter(adDeviceId, "p").getValue()));} catch (Exception e) {}
-        if (previousImageMap.containsKey("NEXT")) {
-            imageMap.setProperty(IMG_START_INDEX, previousImageMap.getProperty("NEXT"));
-            program.append(IMG_START_INDEX);
-            flashImages.append(IMG_START_INDEX);
-        } else {
-            program.append("-");
-        }
         for (ScheduledProgramAction scheduledAction : schedule) {
             List<CampaignAction> actions = scheduledAction.getActions();
+            
+            final int numActions = Math.min(actions.size(), 9); // XXX do not support more than 9 images
+            program.append(numActions);
+            for (int i=0; i<numActions; i++) {
+                CampaignAction action = actions.get(i);
+                String image = usedMediumIds.get(action.getAdMediumId());
+                if (image == null) {
+                    image = new String(new byte[] {currentImageIndex});
+                    usedMediumIds.put(action.getAdMediumId(), image);
+                    imageMap.setProperty(image, ""+action.getAdMediumId());
+                    flashImages.append(image);
+                    currentImageIndex++;
+                }
+                program.append(image);
+            }
+            
             long offset = scheduledAction.getScheduledTime() - now;
             long cycles = Math.max(Math.round(((double)offset)/cycleLen), 2);
             String delayString = Long.toHexString(0x10000+cycles).substring(1);
             program.append(delayString);
-            cal.setTimeInMillis(scheduledAction.getScheduledTime());
-            currentImageIndex++;
-            String currentImage = new String(new byte[] {currentImageIndex});
-            imageMap.setProperty(currentImage, ""+actions.get(0).getAdMediumId());
-            program.append(currentImage);
-            flashImages.append(currentImage);
+
             now = scheduledAction.getScheduledTime() + 15000; // XXX 15 sec. img update
-            // Note: XXX loop must not end here but only on break above
         }
-        // remember used images map in parameter "p"
+        // remember images map in parameter "p"
         StringWriter imageMapString = new StringWriter();
         try {imageMap.store(imageMapString, null);}
         catch (IOException ioe) {}
@@ -207,6 +209,10 @@ public class CampaignsEJB {
             System.err.println("Could not store p and flashimages parameters: " + imageMapString.toString() + ", " + flashImages.toString());
             return "1A0070"; //XXX 
         }
+        
+        System.out.println(imageMapString.toString()); // XXX for debugging
+        System.out.println(program.toString()); // XXX for debugging
+        
         return program.toString();
     }
     
@@ -219,7 +225,7 @@ public class CampaignsEJB {
         int i=0;
         for (ScheduledProgramAction action : schedule) {
             System.out.print((++i) + " " + DF.format(new Date(action.getScheduledTime())) + " ");
-            for (CampaignAction a : action.getActions()) System.out.print(a.getId()+" ");
+            for (CampaignAction a : action.getActions()) System.out.print(a.getId()+"["+a.getAdMediumId()+"]"+" ");
             System.out.println();
         }
     }

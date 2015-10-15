@@ -31,9 +31,9 @@
                         <p:inputText id="accesstoken" size="60" value="#{deviceDebugBean.cloudAccessToken}" disabled="#{deviceDebugBean.selectedDevice eq null}"/>
                         <p:message for="accesstoken"/>
 
-                        <h:outputLabel for="exec" value="Execution Plan (^([A-Z-][0-9A-F]{4})*$):"/>
+                        <h:outputLabel for="exec" value="Execution Plan (^([0-9][A-Z]*[0-9A-F]{4})*$):"/>
                         <p:inputText id="exec" size="75" value="#{deviceDebugBean.exec}" disabled="#{deviceDebugBean.selectedDevice eq null}" >
-                            <f:validateRegex pattern="^([A-Z-][0-9A-F]{4})*$"/>
+                            <f:validateRegex pattern="^([0-9][A-Z]*[0-9A-F]{4})*$"/>
                         </p:inputText>
                         <p:message for="exec"/>
 

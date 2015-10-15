@@ -54,12 +54,17 @@ public class DeviceDebugResource {
             deviceEjb.addDebugMessage(serial, "<<< ok");
             return "ok";
         }
+        // verify client params string, flash firmware if necessary:
+        systemEjb.verifyDeviceParams(deviceEjb.getBySerial(serial).getId(), msg);
         
+        return retrieveProgram();
+    }
+    
+    @GET
+    @Produces({"application/json"})
+    public String retrieveProgram() {
         AdDevice device = deviceEjb.getBySerial(serial);
 
-        // verify client params string, flash firmware if necessary:
-        systemEjb.verifyDeviceParams(device.getId(), msg);
-        
         // send server params:
         StringBuilder result = new StringBuilder();
         AdDeviceParameter param = deviceEjb.getParameter(device.getId(), "exec");
@@ -84,6 +89,7 @@ public class DeviceDebugResource {
      * @return result message
      */
     @GET
+    @Path("ota")
     @Produces("text/plain")
     public String flashFirmware() throws Exception {
         return systemEjb.flashFirmware(deviceEjb.getBySerial(serial).getId());
