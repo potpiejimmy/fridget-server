@@ -163,7 +163,6 @@ public class CampaignsEJB {
         
         int cycleLen = systemEjb.getAttinyCycleLength();
         
-        //cal.setTimeInMillis(schedule.get(0).getScheduledTime());
         StringBuilder program = new StringBuilder();
         Properties imageMap = new Properties();
         Map<Integer,String> usedMediumIds = new HashMap<>();
@@ -171,7 +170,19 @@ public class CampaignsEJB {
         
         final String IMG_START_INDEX = "D"; // start campaign images at index D (A,B,C reserved for welcome, setup and connection error screens)
         byte currentImageIndex = IMG_START_INDEX.getBytes()[0];
+        
         for (ScheduledProgramAction scheduledAction : schedule) {
+            
+            if (program.length()>0) {
+                // append delay to previous action
+                long offset = scheduledAction.getScheduledTime() - now;
+                long cycles = Math.max(Math.round(((double)offset)/cycleLen), 2);
+                String delayString = Long.toHexString(0x10000+cycles).substring(1);
+                program.append(delayString);
+            }
+
+            now = scheduledAction.getScheduledTime() + 15000; // XXX 15 sec. img update
+            
             List<CampaignAction> actions = scheduledAction.getActions();
             
             final int numActions = Math.min(actions.size(), 9); // XXX do not support more than 9 images
@@ -188,14 +199,11 @@ public class CampaignsEJB {
                 }
                 program.append(image);
             }
-            
-            long offset = scheduledAction.getScheduledTime() - now;
-            long cycles = Math.max(Math.round(((double)offset)/cycleLen), 2);
-            String delayString = Long.toHexString(0x10000+cycles).substring(1);
-            program.append(delayString);
-
-            now = scheduledAction.getScheduledTime() + 15000; // XXX 15 sec. img update
         }
+        
+        // append last delay before going online
+        program.append("0002");
+        
         // remember images map in parameter "p"
         StringWriter imageMapString = new StringWriter();
         try {imageMap.store(imageMapString, null);}
