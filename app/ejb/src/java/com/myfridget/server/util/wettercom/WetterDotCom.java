@@ -68,9 +68,9 @@ public class WetterDotCom {
         private WeatherState getWeatherStateFromNumber(int n, boolean night)
         {
             if (n==0) return night ? WeatherState.klar : WeatherState.sonnig;
-            if (n==1) return night ? WeatherState.bewölkt_nachts : WeatherState.leicht_bewölkt;
-            if (n==2) return WeatherState.wolkig;
-            if (n==3 || n==4) return WeatherState.bedeckt;
+            if (n==1 || n==10) return night ? WeatherState.bewölkt_nachts : WeatherState.leicht_bewölkt;
+            if (n==2 || n==20) return WeatherState.wolkig;
+            if (n==3 || n==4 || ((n >= 30) && (n<50))) return WeatherState.bedeckt;
             if (n>4 && n<9) return WeatherState.regen;
             if (n==9) return WeatherState.gewitter;
             if (n>=50 && n<=86) return WeatherState.regen;
