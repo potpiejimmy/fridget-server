@@ -163,6 +163,9 @@ public class CampaignsEJB {
         
         int cycleLen = systemEjb.getAttinyCycleLength();
         
+        Calendar cal = Calendar.getInstance();
+        cal.setTimeInMillis(now);
+        int startDayOfYear = cal.get(Calendar.DAY_OF_YEAR);
         StringBuilder program = new StringBuilder();
         Properties imageMap = new Properties();
         Map<Integer,String> usedMediumIds = new HashMap<>();
@@ -173,15 +176,34 @@ public class CampaignsEJB {
         
         for (ScheduledProgramAction scheduledAction : schedule) {
             
+            long scheduledTime = scheduledAction.getScheduledTime();
+            boolean abort = false;
+            
+            cal.setTimeInMillis(scheduledTime);
+            // abort schedule only if it extends into the next day and goes past 1 a.m.
+            if (cal.get(Calendar.DAY_OF_YEAR) != startDayOfYear &&
+                cal.get(Calendar.HOUR_OF_DAY) >= 1) {
+                cal.set(Calendar.HOUR_OF_DAY, 1);
+                cal.set(Calendar.MINUTE, 1);
+                cal.set(Calendar.SECOND, 0);
+                scheduledTime = cal.getTimeInMillis();
+                abort = true;
+            }
+            
             if (program.length()>0) {
                 // append delay to previous action
-                long offset = scheduledAction.getScheduledTime() - now;
+                long offset = scheduledTime - now;
                 long cycles = Math.max(Math.round(((double)offset)/cycleLen), 2);
                 String delayString = Long.toHexString(0x10000+cycles).substring(1);
                 program.append(delayString);
             }
+            
+            if (abort) {
+                program.append('0'); // no action
+                break;
+            }
 
-            now = scheduledAction.getScheduledTime() + 15000; // XXX 15 sec. img update
+            now = scheduledTime + 15000; // XXX 15 sec. img update
             
             List<CampaignAction> actions = scheduledAction.getActions();
             
