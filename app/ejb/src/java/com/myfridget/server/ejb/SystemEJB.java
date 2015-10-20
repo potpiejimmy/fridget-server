@@ -25,7 +25,6 @@ import javax.persistence.EntityManager;
 import javax.persistence.NoResultException;
 import javax.persistence.PersistenceContext;
 import org.apache.http.entity.ContentType;
-import org.apache.http.entity.mime.FormBodyPartBuilder;
 import org.apache.http.entity.mime.MultipartEntityBuilder;
 
 /**
@@ -74,8 +73,7 @@ public class SystemEJB {
             url += device.getSerial();
 
             // Firmware file:
-            String firmwareVersion = getSystemParameter(PARAMETER_FIRMWARE_VERSION+device.getType()).getValue();
-            String fileName = "core-firmware-"+device.getType()+"-"+firmwareVersion+".bin";
+            String fileName = getFirmwareFilenameForDevice(device);
             File fwFile = new File(getSystemParameter(PARAMETER_FIRMWARE_PATH).getValue(), fileName);
 
             // Upload data:
@@ -93,6 +91,12 @@ public class SystemEJB {
         } catch (Exception e) {
             return "Flashing firmware failed: " + e;
         }
+    }
+    
+    public String getFirmwareFilenameForDevice(AdDevice device) {
+        // Firmware file:
+        String firmwareVersion = getSystemParameter(PARAMETER_FIRMWARE_VERSION+device.getType()).getValue();
+        return "core-firmware-"+device.getType()+"-"+firmwareVersion+".bin";
     }
     
     public String factoryReset(int adDeviceId) {

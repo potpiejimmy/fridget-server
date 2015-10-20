@@ -77,6 +77,11 @@
                     <p:commandLink value="Delete" action="#{adminDevicesBean.delete(p)}" ajax="false"/>
                 </h:panelGroup>
                             </p:column>
+                            <p:column headerText="Firmware">
+                                <h:outputLink value="http://www.doogetha.com/download/#{adminDevicesBean.getFirmwareFilenameForDevice(p)}">
+                                    <h:outputText value="#{adminDevicesBean.getFirmwareFilenameForDevice(p)}"/>
+                                </h:outputLink>
+                            </p:column>
                     </p:dataTable>
 
             </h:form>

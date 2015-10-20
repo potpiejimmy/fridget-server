@@ -3,6 +3,7 @@ package com.myfridget.server.webapp.mbean;
 import com.myfridget.server.db.entity.AdDevice;
 import com.myfridget.server.db.entity.User;
 import com.myfridget.server.ejb.AdDeviceEJB;
+import com.myfridget.server.ejb.SystemEJB;
 import com.myfridget.server.ejb.UsersEJB;
 import com.myfridget.server.util.EPDUtils;
 import com.myfridget.server.webapp.util.WebUtils;
@@ -33,6 +34,8 @@ public class AdminDevicesBean implements Serializable, Converter {
         private AdDeviceEJB deviceEjb;
         @EJB
         private UsersEJB usersEjb;
+        @EJB
+        private SystemEJB systemEJB;
 	
 	private AdDevice currentDevice = null;
 
@@ -100,7 +103,7 @@ public class AdminDevicesBean implements Serializable, Converter {
 	public void edit(AdDevice p) {
             currentDevice = p;
 
-            List<User> source = new ArrayList<User>(usersEjb.getUsers());
+            List<User> source = new ArrayList<>(usersEjb.getUsers());
             List<User> target = deviceEjb.getAssignedUsers(currentDevice.getId());
             source.removeAll(target);
             assignedUsers.setSource(source);
@@ -115,6 +118,10 @@ public class AdminDevicesBean implements Serializable, Converter {
                 WebUtils.addFacesMessage(ex);
             }
 	}
+        
+        public String getFirmwareFilenameForDevice(AdDevice p) {
+            return systemEJB.getFirmwareFilenameForDevice(p);
+        }
 
     @Override
     public Object getAsObject(FacesContext context, UIComponent component, String value) {
