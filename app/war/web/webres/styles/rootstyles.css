@@ -3,7 +3,7 @@
    Syntax recommendation http://www.w3.org/TR/REC-CSS2/
 */
 
-html { 
+html, body { 
     display: block;
     margin: 0;
     padding: 0;
@@ -19,7 +19,6 @@ html {
 }
 
 #root_header {
-    background-color: #c00;
     background-image: url("../img/backcloud.png");
     background-repeat: repeat;
     font-family: 'Noto Sans', sans-serif;
@@ -38,11 +37,20 @@ html {
 }
 
 #root_body {
+    background-image: url("../img/backcloud.png");
+    background-repeat: repeat;
+    padding: 1em;
+}
+
+#root_body_contents {
     background-color: #fff;
+    padding: 0.5em;
+    border: 0.25em solid #A00;
 }
 
 #root_footer {
     font-size: 10pt;
+    margin: 1em;
 }
 
 .ui-widget, .ui-widget .ui-widget, .ui-widget input, .ui-widget select, .ui-widget textarea, .ui-widget button {
@@ -69,12 +77,6 @@ html {
 .ui-datatable.borderless tbody td {
     border-style: none;
     padding: 5px 0px;
-}
-
-.ui-panel .ui-panel-titlebar,
-.ui-tabmenu .ui-tabmenu-nav {
-    background-image: url("../img/backcloud.png");
-    background-repeat: repeat;
 }
 
 .topAlign {
