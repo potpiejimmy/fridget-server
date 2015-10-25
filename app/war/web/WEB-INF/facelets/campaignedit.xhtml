@@ -8,6 +8,23 @@
     
     <ui:composition>
         
+        <script type="text/javascript">
+            function formatActionTime(minuteOfDay) {
+                return twoDigitNumber((minuteOfDay / 60)|0) + ":" + twoDigitNumber(minuteOfDay % 60);
+            }
+            function twoDigitNumber(number) {
+                return ("" + (100+number)).substring(1);
+            }
+            function updateRangeLabel() {
+                setTimeout(function() {
+                    var timeFrom = document.getElementById("campaigneditform:timeFrom").value;
+                    var timeTo = document.getElementById("campaigneditform:timeTo").value;
+                    var label = "Between "+formatActionTime(timeFrom)+"h and "+formatActionTime(timeTo)+"h";
+                    document.getElementById("campaigneditform:displayRange").innerHTML = label;
+                }, 100);
+            }
+        </script>
+        
         <h:form id="campaigneditform">
             
             <p:outputPanel id="campaigneditpanel" style="display:none;">
@@ -64,9 +81,7 @@
                             
                         <h:panelGrid columns="1">
                             <h:outputText id="displayRange" value="Between #{campaignsBean.getFormattedActionTime(campaignsBean.currentAction.minuteOfDayFrom)}h and #{campaignsBean.getFormattedActionTime(campaignsBean.currentAction.minuteOfDayTo)}h" />
-                            <p:slider for="timeFrom,timeTo" style="width: 400px" range="true" maxValue="1440" step="15">
-                                <p:ajax event="slideEnd" update="displayRange" process="timeFrom,timeTo"/>
-                            </p:slider>
+                            <p:slider for="timeFrom,timeTo" style="width: 400px" range="true" maxValue="1440" step="15" onSlide="updateRangeLabel()"/>
                         </h:panelGrid>
                         <h:inputHidden id="timeFrom" value="#{campaignsBean.currentAction.minuteOfDayFrom}" />
                         <h:inputHidden id="timeTo" value="#{campaignsBean.currentAction.minuteOfDayTo}" />

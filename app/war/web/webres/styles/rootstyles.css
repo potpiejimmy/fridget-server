@@ -20,6 +20,8 @@ html {
 
 #root_header {
     background-color: #c00;
+    background-image: url("../img/backcloud.png");
+    background-repeat: repeat;
     font-family: 'Noto Sans', sans-serif;
     font-size: 13pt;
     padding: 10px;
@@ -67,6 +69,12 @@ html {
 .ui-datatable.borderless tbody td {
     border-style: none;
     padding: 5px 0px;
+}
+
+.ui-panel .ui-panel-titlebar,
+.ui-tabmenu .ui-tabmenu-nav {
+    background-image: url("../img/backcloud.png");
+    background-repeat: repeat;
 }
 
 .topAlign {
